@@ -1,8 +1,10 @@
 ---
-name: 🐛 버그 리포트 (Bug Report)
+name: "\U0001F41B 버그 리포트 (Bug Report)"
 about: 버그를 발견했을 때 사용하는 템플릿입니다.
 title: "[버그] "
-labels: bug, needs triage
+labels: bug
+assignees: ZELDA31777
+
 ---
 
 ### 🔥 발생한 버그

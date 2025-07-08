@@ -1,8 +1,10 @@
 ---
-name: ✨ 기능 요청 (Feature Request)
+name: "✨ 기능 요청 (Feature Request)"
 about: 새로운 기능을 제안할 때 사용하는 템플릿입니다.
 title: "[기능] "
-labels: feature, needs triage
+labels: ''
+assignees: ''
+
 ---
 
 ### 💡 제안 배경
