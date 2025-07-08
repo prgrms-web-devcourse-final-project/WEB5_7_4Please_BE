@@ -22,7 +22,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run Backend tests and Checkstyle
-        run : | 
+        run: | 
               ./gradlew check
 
   build:
