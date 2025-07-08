@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'checkstyle'
+    id 'org.springframework.boot' version '3.5.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.deal4u'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+// Checkstyle 설정 블록 추가
+checkstyle {
+    // 1. 사용할 Checkstyle 라이브러리 버전을 지정합니다.
+    toolVersion = '10.14.2'
+
+    // 2. 사용자가 생성한 checkstyle.xml 파일의 경로를 지정합니다.
+    configFile = file("${project.rootDir}/config/codestyle/checkstyle.xml")
+
+    // 3. Checkstyle 검사 시 경고(warning)를 얼마나 허용할지 정합니다. 0으로 하면 경고가 하나라도 있으면 빌드가 실패합니다.
+    maxWarnings = 0
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('check') {
+    dependsOn 'checkstyleMain'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
