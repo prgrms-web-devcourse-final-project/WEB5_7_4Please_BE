@@ -1,13 +1,13 @@
-package com.deal4u.web5_7_4please_be;
+package com.deal4u.fourplease;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Web574PleaseBeApplication {
+public class FourPleaseBeApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Web574PleaseBeApplication.class, args);
+        SpringApplication.run(FourPleaseBeApplication.class, args);
     }
 
 }

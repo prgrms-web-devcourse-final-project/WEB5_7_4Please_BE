@@ -1,10 +1,10 @@
-package com.deal4u.web5_7_4please_be;
+package com.deal4u.fourplease;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Web574PleaseBeApplicationTests {
+class FourPleaseBeApplicationTests {
 
     @Test
     void contextLoads() {
