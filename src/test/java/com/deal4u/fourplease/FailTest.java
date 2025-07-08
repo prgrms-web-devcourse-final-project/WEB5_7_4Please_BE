@@ -9,6 +9,6 @@ class FailTest {
     @Test
     void failTest() {
         FailObject failObject = new FailObject();
-        assertThat(failObject.getValue()).isEqualTo(1);
+        assertThat(failObject.getValue(true)).isEqualTo(1);
     }
 }
