@@ -1,3 +1,8 @@
+---
+name: Open an Issue
+about: Feel free to report bugs, suggest features, or submit proposals here
+---
+
 ## 📌 제목
 [기능 | 버그 | 리팩토링 | 문서] 간단한 설명
 예시: [기능] 로그인 API 추가
