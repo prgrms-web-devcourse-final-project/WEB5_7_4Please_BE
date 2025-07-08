@@ -39,8 +39,6 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Flush Checkstyle report on the status checks
-        uses: l
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
