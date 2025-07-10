@@ -11,11 +11,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@Builder
 @Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Product extends BaseDateEntity {
 
     @Id
@@ -39,4 +45,5 @@ public class Product extends BaseDateEntity {
     private Category category;
 
     private String phone;
+
 }

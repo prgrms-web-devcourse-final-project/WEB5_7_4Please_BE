@@ -1,0 +1,36 @@
+package com.deal4u.fourplease.domain.auction.service;
+
+import com.deal4u.fourplease.domain.auction.dto.ProductCreateRequest;
+import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.Role;
+import com.deal4u.fourplease.domain.member.entity.Status;
+import java.util.List;
+
+public class TestUtils {
+
+     public static ProductCreateRequest genProductCreateRequest() {
+        return new ProductCreateRequest(
+                "칫솔",
+                "한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.",
+                "http://example.com/thumbnail.jpg",
+                List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg"),
+                4L,
+                "서울시 강남구",
+                "101동 102호",
+                "000000",
+                "010-0000-0000"
+        );
+    }
+
+    public static Member genMember() {
+         // TODO: Member 추후 확인 필요
+         return new Member(
+                 1L,
+                 "user1@user.com",
+                 "유저1",
+                 Role.USER,
+                 Status.ACTIVE
+         );
+    }
+
+}
