@@ -1,6 +1,9 @@
 package com.deal4u.fourplease.domain.auction.service;
 
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateRequest;
+import com.deal4u.fourplease.domain.auction.entity.Address;
+import com.deal4u.fourplease.domain.auction.entity.Category;
+import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
@@ -31,6 +34,21 @@ public class TestUtils {
                  Role.USER,
                  Status.ACTIVE
          );
+    }
+
+    public static Product genProduct() {
+        return Product.builder()
+                .name("칫솔")
+                .description("한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.")
+                .thumbnailUrl("http://example.com/thumbnail.jpg")
+                .address(new Address(
+                        "서울시 강남구",
+                        "101동 102호",
+                        "000000"
+                ))
+                .category(new Category(4L, "생활용품"))
+                .phone("010-0000-0000")
+                .build();
     }
 
 }

@@ -43,7 +43,7 @@ class ProductServiceTests {
 
     @Test
     @DisplayName("상품을 등록할 수 있다")
-    void product_can_be_created() throws Exception {
+    void product_can_be_saved() throws Exception {
 
         ProductCreateRequest req = genProductCreateRequest();
         Member seller = genMember();
@@ -51,12 +51,11 @@ class ProductServiceTests {
         Category category = new Category(4L, "생활용품");
         when(categoryRepository.findById(4L)).thenReturn(Optional.of(category));
 
-        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
-
         productService.save(req, seller);
 
         verify(productImageService).save(any(Product.class), eq(req.imageUrls()));
 
+        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
         verify(productRepository).save(productCaptor.capture());
         Product savedProduct = productCaptor.getValue();
 

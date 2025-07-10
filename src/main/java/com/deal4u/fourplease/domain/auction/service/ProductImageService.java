@@ -1,8 +1,8 @@
 package com.deal4u.fourplease.domain.auction.service;
 
-import com.deal4u.fourplease.domain.auction.dto.ProductImageCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.ProductImage;
+import com.deal4u.fourplease.domain.auction.mapper.ProductImageMapper;
 import com.deal4u.fourplease.domain.auction.repository.ProductImageRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +16,7 @@ public class ProductImageService {
 
     public void save(Product product, List<String> imageUrls) {
         for (String imageUrl : imageUrls) {
-            ProductImageCreateDto imgDto = new ProductImageCreateDto(product, imageUrl);
-            ProductImage productImage = imgDto.toEntity();
+            ProductImage productImage = ProductImageMapper.toEntity(product, imageUrl);
             productImageRepository.save(productImage);
         }
     }
