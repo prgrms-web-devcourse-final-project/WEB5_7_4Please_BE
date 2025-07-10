@@ -8,18 +8,20 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.RequiredArgsConstructor;
 
-public class LockStore {
+public class NamedLockStoreImpl implements NameLockStore {
 
     private final Map<String, MyKeyHolder> keyStore = new ConcurrentHashMap<>();
     private final Map<String, Integer> counts = new HashMap<>();
     private final Map<String, ReadWriteLock> locks = new ConcurrentHashMap<>();
 
-    public MyLock getSharedLock(String lockName) {
-        return new MySharedLockImpl(lockName);
+    @Override
+    public NamedLock getPassLock(String lockName) {
+        return new NamedSharedLockImpl(lockName);
     }
 
-    public MyLock getExclusiveLock(String lockName) {
-        return new MyExclusiveLockImpl(lockName);
+    @Override
+    public NamedLock getBottleLock(String lockName) {
+        return new NamedExclusiveLockImpl(lockName);
     }
 
     private ReadWriteLock getLock(String key) {
@@ -52,12 +54,12 @@ public class LockStore {
         private final String key;
     }
 
-    private abstract class AbstractMyLock implements MyLock {
+    private abstract class AbstractNamedLock implements NamedLock {
 
         private final String key;
         private Lock lock;
 
-        public AbstractMyLock(String key) {
+        public AbstractNamedLock(String key) {
             this.key = key;
         }
 
@@ -82,9 +84,9 @@ public class LockStore {
         protected abstract Lock getTargetLock(String key);
     }
 
-    private class MySharedLockImpl extends AbstractMyLock {
+    private class NamedSharedLockImpl extends AbstractNamedLock {
 
-        public MySharedLockImpl(String key) {
+        public NamedSharedLockImpl(String key) {
             super(key);
         }
 
@@ -94,9 +96,9 @@ public class LockStore {
         }
     }
 
-    private class MyExclusiveLockImpl extends AbstractMyLock {
+    private class NamedExclusiveLockImpl extends AbstractNamedLock {
 
-        public MyExclusiveLockImpl(String key) {
+        public NamedExclusiveLockImpl(String key) {
             super(key);
         }
 

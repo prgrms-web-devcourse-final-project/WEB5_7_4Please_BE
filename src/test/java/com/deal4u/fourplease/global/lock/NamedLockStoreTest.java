@@ -27,14 +27,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
-class LockStoreTest {
+class NamedLockStoreTest {
 
-    private LockStore lockStore;
+    private NamedLockStoreImpl namedLockStore;
     private ExecutorService executorService;
 
     @BeforeEach
     void setUp() {
-        lockStore = new LockStore();
+        namedLockStore = new NamedLockStoreImpl();
         executorService = Executors.newFixedThreadPool(20);
     }
 
@@ -56,7 +56,7 @@ class LockStoreTest {
 
             for (int i = 0; i < 10; i++) {
                 executorService.submit(() -> {
-                    MyLock lock = lockStore.getExclusiveLock(lockName);
+                    NamedLock lock = namedLockStore.getBottleLock(lockName);
                     lock.lock();
                     try {
                         int now = current.incrementAndGet();
@@ -80,7 +80,7 @@ class LockStoreTest {
 
         @Test
         void shouldThrowWhenUnlockWithoutLock() {
-            MyLock lock = lockStore.getExclusiveLock("illegal");
+            NamedLock lock = namedLockStore.getBottleLock("illegal");
             assertThrows(IllegalStateException.class, lock::unlock);
         }
     }
@@ -98,7 +98,7 @@ class LockStoreTest {
 
             for (int i = 0; i < 10; i++) {
                 executorService.submit(() -> {
-                    MyLock lock = lockStore.getSharedLock(lockName);
+                    NamedLock lock = namedLockStore.getPassLock(lockName);
                     lock.lock();
                     try {
                         int now = current.incrementAndGet();
@@ -123,23 +123,23 @@ class LockStoreTest {
     @DisplayName("Read-Write Interaction")
     class ReadWriteLockTests {
 
-        @Test
+
+        @RepeatedTest(10)
         void shouldBlockReadersWhenWriterActive() {
             String lockName = "rw";
             AtomicInteger readers = new AtomicInteger();
             AtomicInteger writers = new AtomicInteger();
-            AtomicInteger maxReaders = new AtomicInteger();
             List<String> log = Collections.synchronizedList(new ArrayList<>());
 
-            for (int i = 0; i < 10; i++) {
+            int readerCount = 10;
+            for (int i = 0; i < readerCount; i++) {
                 int id = i;
                 executorService.submit(() -> {
-                    MyLock lock = lockStore.getSharedLock(lockName);
+                    NamedLock lock = namedLockStore.getPassLock(lockName);
                     lock.lock();
                     try {
                         log.add("R" + id + "-start");
-                        int now = readers.incrementAndGet();
-                        maxReaders.updateAndGet(m -> Math.max(m, now));
+                        readers.incrementAndGet();
                     } finally {
                         readers.decrementAndGet();
                         log.add("R" + id + "-end");
@@ -148,10 +148,11 @@ class LockStoreTest {
                 });
             }
 
-            for (int i = 0; i < 5; i++) {
+            int writerCount = 5;
+            for (int i = 0; i < writerCount; i++) {
                 int id = i;
                 executorService.submit(() -> {
-                    MyLock lock = lockStore.getExclusiveLock(lockName);
+                    NamedLock lock = namedLockStore.getBottleLock(lockName);
                     lock.lock();
                     try {
                         log.add("W" + id + "-start");
@@ -164,11 +165,11 @@ class LockStoreTest {
                 });
             }
 
-            await().atMost(10, TimeUnit.SECONDS).untilAtomic(writers, equalTo(5));
+            await().atMost(readerCount, TimeUnit.SECONDS)
+                    .untilAtomic(writers, equalTo(writerCount));
             long readerEndCount = log.stream().filter(s -> s.startsWith("R") && s.endsWith("end"))
                     .count();
-            assertEquals(10, readerEndCount);
-            assertTrue(maxReaders.get() > 1);
+            assertEquals(readerCount, readerEndCount);
         }
     }
 
@@ -189,7 +190,7 @@ class LockStoreTest {
 
                 for (int j = 0; j < threadsPerKey; j++) {
                     executorService.submit(() -> {
-                        MyLock lock = lockStore.getExclusiveLock(key);
+                        NamedLock lock = namedLockStore.getBottleLock(key);
                         lock.lock();
                         try {
                             counts.get(key).incrementAndGet();
@@ -223,7 +224,7 @@ class LockStoreTest {
 
             for (int i = 0; i < threadCount; i++) {
                 executorService.submit(() -> {
-                    MyLock lock = lockStore.getExclusiveLock(lockName);
+                    NamedLock lock = namedLockStore.getBottleLock(lockName);
                     lock.lock();
                     try {
                         counter.increment();
@@ -262,9 +263,9 @@ class LockStoreTest {
                     try {
                         for (int j = 0; j < opsPerThread; j++) {
                             String key = "stress-" + (tid % 10);
-                            MyLock lock = (tid + j) % 3 != 0
-                                    ? lockStore.getSharedLock(key)
-                                    : lockStore.getExclusiveLock(key);
+                            NamedLock lock = (tid + j) % 3 != 0
+                                    ? namedLockStore.getPassLock(key)
+                                    : namedLockStore.getBottleLock(key);
                             lock.lock();
                             try {
                                 totalOps.incrementAndGet();

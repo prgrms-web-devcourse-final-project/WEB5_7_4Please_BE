@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.global.lock;
 
-public interface MyLock {
+public interface NamedLock {
 
     void lock();
 
