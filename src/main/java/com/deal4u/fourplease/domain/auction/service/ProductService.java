@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.domain.auction.service;
 
-import com.deal4u.fourplease.domain.auction.dto.ProductCreateRequest;
+import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
+import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.CategoryRepository;
@@ -20,7 +21,8 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductImageService productImageService;
 
-    public void save(ProductCreateRequest request, Member member) {
+    @Transactional
+    public void save(ProductCreateDto request, Member member) {
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() ->
                         ErrorCode.ENTITY_NOT_FOUND.toException(

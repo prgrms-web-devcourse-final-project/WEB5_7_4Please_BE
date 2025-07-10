@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.auction.service;
 
-import com.deal4u.fourplease.domain.auction.dto.ProductCreateRequest;
+import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
@@ -11,8 +11,8 @@ import java.util.List;
 
 public class TestUtils {
 
-     public static ProductCreateRequest genProductCreateRequest() {
-        return new ProductCreateRequest(
+     public static ProductCreateDto genProductCreateDto() {
+        return new ProductCreateDto(
                 "칫솔",
                 "한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.",
                 "http://example.com/thumbnail.jpg",
