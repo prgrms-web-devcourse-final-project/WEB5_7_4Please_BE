@@ -12,7 +12,7 @@ public class LockStore {
 
     private final Map<String, MyKeyHolder> keyStore = new ConcurrentHashMap<>();
     private final Map<String, Integer> counts = new HashMap<>();
-    private final Map<String, ReadWriteLock> locks = new HashMap<>();
+    private final Map<String, ReadWriteLock> locks = new ConcurrentHashMap<>();
 
     public MyLock getSharedLock(String lockName) {
         return new MySharedLockImpl(lockName);
@@ -26,8 +26,7 @@ public class LockStore {
         MyKeyHolder keyHolder = getKeyHolder(key);
         synchronized (keyHolder) {
             counts.put(key, counts.getOrDefault(key, 0) + 1);
-            return locks.computeIfAbsent(key,
-                    value -> new ReentrantReadWriteLock(true));
+            return locks.computeIfAbsent(key, value -> new ReentrantReadWriteLock(true));
         }
     }
 
@@ -47,6 +46,7 @@ public class LockStore {
     }
 
     @RequiredArgsConstructor
+    @SuppressWarnings("unused")
     private static class MyKeyHolder {
 
         private final String key;
