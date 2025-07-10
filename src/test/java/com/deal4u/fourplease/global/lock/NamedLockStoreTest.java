@@ -29,12 +29,12 @@ import org.junit.jupiter.api.Test;
 
 class NamedLockStoreTest {
 
-    private NamedLockStoreImpl namedLockStore;
+    private NamedLockProvider namedLockStore;
     private ExecutorService executorService;
 
     @BeforeEach
     void setUp() {
-        namedLockStore = new NamedLockStoreImpl();
+        namedLockStore = new NamedLockProvider();
         executorService = Executors.newFixedThreadPool(20);
     }
 
