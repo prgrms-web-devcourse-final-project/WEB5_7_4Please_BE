@@ -19,4 +19,8 @@ public class OrderId {
     public static OrderId generate() {
         return new OrderId(OrderIdGenerator.generate());
     }
+
+    public static OrderId create(String orderId) {
+        return new OrderId(orderId);
+    }
 }
