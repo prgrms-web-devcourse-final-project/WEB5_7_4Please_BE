@@ -94,7 +94,7 @@ class AuctionServiceTests {
         );
 
         when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId)).thenReturn(bidList);
-        when(auctionRepository.findById(auctionId)).thenReturn(Optional.of(auction));
+        when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
 
         when(productImageListResp.toProductImageUrlList()).thenReturn(productImageUrls);
         when(productImageService.getByProduct(product)).thenReturn(productImageListResp);
@@ -120,8 +120,10 @@ class AuctionServiceTests {
     void throws_if_auction_not_exist() throws Exception {
 
         Long auctionId = 1L;
+        List<Long> bidList = List.of(200_0000L, 150_0000L, 100_0000L);
 
-        when(auctionRepository.findById(auctionId)).thenReturn(Optional.empty());
+        when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId)).thenReturn(bidList);
+        when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(
                 () -> {
