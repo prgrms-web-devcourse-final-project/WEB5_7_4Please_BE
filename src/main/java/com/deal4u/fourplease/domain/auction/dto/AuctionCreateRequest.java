@@ -2,8 +2,10 @@ package com.deal4u.fourplease.domain.auction.dto;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionDuration;
+import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.BidPeriod;
 import com.deal4u.fourplease.domain.auction.entity.Product;
+import com.deal4u.fourplease.domain.member.entity.Member;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -69,11 +71,14 @@ public record AuctionCreateRequest(
                 .startingPrice(startingPrice)
                 .instantBidPrice(buyNowPrice)
                 .duration(new AuctionDuration(startDate, bidPeriod.getEndTime(startDate)))
+                .status(AuctionStatus.OPEN)
+                .deleted(false)
                 .build();
     }
 
-    public ProductCreateDto toProductCreateDto() {
+    public ProductCreateDto toProductCreateDto(Member member) {
         return new ProductCreateDto(
+                member,
                 productName,
                 description,
                 thumbnailUrl,

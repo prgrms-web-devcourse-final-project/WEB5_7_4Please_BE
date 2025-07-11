@@ -48,4 +48,6 @@ public class Product extends BaseDateEntity {
 
     private String phone;
 
+    private Boolean deleted;
+
 }

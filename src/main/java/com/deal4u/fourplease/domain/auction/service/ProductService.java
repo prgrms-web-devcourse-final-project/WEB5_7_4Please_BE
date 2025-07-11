@@ -1,7 +1,6 @@
 package com.deal4u.fourplease.domain.auction.service;
 
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
-import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.CategoryRepository;
@@ -22,17 +21,18 @@ public class ProductService {
     private final ProductImageService productImageService;
 
     @Transactional
-    public void save(ProductCreateDto request, Member member) {
+    public Product save(ProductCreateDto request) {
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() ->
                         ErrorCode.ENTITY_NOT_FOUND.toException(
                                 "id %d에 해당하는 카테고리가 없습니다.", request.categoryId()
                         )
                 );
-        Product product = request.toEntity(member, category);
+        Product product = request.toEntity(category);
         productImageService.save(product, request.imageUrls());
 
         productRepository.save(product);
+        return product;
     }
 
 }
