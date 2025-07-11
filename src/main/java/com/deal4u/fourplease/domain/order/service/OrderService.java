@@ -20,12 +20,10 @@ import com.deal4u.fourplease.domain.order.repository.TempAuctionRepository;
 import com.deal4u.fourplease.domain.order.repository.TempBidRepository;
 import com.deal4u.fourplease.domain.order.repository.TempMemberRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class OrderService {
 
