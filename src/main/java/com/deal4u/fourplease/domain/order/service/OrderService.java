@@ -101,7 +101,7 @@ public class OrderService {
     }
 
     private Order findOrderOrThrow(Long orderId) {
-        return orderRepository.findById(orderId)
+        return orderRepository.findByIdWithAuctionAndProduct(orderId)
                 .orElseThrow(ORDER_NOT_FOUND::toException);
     }
 }

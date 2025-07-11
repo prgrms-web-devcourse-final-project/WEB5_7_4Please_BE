@@ -281,7 +281,8 @@ class OrderServiceTest {
                     .orderer(Orderer.createOrderer(ordererMember))
                     .build();
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            when(orderRepository.findByIdWithAuctionAndProduct(orderId)).thenReturn(
+                    Optional.of(order));
 
             // When
             OrderResponse result = orderService.getOrder(orderId);
@@ -293,7 +294,7 @@ class OrderServiceTest {
             assertThat(result.imageUrl()).isEqualTo(
                     order.getAuction().getProduct().getThumbnailUrl());
 
-            verify(orderRepository, times(1)).findById(orderId);
+            verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
         }
 
         @Test
@@ -302,7 +303,8 @@ class OrderServiceTest {
             // Given
             Long orderId = 999L;
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+            when(orderRepository.findByIdWithAuctionAndProduct(orderId)).thenReturn(
+                    Optional.empty());
 
             // When, Then
             assertThatThrownBy(() -> orderService.getOrder(orderId))
@@ -349,7 +351,8 @@ class OrderServiceTest {
                     "박유한"
             );
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            when(orderRepository.findByIdWithAuctionAndProduct(orderId)).thenReturn(
+                    Optional.of(order));
 
             // When
             orderService.updateOrder(orderId, updateRequest);
@@ -362,7 +365,7 @@ class OrderServiceTest {
             assertThat(order.getContent()).isEqualTo("새로운 요청사항");
             assertThat(order.getReceiver()).isEqualTo("박유한");
 
-            verify(orderRepository, times(1)).findById(orderId);
+            verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
         }
 
         @Test
@@ -380,7 +383,8 @@ class OrderServiceTest {
                     "박유한"
             );
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+            when(orderRepository.findByIdWithAuctionAndProduct(orderId)).thenReturn(
+                    Optional.empty());
 
             // When, Then
             assertThatThrownBy(() -> orderService.updateOrder(orderId, updateRequest))
@@ -389,7 +393,7 @@ class OrderServiceTest {
                     .extracting("status")
                     .isEqualTo(HttpStatus.NOT_FOUND);
 
-            verify(orderRepository, times(1)).findById(orderId);
+            verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
         }
     }
 }
