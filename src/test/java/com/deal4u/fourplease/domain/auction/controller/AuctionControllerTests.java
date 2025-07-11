@@ -1,0 +1,53 @@
+package com.deal4u.fourplease.domain.auction.controller;
+
+import static com.deal4u.fourplease.domain.auction.service.TestUtils.genAuctionCreateRequest;
+import static com.deal4u.fourplease.domain.auction.service.TestUtils.genMember;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
+import com.deal4u.fourplease.domain.auction.service.AuctionService;
+import com.deal4u.fourplease.domain.member.entity.Member;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+@WebMvcTest(AuctionController.class)
+class AuctionControllerTests {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private AuctionService auctionService;
+
+    @Test
+    @DisplayName("POST /api/v1/auctions가 성공하면 경매를 등록한 후 201을 반환한다")
+    void createAuction_should_return_201() throws Exception {
+
+        AuctionCreateRequest req = genAuctionCreateRequest();
+        Member member = genMember();
+
+        mockMvc.perform(
+                post("/api/v1/auctions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(req))
+        ).andExpect(status().isCreated())
+                .andDo(print());
+
+        verify(auctionService).save(any(AuctionCreateRequest.class), any(Member.class));
+
+    }
+
+}

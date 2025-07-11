@@ -2,7 +2,6 @@ package com.deal4u.fourplease.domain.auction.controller;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
-import com.deal4u.fourplease.domain.auction.service.ProductService;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuctionController {
 
     private final AuctionService auctionService;
-    private final ProductService productService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void createAuction(
             @Valid @RequestBody AuctionCreateRequest request,
+            //TODO: @AuthenticationPrincipal 추가
             Member member
     ) {
         auctionService.save(request, member);

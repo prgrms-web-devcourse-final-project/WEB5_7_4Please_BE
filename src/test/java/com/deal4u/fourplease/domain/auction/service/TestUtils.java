@@ -58,7 +58,7 @@ public class TestUtils {
                 .build();
     }
 
-    static AuctionCreateRequest genAuctionCreateRequest() {
+    public static AuctionCreateRequest genAuctionCreateRequest() {
         return new AuctionCreateRequest(
                 "칫솔",
                 "한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.",
