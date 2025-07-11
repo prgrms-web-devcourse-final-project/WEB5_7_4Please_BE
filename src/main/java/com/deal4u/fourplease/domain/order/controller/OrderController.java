@@ -6,6 +6,7 @@ import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
 import com.deal4u.fourplease.domain.order.service.OrderService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class OrderController {
     public String createOrder(
             @PathVariable @Positive Long auctionId,
             @PathVariable String type,
-            @RequestBody OrderCreateRequest orderCreateRequest
+            @RequestBody @Valid OrderCreateRequest orderCreateRequest
     ) {
         return orderService.saveOrder(auctionId, type, orderCreateRequest);
     }
@@ -59,7 +60,7 @@ public class OrderController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateOrder(
             @PathVariable @Positive Long orderId,
-            @RequestBody OrderUpdateRequest orderUpdateRequest
+            @RequestBody @Valid OrderUpdateRequest orderUpdateRequest
     ) {
         orderService.updateOrder(orderId, orderUpdateRequest);
     }
