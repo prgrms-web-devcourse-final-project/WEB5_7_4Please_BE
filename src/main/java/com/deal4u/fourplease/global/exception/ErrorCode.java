@@ -13,7 +13,11 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
     INVALID_AUCTION_BIDDER(HttpStatus.BAD_REQUEST, "해당 사용자는 경매의 낙찰자가 아닙니다."),
-    INVALID_ORDER_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 타입입니다.");
+    INVALID_ORDER_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 타입입니다."),
+
+    INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 주문 금액과 일치하지 않습니다."),
+    INVALID_USER(HttpStatus.BAD_REQUEST, "결제자 정보가 올바르지 않습니다."),
+    PAYMENT_CONFIRMATION_FAILED(HttpStatus.BAD_REQUEST, "결제 승인이 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;
