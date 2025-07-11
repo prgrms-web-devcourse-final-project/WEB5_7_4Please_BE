@@ -56,11 +56,11 @@ public record AuctionCreateRequest(
         BidPeriod bidPeriod,
 
         @NotNull(message = "경매 시작가를 입력해 주세요.")
-        @DecimalMin(value = "0.0", inclusive = false)
+        @DecimalMin(value = "0.0")
         @Digits(integer = 15, fraction = 0)
         BigDecimal startingPrice,
 
-        @DecimalMin(value = "0.0", inclusive = false)
+        @DecimalMin(value = "0.0")
         @Digits(integer = 15, fraction = 0)
         BigDecimal buyNowPrice
 

@@ -5,7 +5,6 @@ import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.CategoryRepository;
 import com.deal4u.fourplease.domain.auction.repository.ProductRepository;
-import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,11 +22,7 @@ public class ProductService {
     @Transactional
     public Product save(ProductCreateDto request) {
         Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(() ->
-                        ErrorCode.ENTITY_NOT_FOUND.toException(
-                                "id %d에 해당하는 카테고리가 없습니다.", request.categoryId()
-                        )
-                );
+                .orElseThrow(ErrorCode.ENTITY_NOT_FOUND::toException);
         Product product = request.toEntity(category);
         productImageService.save(product, request.imageUrls());
 
