@@ -37,11 +37,12 @@ public class PaymentService {
         OrderId orderId = OrderId.create(tossPaymentConfirmRequest.orderId());
 
         // todo: 컨텍스트 홀더를 통해 주문자와 현재 로그인한 사용자가 동일한 유저인지 검증 필요
+        Order order = findOrderOrThrow(orderId);
         NamedLock lock = namedLockProvider.getBottleLock(orderId.toString());
+
         lock.lock();
 
         try {
-            Order order = findOrderOrThrow(orderId);
             TossPaymentConfirmResponse response =
                     tossApiClient.confirmPayment(tossPaymentConfirmRequest);
             validatePayment(tossPaymentConfirmRequest, order, response);

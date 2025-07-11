@@ -11,7 +11,6 @@ public class OrderMapper {
         // 인스턴스화 방지
     }
 
-
     public static OrderResponse toOrderResponse(Order order) {
         Product product = order.getAuction().getProduct();
         Address address = order.getAddress();

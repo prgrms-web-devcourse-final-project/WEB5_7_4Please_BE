@@ -19,7 +19,6 @@ public record OrderCreateRequest(
         @NotNull(message = "회원 ID는 필수 입력 항목입니다.")
         Long memberId
 ) {
-
     public static Order toEntity(OrderCreateRequest createRequest, Auction auction, Orderer orderer,
                                  OrderId orderId) {
         return Order.builder()
