@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.auth;
 
-import com.deal4u.fourplease.domain.auth.client.GoogleOAuthClient;
+import com.deal4u.fourplease.domain.auth.model.GoogleOAuthClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

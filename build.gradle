@@ -35,6 +35,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5' // 핵심 JWT 인터페이스 & 빌더 API
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5' // 실제 JWT 구현체
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JWT를 JSON으로 직렬화/역직렬화 하는데 사용
+
+
     testImplementation 'org.springframework.security:spring-security-test'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -52,6 +58,8 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
+
+
 }
 
 tasks.named('check') {
