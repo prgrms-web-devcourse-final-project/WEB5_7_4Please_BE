@@ -1,5 +1,8 @@
 package com.deal4u.fourplease.domain.bid.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.deal4u.fourplease.config.BidWebSocketHandler;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
@@ -19,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -57,16 +58,19 @@ class BidServiceIntegrationTest {
         BidRequest initialRequest = new BidRequest(auctionId, initialBidPrice);
         // H2 DB에 실제 데이터 등록
         bidService.createBid(memberIdA, initialRequest);
-        Member member = memberRepository.findById(memberIdA).orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
+        Member member = memberRepository.findById(memberIdA)
+                .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
         Bidder bidder = new Bidder(member);
-        Auction auction = auctionRepository.findById(auctionId).orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
-        this.initialBid = bidRepository.findByAuctionAndBidder(auction, bidder).orElseThrow(ErrorCode.BID_NOT_FOUND::toException);
+        this.initialBid = bidRepository.findByAuctionAndBidder(auction, bidder)
+                .orElseThrow(ErrorCode.BID_NOT_FOUND::toException);
     }
 
     @Test
     @DisplayName("신규 입찰 (기존 최대 입찰가보다 낮은 경우)")
-    void createBid_Lower_Price_IntegrationTest() {
+    void create_bid_lower_price_integrationtest() {
         // memberId = 1인 유저가 이미 입찰되어 있기 때문에 (입찰자`A`)
         // memberId = 2인 유저로 입찰 (입찰자`B`)
         BidRequest request = new BidRequest(auctionId, 120_000);
@@ -75,7 +79,7 @@ class BidServiceIntegrationTest {
 
     @Test
     @DisplayName("신규 입찰 (기존 최대 입찰가보다 높은 경우)")
-    void createBid_Higher_Price_IntegrationTest() {
+    void create_bid_higher_price_integrationtest() {
         // memberId = 1인 유저가 이미 입찰되어 있기 때문에 (입찰자`A`)
         // memberId = 2인 유저로 입찰 (입찰자`B`)
         BidRequest request = new BidRequest(auctionId, 180_000);
@@ -84,7 +88,7 @@ class BidServiceIntegrationTest {
 
     @Test
     @DisplayName("입찰 갱신 성공 (기본 입찰가보다 높은 금액)")
-    void updateBid_Higher_Price_IntegrationTest() {
+    void update_bid_higher_price_integrationtest() {
         // 1. 입찰자`A`의 신규 입찰 객체 생성
         BidRequest updateRequest = new BidRequest(auctionId, 180_000);
 
@@ -94,7 +98,7 @@ class BidServiceIntegrationTest {
 
     @Test
     @DisplayName("입찰 갱신 실패 (기본 입찰가보다 낮은 금액)")
-    void updateBid_Lower_Price_IntegrationTest() {
+    void update_bid_lower_price_integrationtest() {
         // 1. 입찰자`A`의 신규 입찰 객체 생성
         BidRequest updateRequest = new BidRequest(auctionId, 100_000);
 
@@ -109,7 +113,7 @@ class BidServiceIntegrationTest {
 
     @Test
     @DisplayName("입찰 갱신 실패 (입찰 유저가 존재하지 않는 경우)")
-    void updateBid_Not_Matched_Member_IntegrationTest() {
+    void update_bid_not_matched_member_integrationtest() {
         // 1. MEMBER_NOT_FOUND `ErrorCode`에 대해 `Exception`이 발생하는지 검증
         GlobalException exception = assertThrows(GlobalException.class, () -> {
             bidService.deleteBid(memberIdC, auctionId);
@@ -121,13 +125,13 @@ class BidServiceIntegrationTest {
 
     @Test
     @DisplayName("입찰 취소 성공")
-    void deleteBid_IntegrationTest() {
+    void delete_bid_integrationtest() {
         bidService.deleteBid(memberIdA, initialBid.getBidId());
     }
 
     @Test
     @DisplayName("입찰 취소 실패 (유저가 존재하지 않는 경우)")
-    void deleteBid_Not_Matched_Member_IntegrationTest() {
+    void delete_bid_not_matched_member_integrationtest() {
         // 1. MEMBER_NOT_FOUND `ErrorCode`에 대해 `Exception`이 발생하는지 검증
         GlobalException exception = assertThrows(GlobalException.class, () -> {
             bidService.deleteBid(memberIdC, initialBid.getBidId());
@@ -139,7 +143,7 @@ class BidServiceIntegrationTest {
 
     @Test
     @DisplayName("입찰 취소 실패 (유저가 일치하지 않는 경우)")
-    void deleteBid_Not_Matched_Bid_IntegrationTest() {
+    void delete_bid_not_matched_bid_integrationtest() {
         // 1. BID_NOT_FOUND `ErrorCode`에 대해 `Exception`이 발생하는지 검증
         GlobalException exception = assertThrows(GlobalException.class, () -> {
             bidService.deleteBid(memberIdB, initialBid.getBidId());
