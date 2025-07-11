@@ -1,18 +1,18 @@
 package com.deal4u.fourplease.domain.auction.service;
 
 import static com.deal4u.fourplease.domain.auction.service.TestUtils.*;
-import static com.deal4u.fourplease.domain.auction.validator.Validator.validateListNotEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auction.dto.ProductImageListResponse;
-import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.ProductImage;
 import com.deal4u.fourplease.domain.auction.repository.ProductImageRepository;
+import com.deal4u.fourplease.global.exception.GlobalException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,5 +80,23 @@ class ProductImageServiceTests {
 
     }
 
+    @Test
+    @DisplayName("productId로 조회한 이미지 리스트가 빈 값이면 400 예외가 발생한다")
+    void throw_if_image_list_empty() throws Exception {
+
+        Product product = genProduct();
+        List<ProductImage> productImageList = List.of();
+
+        when(productImageRepository.findByProductId(product.getProductId()))
+                .thenReturn(productImageList);
+
+        assertThatThrownBy(
+                () -> {
+                    productImageService.getByProduct(product);
+                }
+        ).isInstanceOf(GlobalException.class)
+                .hasMessage("빈 리스트 입니다.");
+
+    }
 
 }

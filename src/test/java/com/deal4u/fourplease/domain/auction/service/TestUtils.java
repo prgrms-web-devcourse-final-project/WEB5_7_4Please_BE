@@ -3,6 +3,7 @@ package com.deal4u.fourplease.domain.auction.service;
 import static org.mockito.Mockito.mock;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
+import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.BidPeriod;
@@ -73,6 +74,22 @@ public class TestUtils {
                 BidPeriod.THREE,
                 BigDecimal.valueOf(100_000),
                 null
+        );
+    }
+
+    public static AuctionDetailResponse genAuctionDetailResponse() {
+        return new AuctionDetailResponse(
+                BigDecimal.valueOf(200_0000),
+                null,
+                20,
+                BigDecimal.valueOf(100_0000),
+                "칫솔",
+                4L,
+                "생활용품",
+                "한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.",
+                LocalDateTime.now(),
+                "http://example.com/thumbnail.jpg",
+                List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
         );
     }
 

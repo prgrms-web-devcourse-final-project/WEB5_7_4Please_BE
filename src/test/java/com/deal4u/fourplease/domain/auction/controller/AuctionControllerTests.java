@@ -1,17 +1,22 @@
 package com.deal4u.fourplease.domain.auction.controller;
 
 import static com.deal4u.fourplease.domain.auction.service.TestUtils.genAuctionCreateRequest;
-import static com.deal4u.fourplease.domain.auction.service.TestUtils.genMember;
+import static com.deal4u.fourplease.domain.auction.service.TestUtils.genAuctionDetailResponse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
+import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +42,6 @@ class AuctionControllerTests {
     void createAuction_should_return_201() throws Exception {
 
         AuctionCreateRequest req = genAuctionCreateRequest();
-        Member member = genMember();
 
         mockMvc.perform(
                 post("/api/v1/auctions")
@@ -49,5 +53,24 @@ class AuctionControllerTests {
         verify(auctionService).save(any(AuctionCreateRequest.class), any(Member.class));
 
     }
+
+    @Test
+    @DisplayName("GET /api/v1/auctions/{auctionId}/description이 성공하면 Id의 경매 정보와 200을 반환한다")
+    void readAuction_should_return_200() throws Exception {
+
+        Long auctionId = 1L;
+        AuctionDetailResponse resp = genAuctionDetailResponse();
+
+        when(auctionService.getByAuctionId(auctionId)).thenReturn(resp);
+
+        mockMvc.perform(
+                get("/api/v1/auctions/{auctionId}/description", auctionId)
+        ).andExpect(status().isOk())
+        .andExpect(jsonPath("$.productName").value(resp.productName()))
+        .andExpect(jsonPath("$.description").value(resp.description()))
+        .andDo(print());
+
+    }
+
 
 }
