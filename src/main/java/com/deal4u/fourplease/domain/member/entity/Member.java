@@ -32,5 +32,8 @@ public class Member extends BaseDateEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Status status;
 }
