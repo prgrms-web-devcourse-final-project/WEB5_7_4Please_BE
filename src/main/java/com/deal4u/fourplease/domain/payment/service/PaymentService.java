@@ -34,6 +34,7 @@ public class PaymentService {
         OrderId orderId = OrderId.create(tossPaymentConfirmRequest.orderId());
 
         // Todo: 컨텍스트 홀더에서 결제자와 로그인한 유저가 동일한지 검증하는 로직 필요
+        // Todo: 락 처리 추가
 
         Order order = findOrderOrThrow(orderId);
 
