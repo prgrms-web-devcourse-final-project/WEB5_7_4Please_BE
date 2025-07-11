@@ -1,7 +1,5 @@
 package com.deal4u.fourplease.domain.auction.service;
 
-import static com.deal4u.fourplease.domain.auction.validator.Validator.validateListNotEmpty;
-
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;

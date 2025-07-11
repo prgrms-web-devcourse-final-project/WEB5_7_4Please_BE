@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +40,12 @@ public class AuctionController {
     @ResponseStatus(HttpStatus.OK)
     public AuctionDetailResponse readAuction(@PathVariable @Positive Long auctionId) {
         return auctionService.getByAuctionId(auctionId);
+    }
+
+    @DeleteMapping("{auctionId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAuction(@PathVariable @Positive Long auctionId) {
+        auctionService.deleteByAuctionId(auctionId);
     }
 
 }

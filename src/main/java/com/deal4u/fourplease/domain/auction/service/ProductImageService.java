@@ -28,11 +28,23 @@ public class ProductImageService {
 
     @Transactional(readOnly = true)
     public ProductImageListResponse getByProduct(Product product) {
-        List<ProductImage> productImageList = productImageRepository.findByProductId(
-                product.getProductId());
+        List<ProductImage> productImageList = findByProduct(product);
 
         validateListNotEmpty(productImageList);
 
         return new ProductImageListResponse(productImageList);
+    }
+
+    @Transactional
+    public void deleteProductImage(Product product) {
+        List<ProductImage> targetProductImageList = findByProduct(product);
+
+        validateListNotEmpty(targetProductImageList);
+
+        productImageRepository.deleteAll(targetProductImageList);
+    }
+
+    private List<ProductImage> findByProduct(Product product) {
+        return productImageRepository.findByProductId(product.getProductId());
     }
 }

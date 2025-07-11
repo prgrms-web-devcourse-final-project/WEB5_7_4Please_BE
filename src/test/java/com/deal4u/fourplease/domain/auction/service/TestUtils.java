@@ -9,6 +9,7 @@ import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.BidPeriod;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
+import com.deal4u.fourplease.domain.auction.entity.ProductImage;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
@@ -93,4 +94,10 @@ public class TestUtils {
         );
     }
 
+    public static List<ProductImage> genProductImageList(Product product) {
+        return List.of(
+                new ProductImage(1L, product, "http://example.com/image1.jpg"),
+                new ProductImage(2L, product, "http://example.com/image2.jpg")
+        );
+    }
 }

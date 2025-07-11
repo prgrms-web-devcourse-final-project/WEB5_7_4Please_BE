@@ -30,4 +30,9 @@ public class ProductService {
         return product;
     }
 
+    @Transactional
+    public void deleteProduct(Product targetProduct) {
+        productImageService.deleteProductImage(targetProduct);
+        targetProduct.softDelete();
+    }
 }

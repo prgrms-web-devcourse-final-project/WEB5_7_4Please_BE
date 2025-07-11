@@ -5,6 +5,7 @@ import static com.deal4u.fourplease.domain.auction.service.TestUtils.genAuctionD
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -44,10 +45,10 @@ class AuctionControllerTests {
         AuctionCreateRequest req = genAuctionCreateRequest();
 
         mockMvc.perform(
-                post("/api/v1/auctions")
-                        .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req))
-        ).andExpect(status().isCreated())
+                        post("/api/v1/auctions")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req))
+                ).andExpect(status().isCreated())
                 .andDo(print());
 
         verify(auctionService).save(any(AuctionCreateRequest.class), any(Member.class));
@@ -64,13 +65,25 @@ class AuctionControllerTests {
         when(auctionService.getByAuctionId(auctionId)).thenReturn(resp);
 
         mockMvc.perform(
-                get("/api/v1/auctions/{auctionId}/description", auctionId)
-        ).andExpect(status().isOk())
-        .andExpect(jsonPath("$.productName").value(resp.productName()))
-        .andExpect(jsonPath("$.description").value(resp.description()))
-        .andDo(print());
+                        get("/api/v1/auctions/{auctionId}/description", auctionId)
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.productName").value(resp.productName()))
+                .andExpect(jsonPath("$.description").value(resp.description()))
+                .andDo(print());
 
     }
 
+    @Test
+    @DisplayName("DELETE /api/v1/auctions/{auctionId}가 성공하면 soft delete 후 204를 반환한다")
+    void deleteAuction_should_return_204() throws Exception {
 
+        Long auctionId = 1L;
+
+        mockMvc.perform(
+                        delete("/api/v1/auctions/{auctionId}", auctionId)
+                ).andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(auctionService).deleteByAuctionId(auctionId);
+    }
 }

@@ -76,7 +76,21 @@ class ProductServiceTests {
                     productService.save(wrongRequest);
                 }
         ).isInstanceOf(GlobalException.class);
-    
+
+    }
+
+    @Test
+    @DisplayName("product를 인자로 받아 soft delete를 실행한다")
+    void deleteProduct_should_soft_delete_product_by_product() throws Exception {
+
+        Product product = genProduct();
+
+        productService.deleteProduct(product);
+
+        verify(productImageService).deleteProductImage(product);
+
+        assertThat(product.isDeleted()).isTrue();
+
     }
 
 }

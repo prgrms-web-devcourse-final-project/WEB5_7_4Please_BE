@@ -13,6 +13,7 @@ import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.ProductImage;
 import com.deal4u.fourplease.domain.auction.repository.ProductImageRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,10 +62,7 @@ class ProductImageServiceTests {
     void return_product_image_list_by_product_id() throws Exception {
 
         Product product = genProduct();
-        List<ProductImage> productImageList = List.of(
-                new ProductImage(1L, product, "http://example.com/image1.jpg"),
-                new ProductImage(2L, product, "http://example.com/image2.jpg")
-        );
+        List<ProductImage> productImageList = genProductImageList(product);
 
         when(productImageRepository.findByProductId(product.getProductId()))
                 .thenReturn(productImageList);
@@ -80,6 +78,8 @@ class ProductImageServiceTests {
 
     }
 
+
+
     @Test
     @DisplayName("productId로 조회한 이미지 리스트가 빈 값이면 400 예외가 발생한다")
     void throw_if_image_list_empty() throws Exception {
@@ -93,6 +93,39 @@ class ProductImageServiceTests {
         assertThatThrownBy(
                 () -> {
                     productImageService.getByProduct(product);
+                }
+        ).isInstanceOf(GlobalException.class)
+                .hasMessage("빈 리스트 입니다.");
+
+    }
+
+    @Test
+    @DisplayName("product를 인자로 받아 productImage 리스트를 삭제한다")
+    void productImage_list_can_be_deleted_by_product() throws Exception {
+
+        Product product = genProduct();
+        List<ProductImage> productImageList = genProductImageList(product);
+
+        when(productImageRepository.findByProductId(product.getProductId()))
+                .thenReturn(productImageList);
+
+        productImageService.deleteProductImage(product);
+
+        verify(productImageRepository).deleteAll(productImageList);
+    }
+
+    @Test
+    @DisplayName("product에 해당하는 이미지 url 리스트가 없을 경우 400 예외가 발생한다")
+    void throws_if_image_urls_not_exist() throws Exception {
+
+        Product product = genProduct();
+
+        when(productImageRepository.findByProductId(product.getProductId()))
+                .thenReturn(Collections.emptyList());
+
+        assertThatThrownBy(
+                () -> {
+                    productImageService.deleteProductImage(product);
                 }
         ).isInstanceOf(GlobalException.class)
                 .hasMessage("빈 리스트 입니다.");

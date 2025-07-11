@@ -34,7 +34,7 @@ public class Auction extends BaseDateEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long auctionId;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Product product;
 
     @Column(precision = 10, scale = 2)
@@ -50,4 +50,8 @@ public class Auction extends BaseDateEntity {
     private AuctionStatus status;
 
     private boolean deleted;
+
+    public void softDelete() {
+        this.deleted = true;
+    }
 }

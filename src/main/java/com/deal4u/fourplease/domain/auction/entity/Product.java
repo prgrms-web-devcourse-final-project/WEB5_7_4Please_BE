@@ -48,6 +48,9 @@ public class Product extends BaseDateEntity {
 
     private String phone;
 
-    private Boolean deleted;
+    private boolean deleted;
 
+    public void softDelete() {
+        this.deleted = true;
+    }
 }

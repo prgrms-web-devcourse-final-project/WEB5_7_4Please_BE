@@ -51,7 +51,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("경매를 등록할 수 있다")
-    void auction_can_be_created() throws Exception {
+    void save_should_save_auction() throws Exception {
 
         Member member = genMember();
         AuctionCreateRequest req = genAuctionCreateRequest();
@@ -77,11 +77,11 @@ class AuctionServiceTests {
                 .isEqualTo(req.startDate().plusDays(bidPeriod));
         assertThat(auction.getStatus()).isEqualTo(AuctionStatus.OPEN);
     }
-    
+
     @Test
     @DisplayName("auctionId로 특정 경매를 조회 후 AuctionDetailResponse를 반환한다")
     void getByAuctionId_should_return_AuctionDetailResponse() throws Exception {
-    
+
         Long auctionId = 1L;
 
         List<Long> bidList = List.of(200_0000L, 150_0000L, 100_0000L);
@@ -117,7 +117,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("존재하지 않는 auctionId로 조회를 시도하면 404 예외가 발생한다")
-    void throws_if_auction_not_exist() throws Exception {
+    void throws_when_try_to_get_if_auction_not_exist() throws Exception {
 
         Long auctionId = 1L;
         List<Long> bidList = List.of(200_0000L, 150_0000L, 100_0000L);
@@ -128,6 +128,40 @@ class AuctionServiceTests {
         assertThatThrownBy(
                 () -> {
                     auctionService.getByAuctionId(auctionId);
+                }
+        ).isInstanceOf(GlobalException.class)
+                .hasMessage("경매를 찾을 수 없습니다.");
+
+    }
+
+    @Test
+    @DisplayName("auctionId로 경매를 삭제한다")
+    void deleteByAuctionId_should_soft_delete_auction_by_auction_id() throws Exception {
+
+        Long auctionId = 1L;
+
+        Auction auction = genAuctionCreateRequest().toEntity(genProduct());
+
+        when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
+
+        auctionService.deleteByAuctionId(auctionId);
+
+        verify(productService).deleteProduct(auction.getProduct());
+
+        assertThat(auction.isDeleted()).isTrue();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 auctionId로 삭제를 시도하면 404 예외가 발생한다")
+    void throws_when_try_to_delete_if_auction_not_exist() throws Exception {
+
+        Long auctionId = 1L;
+
+        when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(
+                () -> {
+                    auctionService.deleteByAuctionId(auctionId);
                 }
         ).isInstanceOf(GlobalException.class)
                 .hasMessage("경매를 찾을 수 없습니다.");
