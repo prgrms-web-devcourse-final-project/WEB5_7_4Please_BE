@@ -10,6 +10,7 @@ import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.order.dto.OrderCreateRequest;
 import com.deal4u.fourplease.domain.order.dto.OrderResponse;
+import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
 import com.deal4u.fourplease.domain.order.entity.Orderer;
@@ -61,6 +62,12 @@ public class OrderService {
     public OrderResponse getOrder(Long orderId) {
         Order order = findOrderOrThrow(orderId);
         return OrderMapper.toOrderResponse(order);
+    }
+
+    @Transactional
+    public void updateOrder(Long orderId, OrderUpdateRequest orderUpdateRequest) {
+        Order order = findOrderOrThrow(orderId);
+        order.updateOrder(orderUpdateRequest);
     }
 
     private void validateType(String orderType) {

@@ -19,6 +19,7 @@ import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.order.dto.OrderCreateRequest;
 import com.deal4u.fourplease.domain.order.dto.OrderResponse;
+import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
 import com.deal4u.fourplease.domain.order.entity.Orderer;
@@ -309,6 +310,86 @@ class OrderServiceTest {
                     .hasMessage("해당 주문을 찾을 수 없습니다.")
                     .extracting("status")
                     .isEqualTo(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Nested
+    class UpdateOrderTests {
+
+        @Test
+        @DisplayName("주문 업데이트가 정상적으로 수행되는 경우")
+        void testUpdateOrder_Successful() {
+            // Given
+            Long orderId = 1L;
+
+            Address originalAddress = new Address(
+                    "초가집",
+                    "거지에요",
+                    "12345"
+            );
+
+            Order order = Order.builder()
+                    .id(orderId)
+                    .orderId(OrderId.generate())
+                    .price(new BigDecimal("100.0"))
+                    .auction(auction)
+                    .address(originalAddress)
+                    .phone(null)
+                    .content(null)
+                    .receiver(null)
+                    .orderer(Orderer.createOrderer(member))
+                    .build();
+
+            OrderUpdateRequest updateRequest = new OrderUpdateRequest(
+                    "한남 더힐",
+                    "101동",
+                    "54321",
+                    "010-9876-5432",
+                    "새로운 요청사항",
+                    "박유한"
+            );
+
+            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+            // When
+            orderService.updateOrder(orderId, updateRequest);
+
+            // Then
+            assertThat(order.getAddress().address()).isEqualTo("한남 더힐");
+            assertThat(order.getAddress().detailAddress()).isEqualTo("101동");
+            assertThat(order.getAddress().zipCode()).isEqualTo("54321");
+            assertThat(order.getPhone()).isEqualTo("010-9876-5432");
+            assertThat(order.getContent()).isEqualTo("새로운 요청사항");
+            assertThat(order.getReceiver()).isEqualTo("박유한");
+
+            verify(orderRepository, times(1)).findById(orderId);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 주문을 업데이트하려는 경우 예외 발생")
+        void testUpdateOrder_OrderNotFound() {
+            // Given
+            Long orderId = 999L;
+
+            OrderUpdateRequest updateRequest = new OrderUpdateRequest(
+                    "한남 더힐",
+                    "101동",
+                    "54321",
+                    "010-9876-5432",
+                    "새로운 요청사항",
+                    "박유한"
+            );
+
+            when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+            // When, Then
+            assertThatThrownBy(() -> orderService.updateOrder(orderId, updateRequest))
+                    .isInstanceOf(GlobalException.class)
+                    .hasMessage("해당 주문을 찾을 수 없습니다.")
+                    .extracting("status")
+                    .isEqualTo(HttpStatus.NOT_FOUND);
+
+            verify(orderRepository, times(1)).findById(orderId);
         }
     }
 }

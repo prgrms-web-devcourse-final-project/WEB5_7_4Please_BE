@@ -3,6 +3,7 @@ package com.deal4u.fourplease.domain.order.entity;
 import com.deal4u.fourplease.domain.BaseDateEntity;
 import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -45,4 +46,12 @@ public class Order extends BaseDateEntity {
     private String phone;
     private String content;
     private String receiver;
+
+    public void updateOrder(OrderUpdateRequest orderUpdateRequest) {
+        this.address = new Address(orderUpdateRequest.address(), orderUpdateRequest.addressDetail(),
+                orderUpdateRequest.zipCode());
+        this.phone = orderUpdateRequest.phone();
+        this.content = orderUpdateRequest.content();
+        this.receiver = orderUpdateRequest.receiver();
+    }
 }
