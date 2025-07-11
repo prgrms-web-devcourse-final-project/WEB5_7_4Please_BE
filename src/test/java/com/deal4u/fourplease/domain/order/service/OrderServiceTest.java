@@ -77,7 +77,7 @@ class OrderServiceTest {
                 .build();
 
         orderCreateRequest = OrderCreateRequest.builder()
-                .price(new BigDecimal("15000"))
+                .price(15000L)
                 .memberId(1L)
                 .build();
     }
