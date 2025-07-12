@@ -7,7 +7,7 @@ import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.repository.TempBidRepository;
-import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.TempMember;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
@@ -26,7 +26,7 @@ public class AuctionService {
     private final ProductImageService productImageService;
 
     @Transactional
-    public void save(AuctionCreateRequest request, Member member) {
+    public void save(AuctionCreateRequest request, TempMember member) {
 
         ProductCreateDto productCreateDto = request.toProductCreateDto(member);
         Product product = productService.save(productCreateDto);

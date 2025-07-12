@@ -14,7 +14,7 @@ import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.CategoryRepository;
 import com.deal4u.fourplease.domain.auction.repository.ProductRepository;
-import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.TempMember;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +44,7 @@ class ProductServiceTests {
     void product_can_be_saved_and_returned() throws Exception {
 
         ProductCreateDto req = genProductCreateDto();
-        Member seller = genMember();
+        TempMember seller = genMember();
 
         Category category = new Category(4L, "생활용품");
         when(categoryRepository.findById(4L)).thenReturn(Optional.of(category));

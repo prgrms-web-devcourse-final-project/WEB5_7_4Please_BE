@@ -18,7 +18,7 @@ import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.repository.TempBidRepository;
-import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.TempMember;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -53,7 +53,7 @@ class AuctionServiceTests {
     @DisplayName("경매를 등록할 수 있다")
     void save_should_save_auction() throws Exception {
 
-        Member member = genMember();
+        TempMember member = genMember();
         AuctionCreateRequest req = genAuctionCreateRequest();
 
         int bidPeriod = 3;

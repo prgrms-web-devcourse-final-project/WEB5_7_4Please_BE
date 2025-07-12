@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.review.entity;
 
-import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.TempMember;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -9,6 +9,6 @@ import jakarta.persistence.ManyToOne;
 public class Reviewer {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member reviewer;
+    private TempMember reviewer;
 
 }

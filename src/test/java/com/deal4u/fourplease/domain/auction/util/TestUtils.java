@@ -8,7 +8,7 @@ import com.deal4u.fourplease.domain.auction.entity.BidPeriod;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.ProductImage;
-import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.TempMember;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import java.math.BigDecimal;
@@ -32,9 +32,9 @@ public class TestUtils {
         );
     }
 
-    public static Member genMember() {
+    public static TempMember genMember() {
          // TODO: Member 추후 확인 필요
-         return new Member(
+         return new TempMember(
                  1L,
                  "user1@user.com",
                  "유저1",

@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
-import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.TempMember;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +51,7 @@ class AuctionControllerTests {
                 ).andExpect(status().isCreated())
                 .andDo(print());
 
-        verify(auctionService).save(any(AuctionCreateRequest.class), any(Member.class));
+        verify(auctionService).save(any(AuctionCreateRequest.class), any(TempMember.class));
 
     }
 
