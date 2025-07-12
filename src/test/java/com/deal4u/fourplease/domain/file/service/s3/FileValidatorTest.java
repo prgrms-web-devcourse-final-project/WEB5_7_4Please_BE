@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
+import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
@@ -24,8 +25,12 @@ class FileValidatorTest {
                 new byte[]{1, 2, 3}
         );
 
+        ThrowableAssert.ThrowingCallable validFunction = () -> validator.valid(
+                file.getOriginalFilename(),
+                file);
+
         // when & then
-        assertThatThrownBy(() -> validator.valid(file))
+        assertThatThrownBy(validFunction)
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.INVALID_FILE.getMessage());
     }
@@ -41,8 +46,31 @@ class FileValidatorTest {
                 new byte[]{1, 2}
         );
 
+        ThrowableAssert.ThrowingCallable validFunction = () -> validator.valid(
+                file.getOriginalFilename(),
+                file);
         // when & then
-        assertThatThrownBy(() -> validator.valid(file))
+        assertThatThrownBy(validFunction)
+                .isInstanceOf(GlobalException.class)
+                .hasMessage(ErrorCode.INVALID_FILE.getMessage());
+    }
+
+    @Test
+    @DisplayName("저장하려는 파일이름의 확장자가 다르면 예외")
+    void throwsException_whenSavingFileExtensionDiffersFromActualMimeType() {
+        // given
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "file.png",     // extension is txt
+                "image/png",    // MIME type is png
+                new byte[]{1, 2}
+        );
+
+        ThrowableAssert.ThrowingCallable validFunction = () -> validator.valid(
+                "file.jpg",
+                file);
+        // when & then
+        assertThatThrownBy(validFunction)
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.INVALID_FILE.getMessage());
     }
@@ -59,7 +87,8 @@ class FileValidatorTest {
         );
 
         // when & then
-        assertThatCode(() -> validator.valid(file)).doesNotThrowAnyException();
+        assertThatCode(
+                () -> validator.valid(file.getOriginalFilename(), file)).doesNotThrowAnyException();
     }
 
 }

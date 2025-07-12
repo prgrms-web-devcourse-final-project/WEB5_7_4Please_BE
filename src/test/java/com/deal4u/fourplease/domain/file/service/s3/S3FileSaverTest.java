@@ -24,23 +24,22 @@ class S3FileSaverTest {
     @Test
     @DisplayName("검증이실패하면_이미지를_업로드하지_않는다")
     void doesNotUpload_whenValidationFails() {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "file.png",
-                "application/zip", // unsupported MIME type
-                new byte[]{1, 2, 3}
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "file.png", "application/zip",
+                // unsupported MIME type
+                new byte[]{1, 2, 3});
 
         FileValidator testFileValidator = Mockito.mock(FileValidator.class);
-        doThrow(ErrorCode.INVALID_FILE.toException()).when(testFileValidator).valid(file);
+        doThrow(ErrorCode.INVALID_FILE.toException())
+                .when(testFileValidator)
+                .valid(file.getOriginalFilename(), file);
 
         S3FileUploader testFileUploader = Mockito.mock(S3FileUploader.class);
 
         S3FileSaver fileSaver = new S3FileSaver(testFileValidator, testFileUploader);
 
-        ThrowableAssert.ThrowingCallable executable = () -> fileSaver.save(new SaveData("/test/test", "test"), file);
-        assertThatThrownBy(executable)
-                .isInstanceOf(GlobalException.class)
+        ThrowableAssert.ThrowingCallable executable = () -> fileSaver.save(
+                new SaveData("/test/test", "test"), file);
+        assertThatThrownBy(executable).isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.INVALID_FILE.getMessage());
         verify(testFileUploader, times(0)).upload(any(), any(), any());
     }
@@ -57,9 +56,9 @@ class S3FileSaverTest {
 
         S3FileSaver fileSaver = new S3FileSaver(testFileValidator, testFileUploader);
 
-        ThrowableAssert.ThrowingCallable executable = () ->  fileSaver.save(new SaveData("/test/test", "test"), file);
-        assertThatThrownBy(executable)
-                .isInstanceOf(GlobalException.class)
+        ThrowableAssert.ThrowingCallable executable = () -> fileSaver.save(
+                new SaveData("/test/test", "test"), file);
+        assertThatThrownBy(executable).isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.FILE_SAVE_FAILED.getMessage());
         verify(testFileUploader, times(0)).upload(any(), any(), any());
     }
@@ -67,12 +66,9 @@ class S3FileSaverTest {
     @Test
     @DisplayName("업로드성공")
     void uploadSucceeds_withValidFile() {
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "file.png",
-                "image/png", // valid MIME type and extension
-                new byte[]{1, 2}
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "file.png", "image/png",
+                // valid MIME type and extension
+                new byte[]{1, 2});
 
         FileValidator testFileValidator = Mockito.mock(FileValidator.class);
 
@@ -82,12 +78,8 @@ class S3FileSaverTest {
 
         fileSaver.save(new SaveData("/test/test", "test"), file);
 
-        S3MetaData s3MetaData = new S3MetaData("image/png",
-                String.valueOf(file.getSize()));
-        verify(testFileUploader).upload(
-                any(InputStream.class),
-                eq("/test/test/test.png"),
-                eq(s3MetaData)
-        );
+        S3MetaData s3MetaData = new S3MetaData("image/png", String.valueOf(file.getSize()));
+        verify(testFileUploader).upload(any(InputStream.class), eq("/test/test/test.png"),
+                eq(s3MetaData));
     }
 }

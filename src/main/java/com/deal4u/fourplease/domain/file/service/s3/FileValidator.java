@@ -4,13 +4,15 @@ import static com.deal4u.fourplease.domain.file.util.FileUtil.getFileExtension;
 
 import com.deal4u.fourplease.domain.file.service.FileType;
 import com.deal4u.fourplease.global.exception.ErrorCode;
+import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 public class FileValidator {
 
-    public void valid(MultipartFile file) {
+    public void valid(String savedName, MultipartFile file) {
         FileType fileType = validAndGetFileType(file);
-        validSameFileType(file, fileType);
+        validSameFileType(file.getOriginalFilename(), fileType);
+        validSameFileType(savedName, fileType);
     }
 
     private FileType validAndGetFileType(MultipartFile file) {
@@ -22,8 +24,8 @@ public class FileValidator {
         throw ErrorCode.INVALID_FILE.toException();
     }
 
-    private void validSameFileType(MultipartFile file, FileType fileType) {
-        String fileExtension = getFileExtension(file.getOriginalFilename());
+    private void validSameFileType(@Nullable String fileName, FileType fileType) {
+        String fileExtension = getFileExtension(fileName);
         if (!fileType.isTargetType(fileExtension)) {
             throw ErrorCode.INVALID_FILE.toException();
         }

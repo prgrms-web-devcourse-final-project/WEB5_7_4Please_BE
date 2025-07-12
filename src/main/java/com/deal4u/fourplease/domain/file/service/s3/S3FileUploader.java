@@ -32,7 +32,7 @@ public class S3FileUploader {
                 .build();
         RequestBody body = RequestBody.fromContentProvider(
                 ContentStreamProvider.fromInputStream(date),
-                metaData.contentLength());
+                metaData.contentType());
         s3Client.putObject(objectRequest, body);
     }
 
