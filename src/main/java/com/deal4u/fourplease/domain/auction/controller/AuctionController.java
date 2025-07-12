@@ -36,13 +36,13 @@ public class AuctionController {
         auctionService.save(request, member);
     }
 
-    @GetMapping("{auctionId}/description")
+    @GetMapping("/{auctionId}/description")
     @ResponseStatus(HttpStatus.OK)
     public AuctionDetailResponse readAuction(@PathVariable @Positive Long auctionId) {
         return auctionService.getByAuctionId(auctionId);
     }
 
-    @DeleteMapping("{auctionId}")
+    @DeleteMapping("/{auctionId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAuction(@PathVariable @Positive Long auctionId) {
         auctionService.deleteByAuctionId(auctionId);

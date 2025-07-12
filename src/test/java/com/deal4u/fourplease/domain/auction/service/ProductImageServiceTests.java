@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.auction.service;
 
-import static com.deal4u.fourplease.domain.auction.service.TestUtils.*;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -64,7 +64,7 @@ class ProductImageServiceTests {
         Product product = genProduct();
         List<ProductImage> productImageList = genProductImageList(product);
 
-        when(productImageRepository.findByProductId(product.getProductId()))
+        when(productImageRepository.findByProduct_ProductId(product.getProductId()))
                 .thenReturn(productImageList);
 
 
@@ -87,7 +87,7 @@ class ProductImageServiceTests {
         Product product = genProduct();
         List<ProductImage> productImageList = List.of();
 
-        when(productImageRepository.findByProductId(product.getProductId()))
+        when(productImageRepository.findByProduct_ProductId(product.getProductId()))
                 .thenReturn(productImageList);
 
         assertThatThrownBy(
@@ -106,7 +106,7 @@ class ProductImageServiceTests {
         Product product = genProduct();
         List<ProductImage> productImageList = genProductImageList(product);
 
-        when(productImageRepository.findByProductId(product.getProductId()))
+        when(productImageRepository.findByProduct_ProductId(product.getProductId()))
                 .thenReturn(productImageList);
 
         productImageService.deleteProductImage(product);
@@ -120,7 +120,7 @@ class ProductImageServiceTests {
 
         Product product = genProduct();
 
-        when(productImageRepository.findByProductId(product.getProductId()))
+        when(productImageRepository.findByProduct_ProductId(product.getProductId()))
                 .thenReturn(Collections.emptyList());
 
         assertThatThrownBy(

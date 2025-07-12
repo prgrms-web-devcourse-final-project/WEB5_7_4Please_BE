@@ -1,7 +1,7 @@
 package com.deal4u.fourplease.domain.auction.controller;
 
-import static com.deal4u.fourplease.domain.auction.service.TestUtils.genAuctionCreateRequest;
-import static com.deal4u.fourplease.domain.auction.service.TestUtils.genAuctionDetailResponse;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionCreateRequest;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionDetailResponse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

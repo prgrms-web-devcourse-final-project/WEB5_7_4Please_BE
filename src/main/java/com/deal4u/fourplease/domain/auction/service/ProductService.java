@@ -22,7 +22,7 @@ public class ProductService {
     @Transactional
     public Product save(ProductCreateDto request) {
         Category category = categoryRepository.findById(request.categoryId())
-                .orElseThrow(ErrorCode.ENTITY_NOT_FOUND::toException);
+                .orElseThrow(ErrorCode.CATEGORY_NOT_FOUND::toException);
         Product product = request.toEntity(category);
         productImageService.save(product, request.imageUrls());
 

@@ -18,7 +18,6 @@ import org.hibernate.annotations.SQLRestriction;
 @Builder
 @Getter
 @Table(name = "product_images")
-@SQLRestriction("deleted = false")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductImage {
