@@ -85,9 +85,6 @@ class PaymentServiceTest {
                 "2025-07-12",
                 10000
         );
-
-        doNothing().when(namedLock).lock();
-        doNothing().when(namedLock).unlock();
     }
 
     @Test
@@ -100,6 +97,9 @@ class PaymentServiceTest {
                 .thenReturn(namedLock);
         when(tossApiClient.confirmPayment(confirmRequest))
                 .thenReturn(successResponse);
+
+        doNothing().when(namedLock).lock();
+        doNothing().when(namedLock).unlock();
 
         // when
         paymentService.paymentConfirm(confirmRequest);
@@ -134,10 +134,13 @@ class PaymentServiceTest {
         // given
         when(orderRepository.findByOrderId(any(OrderId.class)))
                 .thenReturn(Optional.of(order));
-        when(namedLockProvider.getBottleLock(order.getOrderId().toString()))  // 수정된 부분
+        when(namedLockProvider.getBottleLock(order.getOrderId().toString()))
                 .thenReturn(namedLock);
         when(tossApiClient.confirmPayment(confirmRequest))
                 .thenReturn(failedResponse);
+
+        doNothing().when(namedLock).lock();
+        doNothing().when(namedLock).unlock();
 
         // when & then
         assertThatThrownBy(() -> paymentService.paymentConfirm(confirmRequest))
