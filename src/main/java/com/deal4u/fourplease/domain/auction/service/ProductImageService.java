@@ -45,6 +45,6 @@ public class ProductImageService {
     }
 
     private List<ProductImage> findByProduct(Product product) {
-        return productImageRepository.findByProduct_ProductId(product.getProductId());
+        return productImageRepository.findByProductProductId(product.getProductId());
     }
 }

@@ -30,7 +30,7 @@ public class AuctionController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createAuction(
             @Valid @RequestBody AuctionCreateRequest request,
-            //TODO: @AuthenticationPrincipal 추가
+            // TODO: @AuthenticationPrincipal 추가
             Member member
     ) {
         auctionService.save(request, member);
