@@ -33,33 +33,46 @@ public class PaymentService {
 
     @Transactional
     public void paymentConfirm(TossPaymentConfirmRequest tossPaymentConfirmRequest) {
-
         OrderId orderId = OrderId.create(tossPaymentConfirmRequest.orderId());
 
-        // todo: 컨텍스트 홀더를 통해 주문자와 현재 로그인한 사용자가 동일한 유저인지 검증 필요
         Order order = findOrderOrThrow(orderId);
 
         validateAmount(tossPaymentConfirmRequest, order);
 
-        NamedLock lock = namedLockProvider.getBottleLock(orderId.toString());
 
+        NamedLock lock = getNamedLock(orderId);
         lock.lock();
 
         try {
-            TossPaymentConfirmResponse response =
-                    tossApiClient.confirmPayment(tossPaymentConfirmRequest);
-            validatePaymentSuccess(response);
-            createPayment(order, tossPaymentConfirmRequest, response);
+            processTossPayment(tossPaymentConfirmRequest, order);
         } finally {
             lock.unlock();
         }
     }
 
-    private void validateAmount(TossPaymentConfirmRequest tossPaymentConfirmRequest,
-                                Order order) {
+    private Order findOrderOrThrow(OrderId orderId) {
+        return orderRepository.findByOrderId(orderId)
+                .orElseThrow(ORDER_NOT_FOUND::toException);
+    }
+
+    private void validateAmount(TossPaymentConfirmRequest tossPaymentConfirmRequest, Order order) {
         if (!order.getPrice().equals(new BigDecimal(tossPaymentConfirmRequest.amount()))) {
             throw INVALID_PAYMENT_AMOUNT.toException();
         }
+    }
+
+    private NamedLock getNamedLock(OrderId orderId) {
+        return namedLockProvider.getBottleLock(orderId.toString());
+    }
+
+    private void processTossPayment(TossPaymentConfirmRequest tossPaymentConfirmRequest,
+                                    Order order) {
+        TossPaymentConfirmResponse response =
+                tossApiClient.confirmPayment(tossPaymentConfirmRequest);
+
+        validatePaymentSuccess(response);
+
+        createPayment(order, tossPaymentConfirmRequest, response);
     }
 
     private void validatePaymentSuccess(TossPaymentConfirmResponse response) {
@@ -72,10 +85,5 @@ public class PaymentService {
                                TossPaymentConfirmResponse response) {
         Payment payment = PaymentMapper.toPayment(order, tossPaymentConfirmRequest, response);
         paymentRepository.save(payment);
-    }
-
-    private Order findOrderOrThrow(OrderId orderId) {
-        return orderRepository.findByOrderId(orderId)
-                .orElseThrow(ORDER_NOT_FOUND::toException);
     }
 }
