@@ -12,4 +12,4 @@ spring:
         show_sql: true
         format_sql: true
 toss:
-  secret-key: ${TOSS_SECRET_KEY:testYuhanPark}
+  secret-key: ${TOSS_SECRET_KEY}
