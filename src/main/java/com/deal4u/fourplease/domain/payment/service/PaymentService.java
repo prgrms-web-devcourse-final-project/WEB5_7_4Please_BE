@@ -38,6 +38,9 @@ public class PaymentService {
 
         // todo: 컨텍스트 홀더를 통해 주문자와 현재 로그인한 사용자가 동일한 유저인지 검증 필요
         Order order = findOrderOrThrow(orderId);
+
+        validateAmount(tossPaymentConfirmRequest, order);
+
         NamedLock lock = namedLockProvider.getBottleLock(orderId.toString());
 
         lock.lock();
@@ -45,18 +48,11 @@ public class PaymentService {
         try {
             TossPaymentConfirmResponse response =
                     tossApiClient.confirmPayment(tossPaymentConfirmRequest);
-            validatePayment(tossPaymentConfirmRequest, order, response);
+            validatePaymentSuccess(response);
             createPayment(order, tossPaymentConfirmRequest, response);
         } finally {
             lock.unlock();
         }
-    }
-
-    private void validatePayment(TossPaymentConfirmRequest tossPaymentConfirmRequest,
-                                 Order order, TossPaymentConfirmResponse response) {
-
-        validatePaymentSuccess(response);
-        validateAmount(tossPaymentConfirmRequest, order);
     }
 
     private void validateAmount(TossPaymentConfirmRequest tossPaymentConfirmRequest,
