@@ -12,4 +12,4 @@ spring:
         show_sql: true
         format_sql: true
 toss:
-  secret-key: 'dummy'
+  secret-key: dummy
