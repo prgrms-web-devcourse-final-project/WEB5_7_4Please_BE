@@ -5,7 +5,7 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public record Address(
         String address,
-        String detailAddress,
+        String addressDetail,
         String zipCode
 ) {
 
