@@ -17,7 +17,7 @@ import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
-import com.deal4u.fourplease.domain.bid.repository.BidRepository;
+import com.deal4u.fourplease.domain.bid.repository.TempBidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.math.BigDecimal;
@@ -44,7 +44,7 @@ class AuctionServiceTests {
     private ProductService productService;
 
     @Mock
-    private BidRepository bidRepository;
+    private TempBidRepository bidRepository;
 
     @Mock
     private ProductImageService productImageService;

@@ -6,7 +6,7 @@ import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
-import com.deal4u.fourplease.domain.bid.repository.BidRepository;
+import com.deal4u.fourplease.domain.bid.repository.TempBidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import jakarta.validation.constraints.Positive;
@@ -22,7 +22,7 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final ProductService productService;
-    private final BidRepository bidRepository;
+    private final TempBidRepository bidRepository;
     private final ProductImageService productImageService;
 
     @Transactional
