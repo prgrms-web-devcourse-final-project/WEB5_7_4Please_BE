@@ -64,7 +64,7 @@ class ProductImageServiceTests {
         Product product = genProduct();
         List<ProductImage> productImageList = genProductImageList(product);
 
-        when(productImageRepository.findByProductProductId(product.getProductId()))
+        when(productImageRepository.findByProductId(product.getProductId()))
                 .thenReturn(productImageList);
 
 
@@ -87,7 +87,7 @@ class ProductImageServiceTests {
         Product product = genProduct();
         List<ProductImage> productImageList = List.of();
 
-        when(productImageRepository.findByProductProductId(product.getProductId()))
+        when(productImageRepository.findByProductId(product.getProductId()))
                 .thenReturn(productImageList);
 
         assertThatThrownBy(
@@ -106,7 +106,7 @@ class ProductImageServiceTests {
         Product product = genProduct();
         List<ProductImage> productImageList = genProductImageList(product);
 
-        when(productImageRepository.findByProductProductId(product.getProductId()))
+        when(productImageRepository.findByProductId(product.getProductId()))
                 .thenReturn(productImageList);
 
         productImageService.deleteProductImage(product);
@@ -120,7 +120,7 @@ class ProductImageServiceTests {
 
         Product product = genProduct();
 
-        when(productImageRepository.findByProductProductId(product.getProductId()))
+        when(productImageRepository.findByProductId(product.getProductId()))
                 .thenReturn(Collections.emptyList());
 
         assertThatThrownBy(
