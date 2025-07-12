@@ -60,6 +60,10 @@ class OrderServiceTest {
     private Auction auction;
     private Member member;
     private OrderCreateRequest orderCreateRequest;
+    private Address address;
+    private Product product;
+    private Orderer orderer;
+    private OrderUpdateRequest orderUpdateRequest;
 
     @BeforeEach
     void setUp() {
@@ -74,12 +78,40 @@ class OrderServiceTest {
                 .memberId(1L)
                 .email("pbk2312@inu.ac.kr")
                 .nickName("당근을 흔들어라")
+                .role(Role.USER)
+                .status(Status.ACTIVE)
                 .build();
 
         orderCreateRequest = OrderCreateRequest.builder()
                 .price(15000L)
                 .memberId(1L)
                 .build();
+
+        address = new Address(
+                "아크로 서울 포레스트 살고싶어요",
+                "101동 202호",
+                "12345"
+        );
+
+
+        product = Product.builder()
+                .productId(1L)
+                .name("맥북 프로")
+                .thumbnailUrl("http://example.com/image.jpg")
+                .seller(Seller.createSeller(member))
+                .address(address)
+                .build();
+
+        orderer = Orderer.createOrderer(member);
+
+        orderUpdateRequest = new OrderUpdateRequest(
+                "한남 더힐",
+                "101동",
+                "54321",
+                "010-9876-5432",
+                "새로운 요청사항",
+                "박유한"
+        );
     }
 
     @Nested
@@ -241,58 +273,36 @@ class OrderServiceTest {
         @Test
         @DisplayName("주문 조회가 정상적으로 수행되는 경우")
         void testGetOrder_Successful() {
+            // Given
             Long orderId = 1L;
 
-            Seller seller = Seller.createSeller(member);
-
-            Address address = new Address(
-                    "아크로 서울 포레스트 살고싶어요",
-                    "101동 202호",
-                    "12345"
-            );
-
-            Product product = Product.builder()
-                    .productId(1L)
-                    .name("맥북 프로")
-                    .thumbnailUrl("http://example.com/image.jpg")
-                    .seller(seller)
-                    .address(address)
-                    .build();
-
-            Auction auctionGet = Auction.builder()
+            Auction auctionWithProduct = Auction.builder()
                     .auctionId(1L)
                     .product(product)
                     .build();
 
-            Member ordererMember = Member.builder()
-                    .memberId(1L)
-                    .nickName("박유한")
-                    .role(Role.USER)
-                    .email("pbk2312@inu.ac.kr")
-                    .status(Status.ACTIVE)
-                    .build();
-
-            Order order = Order.builder()
+            Order orderWithProduct = Order.builder()
                     .id(orderId)
                     .orderId(OrderId.generate())
                     .price(new BigDecimal("100.0"))
-                    .auction(auctionGet)
+                    .auction(auctionWithProduct)
                     .address(address)
-                    .orderer(Orderer.createOrderer(ordererMember))
+                    .orderer(orderer)
                     .build();
 
             when(orderRepository.findByIdWithAuctionAndProduct(orderId)).thenReturn(
-                    Optional.of(order));
+                    Optional.of(orderWithProduct));
 
             // When
             OrderResponse result = orderService.getOrder(orderId);
 
             // Then
             assertThat(result).isNotNull();
-            assertThat(result.price()).isEqualTo(order.getPrice().longValue());
-            assertThat(result.productName()).isEqualTo(order.getAuction().getProduct().getName());
+            assertThat(result.price()).isEqualTo(orderWithProduct.getPrice().longValue());
+            assertThat(result.productName()).isEqualTo(
+                    orderWithProduct.getAuction().getProduct().getName());
             assertThat(result.imageUrl()).isEqualTo(
-                    order.getAuction().getProduct().getThumbnailUrl());
+                    orderWithProduct.getAuction().getProduct().getThumbnailUrl());
 
             verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
         }
@@ -330,7 +340,7 @@ class OrderServiceTest {
                     "12345"
             );
 
-            Order order = Order.builder()
+            Order orderToUpdate = Order.builder()
                     .id(orderId)
                     .orderId(OrderId.generate())
                     .price(new BigDecimal("100.0"))
@@ -339,31 +349,22 @@ class OrderServiceTest {
                     .phone(null)
                     .content(null)
                     .receiver(null)
-                    .orderer(Orderer.createOrderer(member))
+                    .orderer(orderer)
                     .build();
 
-            OrderUpdateRequest updateRequest = new OrderUpdateRequest(
-                    "한남 더힐",
-                    "101동",
-                    "54321",
-                    "010-9876-5432",
-                    "새로운 요청사항",
-                    "박유한"
-            );
-
             when(orderRepository.findByIdWithAuctionAndProduct(orderId)).thenReturn(
-                    Optional.of(order));
+                    Optional.of(orderToUpdate));
 
             // When
-            orderService.updateOrder(orderId, updateRequest);
+            orderService.updateOrder(orderId, orderUpdateRequest);
 
             // Then
-            assertThat(order.getAddress().address()).isEqualTo("한남 더힐");
-            assertThat(order.getAddress().detailAddress()).isEqualTo("101동");
-            assertThat(order.getAddress().zipCode()).isEqualTo("54321");
-            assertThat(order.getPhone()).isEqualTo("010-9876-5432");
-            assertThat(order.getContent()).isEqualTo("새로운 요청사항");
-            assertThat(order.getReceiver()).isEqualTo("박유한");
+            assertThat(orderToUpdate.getAddress().address()).isEqualTo("한남 더힐");
+            assertThat(orderToUpdate.getAddress().detailAddress()).isEqualTo("101동");
+            assertThat(orderToUpdate.getAddress().zipCode()).isEqualTo("54321");
+            assertThat(orderToUpdate.getPhone()).isEqualTo("010-9876-5432");
+            assertThat(orderToUpdate.getContent()).isEqualTo("새로운 요청사항");
+            assertThat(orderToUpdate.getReceiver()).isEqualTo("박유한");
 
             verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
         }
@@ -374,20 +375,11 @@ class OrderServiceTest {
             // Given
             Long orderId = 999L;
 
-            OrderUpdateRequest updateRequest = new OrderUpdateRequest(
-                    "한남 더힐",
-                    "101동",
-                    "54321",
-                    "010-9876-5432",
-                    "새로운 요청사항",
-                    "박유한"
-            );
-
             when(orderRepository.findByIdWithAuctionAndProduct(orderId)).thenReturn(
                     Optional.empty());
 
             // When, Then
-            assertThatThrownBy(() -> orderService.updateOrder(orderId, updateRequest))
+            assertThatThrownBy(() -> orderService.updateOrder(orderId, orderUpdateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("해당 주문을 찾을 수 없습니다.")
                     .extracting("status")
