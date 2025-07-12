@@ -10,12 +10,20 @@ import org.springframework.data.repository.query.Param;
 // todo: 실제 레포지토리로 변경 필요
 public interface TempBidRepository extends JpaRepository<Bid, Long> {
 
-    @Query("SELECT COUNT(b) > 0 FROM Bid b WHERE b.auction.auctionId = :auctionId AND b.bidder.member = :member AND b.isSuccessFulBidder = true")
+    @Query("SELECT COUNT(b) > 0 "
+            + "FROM Bid b "
+            + "WHERE b.auction.auctionId = :auctionId "
+            + "AND b.bidder.member = :member "
+            + "AND b.isSuccessFulBidder = true")
     boolean existsSuccessfulBidder(@Param("auctionId") Long auctionId,
                                    @Param("member") Member member);
 
     // 테스트용
-    @Query("SELECT b FROM Bid b WHERE b.auction.auctionId = :auctionId AND b.bidder.member = :member AND b.isSuccessFulBidder = true")
+    @Query("SELECT b "
+            + "FROM Bid b "
+            + "WHERE b.auction.auctionId = :auctionId "
+            + "AND b.bidder.member = :member "
+            + "AND b.isSuccessFulBidder = true")
     Optional<Bid> findSuccessfulBidByAuctionAndMember(@Param("auctionId") Long auctionId,
                                                       @Param("member") Member member);
 }

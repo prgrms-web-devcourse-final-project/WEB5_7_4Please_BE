@@ -8,6 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 // Todo: 실제 레포지토리 변경 및 삭제 필요
 public interface TempAuctionRepository extends JpaRepository<Auction, Long> {
 
-    @Query("SELECT a FROM Auction a WHERE a.auctionId = :auctionId AND a.deleted = false AND a.status = 'CLOSED'")
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "WHERE a.auctionId = :auctionId "
+            + "AND a.deleted = false "
+            + "AND a.status = 'CLOSED'")
     Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(Long auctionId);
 }
