@@ -3,6 +3,7 @@ package com.deal4u.fourplease.domain.payment.service;
 import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_PAYMENT_AMOUNT;
 import static com.deal4u.fourplease.global.exception.ErrorCode.ORDER_NOT_FOUND;
 import static com.deal4u.fourplease.global.exception.ErrorCode.PAYMENT_CONFIRMATION_FAILED;
+import static com.deal4u.fourplease.global.exception.ErrorCode.PAYMENT_ERROR;
 
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
@@ -13,8 +14,10 @@ import com.deal4u.fourplease.domain.payment.dto.TossPaymentConfirmResponse;
 import com.deal4u.fourplease.domain.payment.entity.Payment;
 import com.deal4u.fourplease.domain.payment.mapper.PaymentMapper;
 import com.deal4u.fourplease.domain.payment.repository.PaymentRepository;
+import com.deal4u.fourplease.global.exception.GlobalException;
 import com.deal4u.fourplease.global.lock.NamedLock;
 import com.deal4u.fourplease.global.lock.NamedLockProvider;
+import feign.FeignException;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,6 +48,10 @@ public class PaymentService {
 
         try {
             processTossPayment(tossPaymentConfirmRequest, order);
+        } catch (FeignException e) {
+            throw PAYMENT_ERROR.toException();
+        } catch (GlobalException e) {
+            throw PAYMENT_CONFIRMATION_FAILED.toException();
         } finally {
             lock.unlock();
         }
@@ -56,7 +63,9 @@ public class PaymentService {
     }
 
     private void validateAmount(TossPaymentConfirmRequest tossPaymentConfirmRequest, Order order) {
-        if (!order.getPrice().equals(new BigDecimal(tossPaymentConfirmRequest.amount()))) {
+        BigDecimal amountFromRequest = new BigDecimal(tossPaymentConfirmRequest.amount());
+
+        if (order.getPrice().compareTo(amountFromRequest) != 0) {
             throw INVALID_PAYMENT_AMOUNT.toException();
         }
     }
