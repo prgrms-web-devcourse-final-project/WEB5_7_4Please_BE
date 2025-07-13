@@ -41,8 +41,8 @@ public class OrderService {
 
         validateType(orderType);
 
-        Member member = findMemberOrThrow(orderCreateRequest.memberId());
-        Auction auction = findAuctionOrThrow(auctionId);
+        Member member = getMemberOrThrow(orderCreateRequest.memberId());
+        Auction auction = getAuctionOrThrow(auctionId);
 
         validateSuccessfulBidder(auction, member, orderType);
 
@@ -58,13 +58,13 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public OrderResponse getOrder(Long orderId) {
-        Order order = findOrderOrThrow(orderId);
+        Order order = getOrderOrThrow(orderId);
         return OrderMapper.toOrderResponse(order);
     }
 
     @Transactional
     public void updateOrder(Long orderId, OrderUpdateRequest orderUpdateRequest) {
-        Order order = findOrderOrThrow(orderId);
+        Order order = getOrderOrThrow(orderId);
         order.updateOrder(orderUpdateRequest);
     }
 
@@ -87,20 +87,20 @@ public class OrderService {
 
     private Order createOrder(OrderCreateRequest orderCreateRequest, Auction auction,
                               Orderer orderer, OrderId orderId) {
-        return OrderCreateRequest.toEntity(orderCreateRequest, auction, orderer, orderId);
+        return orderCreateRequest.toEntity(auction, orderer, orderId);
     }
 
-    private Auction findAuctionOrThrow(Long auctionId) {
+    private Auction getAuctionOrThrow(Long auctionId) {
         return auctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId)
                 .orElseThrow(AUCTION_NOT_FOUND::toException);
     }
 
-    private Member findMemberOrThrow(Long memberId) {
+    private Member getMemberOrThrow(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(USER_NOT_FOUND::toException);
     }
 
-    private Order findOrderOrThrow(Long orderId) {
+    private Order getOrderOrThrow(Long orderId) {
         return orderRepository.findByIdWithAuctionAndProduct(orderId)
                 .orElseThrow(ORDER_NOT_FOUND::toException);
     }

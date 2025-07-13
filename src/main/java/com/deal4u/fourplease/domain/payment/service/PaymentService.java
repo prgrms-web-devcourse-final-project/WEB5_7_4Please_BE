@@ -38,7 +38,7 @@ public class PaymentService {
     public void paymentConfirm(TossPaymentConfirmRequest tossPaymentConfirmRequest) {
         OrderId orderId = OrderId.create(tossPaymentConfirmRequest.orderId());
 
-        Order order = findOrderOrThrow(orderId);
+        Order order = getOrderOrThrow(orderId);
 
         validateAmount(tossPaymentConfirmRequest, order);
 
@@ -57,7 +57,7 @@ public class PaymentService {
         }
     }
 
-    private Order findOrderOrThrow(OrderId orderId) {
+    private Order getOrderOrThrow(OrderId orderId) {
         return orderRepository.findByOrderId(orderId)
                 .orElseThrow(ORDER_NOT_FOUND::toException);
     }
