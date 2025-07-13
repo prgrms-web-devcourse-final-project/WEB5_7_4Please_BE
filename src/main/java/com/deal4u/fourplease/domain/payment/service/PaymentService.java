@@ -30,7 +30,6 @@ public class PaymentService {
     public void paymentConfirm(TossPaymentConfirmRequest tossPaymentConfirmRequest) {
         OrderId orderId = OrderId.create(tossPaymentConfirmRequest.orderId());
 
-        // 1. 주문 조회 (별도 트랜잭션)
         Order order = paymentTransactionService.getOrderOrThrow(orderId);
 
         validateAmount(tossPaymentConfirmRequest, order);
