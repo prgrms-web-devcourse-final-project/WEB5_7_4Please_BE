@@ -4,6 +4,7 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_PAYMENT_A
 import static com.deal4u.fourplease.global.exception.ErrorCode.PAYMENT_CONFIRMATION_FAILED;
 import static com.deal4u.fourplease.global.exception.ErrorCode.PAYMENT_ERROR;
 
+import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
 import com.deal4u.fourplease.domain.payment.config.TossApiClient;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class PaymentService {
 
     private static final String PAYMENT_SUCCESS = "DONE";
+    private static final String LOCK_PREFIX = "auction-lock:";
 
     private final TossApiClient tossApiClient;
     private final NamedLockProvider namedLockProvider;
@@ -29,42 +31,42 @@ public class PaymentService {
 
     public void paymentConfirm(TossPaymentConfirmRequest tossPaymentConfirmRequest) {
         OrderId orderId = OrderId.create(tossPaymentConfirmRequest.orderId());
-
         Order order = paymentTransactionService.getOrderOrThrow(orderId);
 
+        Auction auction = order.getAuction();
         validateAmount(tossPaymentConfirmRequest, order);
 
-        NamedLock lock = getNamedLock(orderId);
+        NamedLock lock = getNamedLock(auction);
         lock.lock();
 
         try {
             TossPaymentConfirmResponse response = callTossPaymentApi(tossPaymentConfirmRequest);
-
             validatePaymentSuccess(response);
 
-            paymentTransactionService.savePayment(order, tossPaymentConfirmRequest, response);
+            paymentTransactionService.savePayment(order, tossPaymentConfirmRequest, response,
+                    auction);
 
         } finally {
             lock.unlock();
         }
     }
 
-    private void validateAmount(TossPaymentConfirmRequest tossPaymentConfirmRequest, Order order) {
-        BigDecimal amountFromRequest = new BigDecimal(tossPaymentConfirmRequest.amount());
-
+    private void validateAmount(TossPaymentConfirmRequest request, Order order) {
+        BigDecimal amountFromRequest = new BigDecimal(request.amount());
         if (order.getPrice().compareTo(amountFromRequest) != 0) {
             throw INVALID_PAYMENT_AMOUNT.toException();
         }
     }
 
-    private NamedLock getNamedLock(OrderId orderId) {
-        return namedLockProvider.getBottleLock(orderId.toString());
+    private NamedLock getNamedLock(Auction auction) {
+        String key = LOCK_PREFIX + auction.getAuctionId();
+        return namedLockProvider.getBottleLock(key);
     }
 
     private TossPaymentConfirmResponse callTossPaymentApi(
-            TossPaymentConfirmRequest tossPaymentConfirmRequest) {
+            TossPaymentConfirmRequest request) {
         try {
-            return tossApiClient.confirmPayment(tossPaymentConfirmRequest);
+            return tossApiClient.confirmPayment(request);
         } catch (FeignException e) {
             throw PAYMENT_ERROR.toException();
         } catch (GlobalException e) {

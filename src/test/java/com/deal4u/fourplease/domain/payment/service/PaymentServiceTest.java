@@ -7,6 +7,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
 import com.deal4u.fourplease.domain.payment.config.TossApiClient;
@@ -51,6 +53,17 @@ class PaymentServiceTest {
 
     @BeforeEach
     void setUp() {
+
+        Auction auction = Auction.builder()
+                .auctionId(1L)
+                .product(null)
+                .startingPrice(50000L)
+                .instantBidPrice(100000L)
+                .duration(null)
+                .status(AuctionStatus.OPEN)
+                .deleted(false)
+                .build();
+
         confirmRequest = new TossPaymentConfirmRequest(
                 "paymentKey123",
                 "order123",
@@ -59,6 +72,7 @@ class PaymentServiceTest {
 
         order = Order.builder()
                 .orderId(OrderId.create("order123"))
+                .auction(auction)
                 .price(new BigDecimal("10000"))
                 .build();
 
@@ -84,6 +98,9 @@ class PaymentServiceTest {
     @Test
     @DisplayName("결제 승인 성공 - 정상적인 결제 처리")
     void paymentConfirm_Success_Improved() {
+
+        String LOCK_PREFIX = "auction-lock:";
+
         // given
         when(paymentTransactionService.getOrderOrThrow(any(OrderId.class)))
                 .thenReturn(order);
@@ -102,9 +119,10 @@ class PaymentServiceTest {
         verify(paymentTransactionService).getOrderOrThrow(any(OrderId.class));
         verify(namedLock).lock();
         verify(tossApiClient).confirmPayment(confirmRequest);
-        verify(paymentTransactionService).savePayment(order, confirmRequest, successResponse);
+        verify(paymentTransactionService).savePayment(order, confirmRequest, successResponse,
+                order.getAuction());
         verify(namedLock).unlock();
-        verify(namedLockProvider).getBottleLock(order.getOrderId().toString());
+        verify(namedLockProvider).getBottleLock(LOCK_PREFIX + order.getAuction().getAuctionId());
     }
 
     @Test
@@ -125,10 +143,12 @@ class PaymentServiceTest {
     @Test
     @DisplayName("결제 승인 실패 - 토스 API 응답 상태가 실패")
     void paymentConfirm_PaymentStatusFailed() {
+        String LOCK_PREFIX = "auction-lock:";
+
         // given
         when(paymentTransactionService.getOrderOrThrow(any(OrderId.class)))
                 .thenReturn(order);
-        when(namedLockProvider.getBottleLock(order.getOrderId().toString()))
+        when(namedLockProvider.getBottleLock(LOCK_PREFIX + order.getAuction().getAuctionId()))
                 .thenReturn(namedLock);
         when(tossApiClient.confirmPayment(confirmRequest))
                 .thenReturn(failedResponse);
