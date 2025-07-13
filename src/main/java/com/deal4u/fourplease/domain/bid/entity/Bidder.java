@@ -5,12 +5,15 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Embeddable
 @Getter
 @EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bidder {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,7 +24,4 @@ public class Bidder {
         this.member = member;
     }
 
-    public Bidder() {
-
-    }
 }

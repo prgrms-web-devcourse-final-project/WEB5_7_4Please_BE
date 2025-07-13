@@ -38,9 +38,7 @@ public class BidService {
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
         // 2. 로그인 유저의 정보를 기반으로 Bidder 객체 생성
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
-        Bidder bidder = new Bidder(member);
+        Bidder bidder = getBidder(memberId);
 
         // 3. 기존 입찰 내역 조회
         Optional<Bid> existBidOptional = bidRepository.findByAuctionAndBidder(auction, bidder);
@@ -49,7 +47,7 @@ public class BidService {
             Bid existBid = existBidOptional.get();
             // 3-1. 기존 입찰 금액보다 신규 입찰 금액이 큰 경우
             if (request.price() > existBid.getPrice().intValue()) {
-                existBid.updatePrice(request.price());
+                existBid.update(request.price());
             } else {
                 throw ErrorCode.BID_FORBIDDEN_PRICE.toException();
             }
@@ -69,9 +67,7 @@ public class BidService {
     @Transactional
     public void deleteBid(long memberId, long bidId) {
         // 1. 로그인 유저의 정보를 기반으로 Bidder 객체 생성
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
-        Bidder bidder = new Bidder(member);
+        Bidder bidder = getBidder(memberId);
 
         // 2. 기존 입찰 내역 조회
         Bid existBid = bidRepository.findByBidIdAndBidder(bidId, bidder)
@@ -98,4 +94,11 @@ public class BidService {
         Page<BidResponse> bidResponsePage = bidPage.map(BidMapper::toResponse);
         return PageResponse.fromPage(bidResponsePage);
     }
+
+    private Bidder getBidder(long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
+        return new Bidder(member);
+    }
+
 }
