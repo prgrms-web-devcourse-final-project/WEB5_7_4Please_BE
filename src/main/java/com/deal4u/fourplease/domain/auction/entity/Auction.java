@@ -36,4 +36,8 @@ public class Auction extends BaseDateEntity {
     @Enumerated(EnumType.STRING)
     private AuctionStatus status;
     private boolean deleted;
+
+    public void close() {
+        this.status = AuctionStatus.CLOSED;
+    }
 }
