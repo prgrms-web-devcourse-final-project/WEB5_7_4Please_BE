@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class Bid extends BaseDateEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bidId;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auction_id")
     private Auction auction;
     @Embedded
     private Bidder bidder;

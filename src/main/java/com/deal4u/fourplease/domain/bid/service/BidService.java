@@ -4,9 +4,11 @@ import com.deal4u.fourplease.config.BidWebSocketHandler;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.dto.BidRequest;
+import com.deal4u.fourplease.domain.bid.dto.BidResponse;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.BidMessageStatus;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
+import com.deal4u.fourplease.domain.bid.entity.PageResponse;
 import com.deal4u.fourplease.domain.bid.mapper.BidMapper;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
@@ -14,11 +16,14 @@ import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BidService {
 
     private final BidRepository bidRepository;
@@ -77,5 +82,20 @@ public class BidService {
 
         // 4. `WebSocket`의 모든 `Session`에 입찰 취소 정보 전송
         bidWebSocketHandler.broadcastBid(existBid, BidMessageStatus.BID_DELETED);
+    }
+
+    public PageResponse<BidResponse> getBidListForAuction(Long auctionId, Pageable pageable) {
+        // 1. Auction 조회
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
+
+        // 2. 경매 ID를 기반으로 입찰 내역 조회
+        Page<Bid> bidPage = bidRepository.findByAuctionAndDeletedFalseOrderByPriceDescBidTimeAsc(
+                auction,
+                pageable);
+
+        // 3. `BidResponse`로 `Mapper`를 이용해서 Mapping
+        Page<BidResponse> bidResponsePage = bidPage.map(BidMapper::toResponse);
+        return PageResponse.fromPage(bidResponsePage);
     }
 }
