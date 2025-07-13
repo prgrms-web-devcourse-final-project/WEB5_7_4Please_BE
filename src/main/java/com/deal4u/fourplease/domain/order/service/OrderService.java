@@ -2,8 +2,6 @@ package com.deal4u.fourplease.domain.order.service;
 
 import static com.deal4u.fourplease.global.exception.ErrorCode.AUCTION_NOT_FOUND;
 import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_AUCTION_BIDDER;
-import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_BID_PRICE;
-import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_INSTANT_BID_PRICE;
 import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_ORDER_TYPE;
 import static com.deal4u.fourplease.global.exception.ErrorCode.ORDER_NOT_FOUND;
 import static com.deal4u.fourplease.global.exception.ErrorCode.USER_NOT_FOUND;
@@ -22,6 +20,7 @@ import com.deal4u.fourplease.domain.order.repository.OrderRepository;
 import com.deal4u.fourplease.domain.order.repository.TempAuctionRepository;
 import com.deal4u.fourplease.domain.order.repository.TempBidRepository;
 import com.deal4u.fourplease.domain.order.repository.TempMemberRepository;
+import com.deal4u.fourplease.domain.order.util.OrderValidator;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,9 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
-
-    private static final String BUY_NOW = "BUY_NOW";
-    private static final String AWARD = "AWARD";
 
     private final TempMemberRepository memberRepository;
     private final TempAuctionRepository auctionRepository;
@@ -43,15 +39,18 @@ public class OrderService {
     public String saveOrder(Long auctionId, String orderType,
                             OrderCreateRequest orderCreateRequest) {
 
-        validateType(orderType);
+        OrderValidator.validateOrderType(orderType);
 
         Member member = getMemberOrThrow(orderCreateRequest.memberId());
         Auction auction = getAuctionOrThrow(auctionId);
 
         BigDecimal expectedPrice = determineOrderPrice(auction, member, orderType);
 
-        validateOrderPrice(BigDecimal.valueOf(orderCreateRequest.price()), expectedPrice,
-                orderType);
+        OrderValidator.validateOrderPrice(
+                BigDecimal.valueOf(orderCreateRequest.price()),
+                expectedPrice,
+                orderType
+        );
 
         OrderId orderId = OrderId.generate();
         Orderer orderer = Orderer.createOrderer(member);
@@ -75,27 +74,10 @@ public class OrderService {
         order.updateOrder(orderUpdateRequest);
     }
 
-    private void validateType(String orderType) {
-        if (!BUY_NOW.equals(orderType) && !AWARD.equals(orderType)) {
-            throw INVALID_ORDER_TYPE.toException();
-        }
-    }
-
-    private void validateOrderPrice(BigDecimal requestPrice, BigDecimal expectedPrice,
-                                    String orderType) {
-        if (requestPrice.compareTo(expectedPrice) != 0) {
-            if (BUY_NOW.equals(orderType)) {
-                throw INVALID_INSTANT_BID_PRICE.toException();
-            } else {
-                throw INVALID_BID_PRICE.toException();
-            }
-        }
-    }
-
     private BigDecimal determineOrderPrice(Auction auction, Member member, String orderType) {
-        if (BUY_NOW.equals(orderType)) {
+        if ("BUY_NOW".equals(orderType)) {
             return BigDecimal.valueOf(auction.getInstantBidPrice());
-        } else if (AWARD.equals(orderType)) {
+        } else if ("AWARD".equals(orderType)) {
             return getSuccessfulBidPrice(auction, member);
         }
 
