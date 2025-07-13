@@ -47,6 +47,16 @@ public class Order extends BaseDateEntity {
     private String content;
     private String receiver;
 
+    public static Order createOrder(Auction auction, Orderer orderer, OrderId orderId,
+                                    BigDecimal orderPrice) {
+        return Order.builder()
+                .orderId(orderId)
+                .auction(auction)
+                .orderer(orderer)
+                .price(orderPrice)
+                .build();
+    }
+
     public void updateOrder(OrderUpdateRequest orderUpdateRequest) {
         this.address = new Address(orderUpdateRequest.address(), orderUpdateRequest.addressDetail(),
                 orderUpdateRequest.zipCode());

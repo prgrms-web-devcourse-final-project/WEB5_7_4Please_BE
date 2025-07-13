@@ -2,11 +2,14 @@ package com.deal4u.fourplease.domain.order.service;
 
 import static com.deal4u.fourplease.global.exception.ErrorCode.AUCTION_NOT_FOUND;
 import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_AUCTION_BIDDER;
+import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_BID_PRICE;
+import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_INSTANT_BID_PRICE;
 import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_ORDER_TYPE;
 import static com.deal4u.fourplease.global.exception.ErrorCode.ORDER_NOT_FOUND;
 import static com.deal4u.fourplease.global.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.order.dto.OrderCreateRequest;
 import com.deal4u.fourplease.domain.order.dto.OrderResponse;
@@ -19,6 +22,7 @@ import com.deal4u.fourplease.domain.order.repository.OrderRepository;
 import com.deal4u.fourplease.domain.order.repository.TempAuctionRepository;
 import com.deal4u.fourplease.domain.order.repository.TempBidRepository;
 import com.deal4u.fourplease.domain.order.repository.TempMemberRepository;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,12 +48,15 @@ public class OrderService {
         Member member = getMemberOrThrow(orderCreateRequest.memberId());
         Auction auction = getAuctionOrThrow(auctionId);
 
-        validateSuccessfulBidder(auction, member, orderType);
+        BigDecimal expectedPrice = determineOrderPrice(auction, member, orderType);
+
+        validateOrderPrice(BigDecimal.valueOf(orderCreateRequest.price()), expectedPrice,
+                orderType);
 
         OrderId orderId = OrderId.generate();
         Orderer orderer = Orderer.createOrderer(member);
 
-        Order order = createOrder(orderCreateRequest, auction, orderer, orderId);
+        Order order = Order.createOrder(auction, orderer, orderId, expectedPrice);
 
         orderRepository.save(order);
 
@@ -74,20 +81,31 @@ public class OrderService {
         }
     }
 
-    private void validateSuccessfulBidder(Auction auction, Member member, String orderType) {
-        if (AWARD.equals(orderType) && !isSuccessfulBidder(auction, member)) {
-            throw INVALID_AUCTION_BIDDER.toException();
+    private void validateOrderPrice(BigDecimal requestPrice, BigDecimal expectedPrice,
+                                    String orderType) {
+        if (requestPrice.compareTo(expectedPrice) != 0) {
+            if (BUY_NOW.equals(orderType)) {
+                throw INVALID_INSTANT_BID_PRICE.toException();
+            } else {
+                throw INVALID_BID_PRICE.toException();
+            }
         }
     }
 
-    private boolean isSuccessfulBidder(Auction auction, Member member) {
-        return bidRepository.existsSuccessfulBidder(
-                auction.getAuctionId(), member);
+    private BigDecimal determineOrderPrice(Auction auction, Member member, String orderType) {
+        if (BUY_NOW.equals(orderType)) {
+            return BigDecimal.valueOf(auction.getInstantBidPrice());
+        } else if (AWARD.equals(orderType)) {
+            return getSuccessfulBidPrice(auction, member);
+        }
+
+        throw INVALID_ORDER_TYPE.toException();
     }
 
-    private Order createOrder(OrderCreateRequest orderCreateRequest, Auction auction,
-                              Orderer orderer, OrderId orderId) {
-        return orderCreateRequest.toEntity(auction, orderer, orderId);
+    private BigDecimal getSuccessfulBidPrice(Auction auction, Member member) {
+        return bidRepository.findSuccessfulBid(auction.getAuctionId(), member)
+                .map(Bid::getPrice)
+                .orElseThrow(INVALID_AUCTION_BIDDER::toException);
     }
 
     private Auction getAuctionOrThrow(Long auctionId) {

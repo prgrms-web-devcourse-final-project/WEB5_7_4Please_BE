@@ -14,6 +14,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
     INVALID_AUCTION_BIDDER(HttpStatus.BAD_REQUEST, "해당 사용자는 경매의 낙찰자가 아닙니다."),
     INVALID_ORDER_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 타입입니다."),
+    INVALID_INSTANT_BID_PRICE(HttpStatus.BAD_REQUEST, "요청된 가격이 즉시 입찰가와 일치하지 않습니다."),
+    INVALID_BID_PRICE(HttpStatus.BAD_REQUEST, "요청된 가격이 낙찰가와 일치하지 않습니다."),
 
     INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 주문 금액과 일치하지 않습니다."),
     INVALID_USER(HttpStatus.BAD_REQUEST, "결제자 정보가 올바르지 않습니다."),
