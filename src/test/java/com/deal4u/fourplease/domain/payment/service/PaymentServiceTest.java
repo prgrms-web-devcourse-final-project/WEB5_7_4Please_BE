@@ -9,17 +9,14 @@ import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
-import com.deal4u.fourplease.domain.order.repository.OrderRepository;
 import com.deal4u.fourplease.domain.payment.config.TossApiClient;
 import com.deal4u.fourplease.domain.payment.dto.TossPaymentConfirmRequest;
 import com.deal4u.fourplease.domain.payment.dto.TossPaymentConfirmResponse;
-import com.deal4u.fourplease.domain.payment.entity.Payment;
-import com.deal4u.fourplease.domain.payment.repository.PaymentRepository;
+import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import com.deal4u.fourplease.global.lock.NamedLock;
 import com.deal4u.fourplease.global.lock.NamedLockProvider;
 import java.math.BigDecimal;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,10 +33,7 @@ class PaymentServiceTest {
     private TossApiClient tossApiClient;
 
     @Mock
-    private OrderRepository orderRepository;
-
-    @Mock
-    private PaymentRepository paymentRepository;
+    private PaymentTransactionService paymentTransactionService;
 
     @Mock
     private NamedLockProvider namedLockProvider;
@@ -91,8 +85,8 @@ class PaymentServiceTest {
     @DisplayName("결제 승인 성공 - 정상적인 결제 처리")
     void paymentConfirm_Success_Improved() {
         // given
-        when(orderRepository.findByOrderId(any(OrderId.class)))
-                .thenReturn(Optional.of(order));
+        when(paymentTransactionService.getOrderOrThrow(any(OrderId.class)))
+                .thenReturn(order);
         when(namedLockProvider.getBottleLock(anyString()))
                 .thenReturn(namedLock);
         when(tossApiClient.confirmPayment(confirmRequest))
@@ -105,10 +99,10 @@ class PaymentServiceTest {
         paymentService.paymentConfirm(confirmRequest);
 
         // then
-        verify(orderRepository).findByOrderId(any(OrderId.class));
+        verify(paymentTransactionService).getOrderOrThrow(any(OrderId.class));
         verify(namedLock).lock();
         verify(tossApiClient).confirmPayment(confirmRequest);
-        verify(paymentRepository).save(any(Payment.class));
+        verify(paymentTransactionService).savePayment(order, confirmRequest, successResponse);
         verify(namedLock).unlock();
         verify(namedLockProvider).getBottleLock(order.getOrderId().toString());
     }
@@ -117,8 +111,8 @@ class PaymentServiceTest {
     @DisplayName("결제 승인 실패 - 주문을 찾을 수 없음")
     void paymentConfirm_OrderNotFound() {
         // given
-        when(orderRepository.findByOrderId(any(OrderId.class)))
-                .thenReturn(Optional.empty());
+        when(paymentTransactionService.getOrderOrThrow(any(OrderId.class)))
+                .thenThrow(ErrorCode.ORDER_NOT_FOUND.toException());
 
         // when & then
         assertThatThrownBy(() -> paymentService.paymentConfirm(confirmRequest))
@@ -132,8 +126,8 @@ class PaymentServiceTest {
     @DisplayName("결제 승인 실패 - 토스 API 응답 상태가 실패")
     void paymentConfirm_PaymentStatusFailed() {
         // given
-        when(orderRepository.findByOrderId(any(OrderId.class)))
-                .thenReturn(Optional.of(order));
+        when(paymentTransactionService.getOrderOrThrow(any(OrderId.class)))
+                .thenReturn(order);
         when(namedLockProvider.getBottleLock(order.getOrderId().toString()))
                 .thenReturn(namedLock);
         when(tossApiClient.confirmPayment(confirmRequest))
@@ -160,8 +154,9 @@ class PaymentServiceTest {
                 20000  // 금액이 잘못된 경우
         );
 
-        when(orderRepository.findByOrderId(any(OrderId.class)))
-                .thenReturn(Optional.of(order));
+        when(paymentTransactionService.getOrderOrThrow(any(OrderId.class)))
+                .thenReturn(order);
+
 
         // when & then
         assertThatThrownBy(() -> paymentService.paymentConfirm(invalidAmountRequest))
