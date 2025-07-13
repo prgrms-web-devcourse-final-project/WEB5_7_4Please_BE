@@ -56,7 +56,7 @@ public class OrderService {
         OrderId orderId = OrderId.generate();
         Orderer orderer = Orderer.createOrderer(member);
 
-        Order order = Order.createOrder(auction, orderer, orderId, expectedPrice);
+        Order order = createOrder(auction, orderer, orderId, expectedPrice);
 
         orderRepository.save(order);
 
@@ -100,6 +100,16 @@ public class OrderService {
         }
 
         throw INVALID_ORDER_TYPE.toException();
+    }
+
+    private Order createOrder(Auction auction, Orderer orderer, OrderId orderId,
+                              BigDecimal orderPrice) {
+        return Order.builder()
+                .orderId(orderId)
+                .auction(auction)
+                .orderer(orderer)
+                .price(orderPrice)
+                .build();
     }
 
     private BigDecimal getSuccessfulBidPrice(Auction auction, Member member) {
