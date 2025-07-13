@@ -5,9 +5,11 @@ import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.BidMessageStatus;
 import com.deal4u.fourplease.domain.bid.mapper.BidMapper;
 import com.deal4u.fourplease.global.exception.ErrorCode;
+import com.deal4u.fourplease.global.exception.GlobalException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
@@ -32,8 +34,14 @@ public class BidWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // Client Connection
-        Long auctionId = getAuctionId(session);
-        rooms.computeIfAbsent(auctionId, key -> ConcurrentHashMap.newKeySet()).add(session);
+        try {
+            Long auctionId = getAuctionId(session);
+            rooms.computeIfAbsent(auctionId, key -> ConcurrentHashMap.newKeySet()).add(session);
+        } catch (GlobalException e) {
+            session.close(CloseStatus.BAD_DATA.withReason(e.getMessage()));
+        } catch (Exception e) {
+            session.close(CloseStatus.SERVER_ERROR);
+        }
     }
 
     @Override
@@ -73,7 +81,16 @@ public class BidWebSocketHandler extends TextWebSocketHandler {
 
     // URL에서 auctionId를 추출
     private Long getAuctionId(WebSocketSession session) {
-        String path = session.getUri().getPath();
-        return Long.parseLong(path.substring(path.lastIndexOf("/") + 1));
+        String path = Objects.requireNonNull(session.getUri()).getPath();
+        String idString = path.substring(path.lastIndexOf("/") + 1);
+
+        try {
+            if (idString.isEmpty()) {
+                throw new NumberFormatException("Auction id is empty");
+            }
+            return Long.parseLong(idString);
+        } catch (NumberFormatException e) {
+            throw ErrorCode.WEBSOCKET_INVALID_REQUEST_FORMAT.toException();
+        }
     }
 }
