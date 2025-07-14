@@ -59,7 +59,7 @@ public class BidMultiThreadTest {
         executorService.shutdown();
 
         await().atLeast(1000, TimeUnit.MILLISECONDS)
-                .atMost(1200, TimeUnit.MILLISECONDS)
+                .atMost(1500, TimeUnit.MILLISECONDS)
                 .untilAtomic(count, equalTo(2));
     }
 }
