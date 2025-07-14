@@ -10,20 +10,21 @@ import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/signup")
+@RequestMapping("/api/v1")
 @Slf4j
 @RequiredArgsConstructor
-public class SignUpController {
+public class MemberController {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
     private final AuthService authService;
 
-    @PostMapping("/{token}")
+    @PostMapping("/signup/{token}")
     public ResponseEntity<?> signUp(@PathVariable String token, @RequestBody SignupRequest request) {
         if (!jwtProvider.validateToken(token)) return ResponseEntity.status(401).build();
 
@@ -44,6 +45,17 @@ public class SignUpController {
                 "refreshToken", tokenPair.refreshToken(),
                 "redirectUrl", "/"
         ));
+    }
+
+    @PatchMapping("/members")
+    public ResponseEntity<?> updateMember(
+            @AuthenticationPrincipal Member member,
+            @RequestBody Map<String, Object> body
+    ) {
+        String nickName = body.get("nickName").toString();
+        member.setNickName(nickName);
+        memberRepository.save(member);
+        return ResponseEntity.ok("업데이트 성공");
     }
 
 }
