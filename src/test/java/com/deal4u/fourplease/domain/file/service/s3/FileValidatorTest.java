@@ -25,7 +25,7 @@ class FileValidatorTest {
                 new byte[]{1, 2, 3}
         );
 
-        ThrowableAssert.ThrowingCallable validFunction = () -> validator.valid(
+        ThrowableAssert.ThrowingCallable validFunction = () -> validator.validate(
                 file.getOriginalFilename(),
                 file);
 
@@ -46,7 +46,7 @@ class FileValidatorTest {
                 new byte[]{1, 2}
         );
 
-        ThrowableAssert.ThrowingCallable validFunction = () -> validator.valid(
+        ThrowableAssert.ThrowingCallable validFunction = () -> validator.validate(
                 file.getOriginalFilename(),
                 file);
         // when & then
@@ -66,7 +66,7 @@ class FileValidatorTest {
                 new byte[]{1, 2}
         );
 
-        ThrowableAssert.ThrowingCallable validFunction = () -> validator.valid(
+        ThrowableAssert.ThrowingCallable validFunction = () -> validator.validate(
                 "file.jpg",
                 file);
         // when & then
@@ -88,7 +88,7 @@ class FileValidatorTest {
 
         // when & then
         assertThatCode(
-                () -> validator.valid(file.getOriginalFilename(), file)).doesNotThrowAnyException();
+                () -> validator.validate(file.getOriginalFilename(), file)).doesNotThrowAnyException();
     }
 
 }

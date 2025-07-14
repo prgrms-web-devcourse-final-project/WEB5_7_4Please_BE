@@ -33,7 +33,7 @@ class S3FileSaverTest {
         FileValidator testFileValidator = Mockito.mock(FileValidator.class);
         doThrow(ErrorCode.INVALID_FILE.toException())
                 .when(testFileValidator)
-                .valid(savedName, file);
+                .validate(savedName, file);
 
         S3FileUploader testFileUploader = Mockito.mock(S3FileUploader.class);
 
@@ -80,7 +80,7 @@ class S3FileSaverTest {
 
         fileSaver.save(new SaveData("/test/test", "test.png"), file);
 
-        S3MetaData s3MetaData = new S3MetaData("image/png", String.valueOf(file.getSize()));
+        S3MetaData s3MetaData = new S3MetaData("image/png", file.getSize());
         verify(testFileUploader).upload(any(InputStream.class), eq("/test/test/test.png"),
                 eq(s3MetaData));
     }

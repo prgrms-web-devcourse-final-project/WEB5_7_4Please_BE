@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class FileValidator {
 
-    public void valid(String savedName, MultipartFile file) {
+    public void validate(String savedName, MultipartFile file) {
         FileType fileType = validAndGetFileType(file);
         validSameFileType(file.getOriginalFilename(), fileType);
         validSameFileType(savedName, fileType);

@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class MetaDataMapper {
 
     public static S3MetaData toMetaData(MultipartFile file) {
-        return new S3MetaData(Objects.requireNonNull(file.getContentType()),
-                String.valueOf(file.getSize()));
+        return new S3MetaData(Objects.requireNonNull(file.getContentType()), file.getSize());
     }
 }

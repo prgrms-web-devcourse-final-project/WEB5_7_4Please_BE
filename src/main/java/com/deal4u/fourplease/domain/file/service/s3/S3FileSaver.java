@@ -21,7 +21,7 @@ public class S3FileSaver implements FileSaver {
 
     @Override
     public URL save(SaveData saveData, MultipartFile file) {
-        fileValidator.valid(saveData.savedFileName(), file);
+        fileValidator.validate(saveData.savedFileName(), file);
         try (InputStream inputStream = file.getInputStream()) {
             S3MetaData metaData = toMetaData(file);
             return fileUploader.upload(inputStream, saveData.fullPath(), metaData);
