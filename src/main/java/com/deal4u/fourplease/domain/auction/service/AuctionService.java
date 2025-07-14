@@ -57,6 +57,6 @@ public class AuctionService {
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
         productService.deleteProduct(targetAuction.getProduct());
-        targetAuction.softDelete();
+        targetAuction.delete();
     }
 }

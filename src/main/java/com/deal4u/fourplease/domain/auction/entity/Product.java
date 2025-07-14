@@ -22,8 +22,8 @@ import org.hibernate.annotations.SQLRestriction;
 @Builder
 @Table(name = "products")
 @SQLRestriction("deleted = false")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Product extends BaseDateEntity {
 
     @Id
@@ -50,7 +50,7 @@ public class Product extends BaseDateEntity {
 
     private boolean deleted;
 
-    public void softDelete() {
+    public void delete() {
         this.deleted = true;
     }
 }

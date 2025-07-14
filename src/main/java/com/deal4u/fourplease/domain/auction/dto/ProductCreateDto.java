@@ -58,7 +58,7 @@ public record ProductCreateDto(
                 .description(description)
                 .thumbnailUrl(thumbnailUrl)
                 .address(address)
-                .seller(new Seller(member))
+                .seller(Seller.create(member))
                 .category(category)
                 .phone(phone)
                 .deleted(false)
