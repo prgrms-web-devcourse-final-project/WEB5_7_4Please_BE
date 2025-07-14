@@ -41,27 +41,30 @@ public class BidService {
         Bidder bidder = getBidder(memberId);
 
         // 3. 기존 입찰 내역 조회
-        Optional<Bid> existBidOptional = bidRepository.findByAuctionAndBidder(auction, bidder);
+        Optional<Bid> existBidOptional = bidRepository.findByAuctionAndBidderOrderByPriceDesc(auction, bidder);
 
         if (existBidOptional.isPresent()) {
             Bid existBid = existBidOptional.get();
             // 3-1. 기존 입찰 금액보다 신규 입찰 금액이 큰 경우
             if (request.price() > existBid.getPrice().intValue()) {
-                existBid.update(request.price());
+                createBid(request, auction, bidder);
             } else {
                 throw ErrorCode.BID_FORBIDDEN_PRICE.toException();
             }
-            bidWebSocketHandler.broadcastBid(existBid, BidMessageStatus.BID_UPDATED);
         } else {
-            // 4. Bid Entity 객체 생성
-            Bid bid = BidMapper.toEntity(auction, bidder, request.price());
-
-            // 5. DB에 저장
-            Bid save = bidRepository.save(bid);
-
-            // 6. `WebSocket`의 모든 `Session`에 새 입찰 정보 전송
-            bidWebSocketHandler.broadcastBid(save, BidMessageStatus.BID_CREATED);
+            createBid(request, auction, bidder);
         }
+    }
+
+    private void createBid(BidRequest request, Auction auction, Bidder bidder) {
+        // 4. Bid Entity 객체 생성
+        Bid bid = BidMapper.toEntity(auction, bidder, request.price());
+
+        // 5. DB에 저장
+        Bid save = bidRepository.save(bid);
+
+        // 6. `WebSocket`의 모든 `Session`에 새 입찰 정보 전송
+        bidWebSocketHandler.broadcastBid(save, BidMessageStatus.BID_CREATED);
     }
 
     @Transactional

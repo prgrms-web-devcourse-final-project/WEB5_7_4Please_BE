@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BidRepository extends JpaRepository<Bid, Long> {
 
-    Optional<Bid> findByAuctionAndBidder(Auction auction, Bidder bidder);
+    Optional<Bid> findByAuctionAndBidderOrderByPriceDesc(Auction auction, Bidder bidder);
 
     @Query("select b.price from Bid b where b.auction.auctionId = :auctionId order by b.price desc")
     List<Long> findPricesByAuctionIdOrderByPriceDesc(@Param("auctionId") Long auctionId);

@@ -72,7 +72,7 @@ class BidServiceIntegrationTest {
         Auction auction = auctionRepository.findById(auctionId2)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
-        this.initialBid = bidRepository.findByAuctionAndBidder(auction, bidder)
+        this.initialBid = bidRepository.findByAuctionAndBidderOrderByPriceDesc(auction, bidder)
                 .orElseThrow(ErrorCode.BID_NOT_FOUND::toException);
     }
 
@@ -95,7 +95,7 @@ class BidServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("입찰 갱신 성공 (기본 입찰가보다 높은 금액)")
+    @DisplayName("입찰 갱신 성공 (자기 자신의 입찰가보다 높은 금액)")
     void update_bid_higher_price_integrationtest() {
         // 1. 입찰자`A`의 신규 입찰 객체 생성
         BidRequest updateRequest = new BidRequest(auctionId2, 180_000);
@@ -105,7 +105,7 @@ class BidServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("입찰 갱신 실패 (기본 입찰가보다 낮은 금액)")
+    @DisplayName("입찰 갱신 실패 (자기 자신의 입찰가보다 낮은 금액)")
     void update_bid_lower_price_integrationtest() {
         // 1. 입찰자`A`의 신규 입찰 객체 생성
         BidRequest updateRequest = new BidRequest(auctionId2, 100_000);
