@@ -16,6 +16,7 @@ import com.deal4u.fourplease.domain.order.dto.OrderResponse;
 import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
+import com.deal4u.fourplease.domain.order.entity.OrderType;
 import com.deal4u.fourplease.domain.order.entity.Orderer;
 import com.deal4u.fourplease.domain.order.mapper.OrderMapper;
 import com.deal4u.fourplease.domain.order.repository.OrderRepository;
@@ -31,16 +32,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private static final String BUY_NOW = "BUY_NOW";
-    private static final String AWARD = "AWARD";
-
     private final TempMemberRepository memberRepository;
     private final TempAuctionRepository auctionRepository;
     private final OrderRepository orderRepository;
     private final TempBidRepository bidRepository;
 
     @Transactional
-    public String saveOrder(Long auctionId, String orderType,
+    public String saveOrder(Long auctionId, OrderType orderType,
                             OrderCreateRequest orderCreateRequest) {
 
         // todo: 나중에 컨텍스트 홀더에서 받을 예정
@@ -77,16 +75,17 @@ public class OrderService {
         order.updateOrder(orderUpdateRequest);
     }
 
-    private void validateType(String orderType) {
-        if (!BUY_NOW.equals(orderType) && !AWARD.equals(orderType)) {
-            throw INVALID_ORDER_TYPE.toException();
+    private void validateType(OrderType orderType) {
+        if (orderType == OrderType.BUY_NOW || orderType == OrderType.AWARD) {
+            return;
         }
+        throw INVALID_ORDER_TYPE.toException();
     }
 
     private void validateOrderPrice(BigDecimal requestPrice, BigDecimal expectedPrice,
-                                    String orderType) {
+                                    OrderType orderType) {
         if (requestPrice.compareTo(expectedPrice) != 0) {
-            if (BUY_NOW.equals(orderType)) {
+            if (OrderType.BUY_NOW.equals(orderType)) {
                 throw INVALID_INSTANT_BID_PRICE.toException();
             } else {
                 throw INVALID_BID_PRICE.toException();
@@ -94,10 +93,10 @@ public class OrderService {
         }
     }
 
-    private BigDecimal determineOrderPrice(Auction auction, Member member, String orderType) {
-        if (BUY_NOW.equals(orderType)) {
+    private BigDecimal determineOrderPrice(Auction auction, Member member, OrderType orderType) {
+        if (OrderType.BUY_NOW.equals(orderType)) {
             return BigDecimal.valueOf(auction.getInstantBidPrice());
-        } else if (AWARD.equals(orderType)) {
+        } else if (OrderType.AWARD.equals(orderType)) {
             return getSuccessfulBidPrice(auction, member);
         }
 

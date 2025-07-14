@@ -22,6 +22,7 @@ import com.deal4u.fourplease.domain.order.dto.OrderResponse;
 import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
+import com.deal4u.fourplease.domain.order.entity.OrderType;
 import com.deal4u.fourplease.domain.order.entity.Orderer;
 import com.deal4u.fourplease.domain.order.repository.OrderRepository;
 import com.deal4u.fourplease.domain.order.repository.TempAuctionRepository;
@@ -137,12 +138,11 @@ class OrderServiceTest {
         void testCreateOrder_BuyNowSuccessful() {
             // Given
             Long auctionId = 1L;
-            String orderType = "BUY_NOW";
-            Long memberId = 1L;
+            OrderType orderType = OrderType.BUY_NOW;
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(memberId))
+            when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
 
             // When
@@ -158,8 +158,7 @@ class OrderServiceTest {
         void testCreateOrder_BuyNowInvalidPrice() {
             // Given
             Long auctionId = 1L;
-            String orderType = "BUY_NOW";
-            Long memberId = 1L;
+            OrderType orderType = OrderType.BUY_NOW;
 
             OrderCreateRequest invalidPriceRequest = OrderCreateRequest.builder()
                     .price(10000L)
@@ -167,7 +166,7 @@ class OrderServiceTest {
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(memberId))
+            when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
 
             // When, Then
@@ -183,12 +182,12 @@ class OrderServiceTest {
         @DisplayName("낙찰자가 AWARD 타입의 주문을 정상적으로 생성하는 경우")
         void testCreateOrder_AwardSuccessful() {
             // Given
-            String orderType = "AWARD";
+            OrderType orderType = OrderType.AWARD;
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(
                     auction.getAuctionId()))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(member.getMemberId()))
+            when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
             when(tempBidRepository.findSuccessfulBid(auction.getAuctionId(), member))
                     .thenReturn(Optional.of(winningBid));
@@ -213,7 +212,7 @@ class OrderServiceTest {
         @DisplayName("AWARD 타입의 주문에서 가격이 일치하지 않는 경우 예외 발생")
         void testCreateOrder_AwardInvalidPrice() {
             // Given
-            String orderType = "AWARD";
+            OrderType orderType = OrderType.AWARD;
 
             OrderCreateRequest invalidPriceRequest = OrderCreateRequest.builder()
                     .price(10000L)  // 낙찰가(15000L)와 다른 가격
@@ -222,7 +221,7 @@ class OrderServiceTest {
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(
                     auction.getAuctionId()))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(member.getMemberId()))
+            when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
             when(tempBidRepository.findSuccessfulBid(auction.getAuctionId(), member))
                     .thenReturn(Optional.of(winningBid));
@@ -237,30 +236,13 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("유효하지 않은 주문 유형인 경우 예외 발생")
-        void testCreateOrder_InvalidOrderType() {
-            // Given
-            Long auctionId = 1L;
-            String orderType = "INVALID_TYPE";
-
-            // When, Then
-            assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, orderCreateRequest))
-                    .isInstanceOf(GlobalException.class)
-                    .hasMessage("유효하지 않은 주문 타입입니다.")
-                    .extracting("status")
-                    .isEqualTo(HttpStatus.BAD_REQUEST);
-        }
-
-        @Test
         @DisplayName("경매를 찾을 수 없는 경우 예외 발생")
         void testCreateOrder_AuctionNotFound() {
             // Given
             Long auctionId = 1L;
-            String orderType = "BUY_NOW";
-            Long memberId = 1L;
+            OrderType orderType = OrderType.BUY_NOW;
 
-            when(tempMemberRepository.findById(memberId))
+            when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
                     .thenReturn(Optional.empty());
@@ -279,10 +261,9 @@ class OrderServiceTest {
         void testCreateOrder_UserNotFound() {
             // Given
             Long auctionId = 1L;
-            String orderType = "BUY_NOW";
-            Long memberId = 1L;
+            OrderType orderType = OrderType.BUY_NOW;
 
-            when(tempMemberRepository.findById(memberId))
+            when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.empty());
 
             // When, Then
@@ -299,12 +280,11 @@ class OrderServiceTest {
         void testCreateOrder_InvalidBidderForAward() {
             // Given
             Long auctionId = 1L;
-            String orderType = "AWARD";
-            Long memberId = 1L;
+            OrderType orderType = OrderType.AWARD;
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(memberId))
+            when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
             when(tempBidRepository.findSuccessfulBid(auctionId, member))
                     .thenReturn(Optional.empty());  // 낙찰 입찰이 없음
@@ -316,6 +296,97 @@ class OrderServiceTest {
                     .hasMessage("해당 사용자는 경매의 낙찰자가 아닙니다.")
                     .extracting("status")
                     .isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+        @Test
+        @DisplayName("null인 주문 유형인 경우 예외 발생")
+        void testCreateOrder_NullOrderType() {
+            // Given
+            Long auctionId = 1L;
+            OrderType orderType = null;
+
+            // When, Then
+            assertThatThrownBy(
+                    () -> orderService.saveOrder(auctionId, orderType, orderCreateRequest))
+                    .isInstanceOf(GlobalException.class)
+                    .hasMessage("유효하지 않은 주문 타입입니다.")
+                    .extracting("status")
+                    .isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+        @Test
+        @DisplayName("OrderType enum의 value가 올바른지 확인")
+        void testOrderType_EnumValues() {
+            // Given & When & Then
+            assertThat(OrderType.BUY_NOW.getValue()).isEqualTo("BUY_NOW");
+            assertThat(OrderType.AWARD.getValue()).isEqualTo("AWARD");
+        }
+
+        @Test
+        @DisplayName("OrderType enum의 모든 값이 올바르게 정의되었는지 확인")
+        void testOrderType_AllEnumValues() {
+            // Given & When
+            OrderType[] orderTypes = OrderType.values();
+
+            // Then
+            assertThat(orderTypes).hasSize(2);
+            assertThat(orderTypes[0]).isEqualTo(OrderType.BUY_NOW);
+            assertThat(orderTypes[1]).isEqualTo(OrderType.AWARD);
+        }
+
+        @Test
+        @DisplayName("BUY_NOW 타입 주문에서 즉시 구매가 정확히 처리되는지 확인")
+        void testCreateOrder_BuyNowTypeValidation() {
+            // Given
+            Long auctionId = 1L;
+            OrderType orderType = OrderType.BUY_NOW;
+
+            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
+                    .thenReturn(Optional.of(auction));
+            when(tempMemberRepository.findById(1L))
+                    .thenReturn(Optional.of(member));
+
+            // When
+            String orderId = orderService.saveOrder(auctionId, orderType, orderCreateRequest);
+
+            // Then
+            assertNotNull(orderId);
+
+            ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
+            verify(orderRepository, times(1)).save(orderCaptor.capture());
+
+            Order capturedOrder = orderCaptor.getValue();
+            assertThat(capturedOrder.getPrice()).isEqualByComparingTo(
+                    BigDecimal.valueOf(auction.getInstantBidPrice()));
+            assertThat(capturedOrder.getAuction().getAuctionId()).isEqualTo(auction.getAuctionId());
+        }
+
+        @Test
+        @DisplayName("AWARD 타입 주문에서 낙찰가가 정확히 처리되는지 확인")
+        void testCreateOrder_AwardTypeValidation() {
+            // Given
+            Long auctionId = 1L;
+            OrderType orderType = OrderType.AWARD;
+
+            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
+                    .thenReturn(Optional.of(auction));
+            when(tempMemberRepository.findById(1L))
+                    .thenReturn(Optional.of(member));
+            when(tempBidRepository.findSuccessfulBid(auctionId, member))
+                    .thenReturn(Optional.of(winningBid));
+
+            // When
+            String orderId = orderService.saveOrder(auctionId, orderType, awardOrderCreateRequest);
+
+            // Then
+            assertNotNull(orderId);
+
+            ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
+            verify(orderRepository, times(1)).save(orderCaptor.capture());
+
+            Order capturedOrder = orderCaptor.getValue();
+            assertThat(capturedOrder.getPrice()).isEqualByComparingTo(winningBid.getPrice());
+            assertThat(capturedOrder.getAuction().getAuctionId()).isEqualTo(auction.getAuctionId());
         }
     }
 

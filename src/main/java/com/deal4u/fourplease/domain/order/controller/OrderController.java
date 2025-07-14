@@ -3,6 +3,7 @@ package com.deal4u.fourplease.domain.order.controller;
 import com.deal4u.fourplease.domain.order.dto.OrderCreateRequest;
 import com.deal4u.fourplease.domain.order.dto.OrderResponse;
 import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
+import com.deal4u.fourplease.domain.order.entity.OrderType;
 import com.deal4u.fourplease.domain.order.service.OrderService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,10 +36,11 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     public String createOrder(
             @PathVariable @Positive Long auctionId,
-            @PathVariable String type,
+            @PathVariable OrderType type,
             @RequestBody @Valid OrderCreateRequest orderCreateRequest
     ) {
-        return orderService.saveOrder(auctionId, type, orderCreateRequest);
+        return orderService.saveOrder(auctionId, type,
+                orderCreateRequest);
     }
 
     @GetMapping("/orders/{orderId}")

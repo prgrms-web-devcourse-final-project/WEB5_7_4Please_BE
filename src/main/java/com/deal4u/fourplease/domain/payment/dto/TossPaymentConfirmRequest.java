@@ -11,6 +11,6 @@ public record TossPaymentConfirmRequest(
         String orderId,
 
         @NotNull(message = "amount는 필수 입력값입니다.")
-        int amount
+        Integer amount
 ) {
 }
