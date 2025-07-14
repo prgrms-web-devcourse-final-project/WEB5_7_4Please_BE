@@ -135,7 +135,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("즉시 구매(BUY_NOW) 주문이 정상적으로 생성되는 경우")
-        void testCreateOrder_BuyNowSuccessful() {
+        void test_create_order_buy_now_successful() {
             // Given
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
@@ -155,7 +155,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("즉시 구매(BUY_NOW) 주문에서 가격이 일치하지 않는 경우 예외 발생")
-        void testCreateOrder_BuyNowInvalidPrice() {
+        void test_create_order_buy_now_invalid_price() {
             // Given
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
@@ -180,7 +180,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("낙찰자가 AWARD 타입의 주문을 정상적으로 생성하는 경우")
-        void testCreateOrder_AwardSuccessful() {
+        void test_create_order_award_successful() {
             // Given
             String orderType = "AWARD";
 
@@ -210,7 +210,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("AWARD 타입의 주문에서 가격이 일치하지 않는 경우 예외 발생")
-        void testCreateOrder_AwardInvalidPrice() {
+        void test_create_order_award_invalid_price() {
             // Given
             String orderType = "AWARD";
 
@@ -237,7 +237,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("경매를 찾을 수 없는 경우 예외 발생")
-        void testCreateOrder_AuctionNotFound() {
+        void test_create_order_auction_not_found() {
             // Given
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
@@ -258,7 +258,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("사용자를 찾을 수 없는 경우 예외 발생")
-        void testCreateOrder_UserNotFound() {
+        void test_create_order_user_not_found() {
             // Given
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
@@ -277,7 +277,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("AWARD 타입의 주문에서 유효하지 않은 입찰자일 경우 예외 발생")
-        void testCreateOrder_InvalidBidderForAward() {
+        void test_create_order_invalid_bidder_for_award() {
             // Given
             Long auctionId = 1L;
             String orderType = "AWARD";
@@ -300,7 +300,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("유효하지 않은 주문 타입인 경우 예외 발생")
-        void testCreateOrder_InvalidOrderType() {
+        void test_create_order_invalid_order_type() {
             // Given
             Long auctionId = 1L;
             String orderType = "INVALID_TYPE";
@@ -316,7 +316,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("BUY_NOW 타입 주문에서 즉시 구매가 정확히 처리되는지 확인")
-        void testCreateOrder_BuyNowTypeValidation() {
+        void test_create_order_buy_now_type_validation() {
             // Given
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
@@ -343,7 +343,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("AWARD 타입 주문에서 낙찰가가 정확히 처리되는지 확인")
-        void testCreateOrder_AwardTypeValidation() {
+        void test_create_order_award_type_validation() {
             // Given
             Long auctionId = 1L;
             String orderType = "AWARD";
@@ -371,7 +371,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("OrderType enum의 fromString 메서드 - 유효한 타입들 검증")
-        void testOrderType_FromStringValidation() {
+        void test_order_type_from_string_validation() {
             // Given & When & Then
             assertThat(OrderType.fromString("BUY_NOW")).isEqualTo(OrderType.BUY_NOW);
             assertThat(OrderType.fromString("AWARD")).isEqualTo(OrderType.AWARD);
@@ -383,7 +383,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("OrderType enum의 fromString 메서드 - 유효하지 않은 문자열 예외 검증")
-        void testOrderType_FromStringInvalidValue() {
+        void test_order_type_from_string_invalid_value() {
             // Given & When & Then
             assertThatThrownBy(() -> OrderType.fromString("INVALID"))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -391,7 +391,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("OrderType enum의 fromString 메서드 - null 값 예외 검증")
-        void testOrderType_FromStringNullValue() {
+        void test_order_type_from_string_null_value() {
             // Given & When & Then
             assertThatThrownBy(() -> OrderType.fromString(null))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -403,7 +403,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("주문 조회가 정상적으로 수행되는 경우")
-        void testGetOrder_Successful() {
+        void test_get_order_successful() {
             // Given
             Long orderId = 1L;
 
@@ -440,7 +440,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("존재하지 않는 주문을 조회하는 경우 예외 발생")
-        void testGetOrder_OrderNotFound() {
+        void test_get_order_order_not_found() {
             // Given
             Long orderId = 999L;
 
@@ -461,7 +461,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("주문 업데이트가 정상적으로 수행되는 경우")
-        void testUpdateOrder_Successful() {
+        void test_update_order_successful() {
             // Given
             Long orderId = 1L;
 
@@ -502,7 +502,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("존재하지 않는 주문을 업데이트하려는 경우 예외 발생")
-        void testUpdateOrder_OrderNotFound() {
+        void test_update_order_order_not_found() {
             // Given
             Long orderId = 999L;
 
