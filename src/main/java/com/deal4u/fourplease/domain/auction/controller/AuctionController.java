@@ -3,7 +3,10 @@ package com.deal4u.fourplease.domain.auction.controller;
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
-import com.deal4u.fourplease.domain.member.entity.TempMember;
+import com.deal4u.fourplease.domain.member.entity.Member;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -22,26 +25,36 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auctions")
 @RequiredArgsConstructor
+@Tag(name = "Auction", description = "상품-경매 관리 API")
 public class AuctionController {
 
     private final AuctionService auctionService;
 
+    @Operation(summary = "경매등록")
+    @ApiResponse(responseCode = "201", description = "경매 등록 성공")
+    @ApiResponse(responseCode = "400", description = "invalid value")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void createAuction(
             @Valid @RequestBody AuctionCreateRequest request,
             // TODO: @AuthenticationPrincipal 추가
-            TempMember member
+            Member member
     ) {
         auctionService.save(request, member);
     }
 
+    @Operation(summary = "상품 설명")
+    @ApiResponse(responseCode = "200", description = "상품 설명 반환")
+    @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
     @GetMapping("/{auctionId}/description")
     @ResponseStatus(HttpStatus.OK)
     public AuctionDetailResponse readAuction(@PathVariable @Positive Long auctionId) {
         return auctionService.getByAuctionId(auctionId);
     }
 
+    @Operation(summary = "경매제거")
+    @ApiResponse(responseCode = "204", description = "경매 삭제 성공")
+    @ApiResponse(responseCode = "409", description = "낙찰된 경매는 제거 불가능")
     @DeleteMapping("/{auctionId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAuction(@PathVariable @Positive Long auctionId) {

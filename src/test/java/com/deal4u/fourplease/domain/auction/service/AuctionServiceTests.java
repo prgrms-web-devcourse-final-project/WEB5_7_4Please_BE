@@ -17,8 +17,8 @@ import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
-import com.deal4u.fourplease.domain.bid.repository.TempBidRepository;
-import com.deal4u.fourplease.domain.member.entity.TempMember;
+import com.deal4u.fourplease.domain.bid.repository.BidRepository;
+import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -44,7 +44,7 @@ class AuctionServiceTests {
     private ProductService productService;
 
     @Mock
-    private TempBidRepository bidRepository;
+    private BidRepository bidRepository;
 
     @Mock
     private ProductImageService productImageService;
@@ -53,7 +53,7 @@ class AuctionServiceTests {
     @DisplayName("경매를 등록할 수 있다")
     void save_should_save_auction() throws Exception {
 
-        TempMember member = genMember();
+        Member member = genMember();
         AuctionCreateRequest req = genAuctionCreateRequest();
 
         int bidPeriod = 3;
@@ -93,6 +93,7 @@ class AuctionServiceTests {
                 "http://example.com/image1.jpg", "http://example.com/image2.jpg"
         );
 
+        // TODO: Long -> BigDecimal로 변경 예정
         when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId)).thenReturn(bidList);
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
 
@@ -122,6 +123,7 @@ class AuctionServiceTests {
         Long auctionId = 1L;
         List<Long> bidList = List.of(200_0000L, 150_0000L, 100_0000L);
 
+        // TODO: Long -> BigDecimal로 변경 예정
         when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId)).thenReturn(bidList);
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.empty());
 

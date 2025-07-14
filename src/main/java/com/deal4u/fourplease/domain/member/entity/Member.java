@@ -17,7 +17,7 @@ import org.hibernate.annotations.NaturalId;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TempMember extends BaseDateEntity {
+public class Member extends BaseDateEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

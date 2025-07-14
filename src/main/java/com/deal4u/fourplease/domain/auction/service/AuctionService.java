@@ -6,8 +6,8 @@ import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
-import com.deal4u.fourplease.domain.bid.repository.TempBidRepository;
-import com.deal4u.fourplease.domain.member.entity.TempMember;
+import com.deal4u.fourplease.domain.bid.repository.BidRepository;
+import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
@@ -22,11 +22,11 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final ProductService productService;
-    private final TempBidRepository bidRepository;
+    private final BidRepository bidRepository;
     private final ProductImageService productImageService;
 
     @Transactional
-    public void save(AuctionCreateRequest request, TempMember member) {
+    public void save(AuctionCreateRequest request, Member member) {
 
         ProductCreateDto productCreateDto = request.toProductCreateDto(member);
         Product product = productService.save(productCreateDto);
@@ -37,6 +37,7 @@ public class AuctionService {
     }
 
     public AuctionDetailResponse getByAuctionId(@Positive Long auctionId) {
+        // TODO: Long -> BigDecimal로 변경 예정
         List<Long> bidList = bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId);
 
         Auction auction = auctionRepository.findByIdWithProduct(auctionId)

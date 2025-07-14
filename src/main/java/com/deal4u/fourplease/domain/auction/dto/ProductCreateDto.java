@@ -5,7 +5,7 @@ import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.Seller;
-import com.deal4u.fourplease.domain.member.entity.TempMember;
+import com.deal4u.fourplease.domain.member.entity.Member;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +16,7 @@ import java.util.List;
 public record ProductCreateDto(
 
         @NotNull(message = "판매자 정보를 입력해 주세요.")
-        TempMember member,
+        Member member,
 
         @NotBlank(message = "상품 이름을 입력해 주세요.")
         @Size(min = 1, max = 20, message = "상품 이름은 1자 이상 20자 이하로 입력해주세요.")
