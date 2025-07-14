@@ -15,10 +15,8 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private JwtProvider jwtProvider;
-    private RefreshTokenRepository refreshTokenRepository;
-    private MemberRepository memberRepository;
-
+    private final JwtProvider jwtProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     // 로그인 시 토큰 생성 및 저장
     public TokenPair createTokenPair(Member member) {
