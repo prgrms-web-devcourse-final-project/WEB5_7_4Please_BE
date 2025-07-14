@@ -97,7 +97,7 @@ public class OrderService {
 
     private BigDecimal determineOrderPrice(Auction auction, Member member, OrderType orderType) {
         if (OrderType.BUY_NOW.equals(orderType)) {
-            return BigDecimal.valueOf(auction.getInstantBidPrice());
+            return auction.getInstantBidPrice();
         } else if (OrderType.AWARD.equals(orderType)) {
             return getSuccessFulBidPrice(auction, member);
         }

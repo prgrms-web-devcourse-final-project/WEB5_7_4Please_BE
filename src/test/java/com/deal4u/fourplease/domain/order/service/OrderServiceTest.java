@@ -72,8 +72,8 @@ class OrderServiceTest {
     void setUp() {
         auction = Auction.builder()
                 .auctionId(1L)
-                .startingPrice(100L)
-                .instantBidPrice(20000L)
+                .startingPrice(new BigDecimal("100"))
+                .instantBidPrice(new BigDecimal("20000"))
                 .deleted(false)
                 .build();
 
@@ -103,7 +103,7 @@ class OrderServiceTest {
                 .productId(1L)
                 .name("맥북 프로")
                 .thumbnailUrl("http://example.com/image.jpg")
-                .seller(Seller.createSeller(member))
+                .seller(Seller.create(member))
                 .address(address)
                 .build();
 
@@ -337,7 +337,7 @@ class OrderServiceTest {
 
             Order capturedOrder = orderCaptor.getValue();
             assertThat(capturedOrder.getPrice()).isEqualByComparingTo(
-                    BigDecimal.valueOf(auction.getInstantBidPrice()));
+                    auction.getInstantBidPrice());
             assertThat(capturedOrder.getAuction().getAuctionId()).isEqualTo(auction.getAuctionId());
         }
 
@@ -491,7 +491,7 @@ class OrderServiceTest {
 
             // Then
             assertThat(orderToUpdate.getAddress().address()).isEqualTo("한남 더힐");
-            assertThat(orderToUpdate.getAddress().detailAddress()).isEqualTo("101동");
+            assertThat(orderToUpdate.getAddress().addressDetail()).isEqualTo("101동");
             assertThat(orderToUpdate.getAddress().zipCode()).isEqualTo("54321");
             assertThat(orderToUpdate.getPhone()).isEqualTo("010-9876-5432");
             assertThat(orderToUpdate.getContent()).isEqualTo("새로운 요청사항");
