@@ -1,19 +1,18 @@
 package com.deal4u.fourplease.domain.auth.model;
 
 import com.deal4u.fourplease.domain.member.entity.Member;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 @Getter
 @RequiredArgsConstructor
-public class CustomOAuth2User implements OAuth2User {
+public class Customoauth2User implements OAuth2User {
     private final Member member;
     private final Map<String, Object> attributes;
 
@@ -33,7 +32,4 @@ public class CustomOAuth2User implements OAuth2User {
         return member.getEmail(); // 인증 객체 식별자
     }
 
-    public Member getMember() {
-        return member;
-    }
 }

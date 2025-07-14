@@ -7,30 +7,46 @@ import com.deal4u.fourplease.domain.auth.repository.RefreshTokenRepository;
 import com.deal4u.fourplease.domain.auth.service.AuthService;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.dto.SignupRequest;
+import com.deal4u.fourplease.domain.member.dto.SignupResponse;
+import com.deal4u.fourplease.domain.member.dto.UpdateMemberResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MemberService {
+    private static final String MAIN_REDIRECT_URL = "/";
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
     private final AuthService authService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
 
-    private void validateNickName(String nickName) {
+    public void validateMember(Member member) {
+        if (member == null) {
+            throw ErrorCode.MEMBER_NOT_FOUND.toException();
+        }
+
+        if (member.getEmail() == null || member.getEmail().trim().isEmpty()) {
+            throw ErrorCode.OAUTH_EMAIL_NOT_FOUND.toException();
+        }
+
+        if (member.getStatus() == Status.DELETED) {
+            throw ErrorCode.MEMBER_WITHDRAWN.toException();
+        }
+    }
+
+    public void validateNickName(String nickName) {
         if (nickName == null || nickName.isBlank()) {
             throw ErrorCode.INVALID_NICKNAME.toException();
         }
@@ -59,17 +75,16 @@ public class MemberService {
 
         String token = authHeader.replace("Bearer ", "");
         if (token.isBlank()) {
-            throw ErrorCode.INVALID_TOKEN.toException();
+            throw ErrorCode.INVALID_AUTH_HEADER.toException();
         }
 
         return token;
     }
+
     @Transactional
-    public ResponseEntity<?> signup(String token, SignupRequest request) {
+    public ResponseEntity<SignupResponse> signup(String token, SignupRequest request) {
         // 토큰 유효성 검사
-        if (!jwtProvider.validateToken(token)) {
-            throw ErrorCode.INVALID_TOKEN.toException();
-        }
+        jwtProvider.validateOrThrow(token);
 
         // 닉네임 유효성 검사
         validateNickName(request.nickName());
@@ -87,32 +102,36 @@ public class MemberService {
         log.info("닉네임 설정된 유저: {}", member.getEmail());
 
         TokenPair tokenPair = authService.createTokenPair(member);
-        return ResponseEntity.ok(Map.of(
-                "message", "닉네임 설정 완료, 로그인 성공",
-                "accessToken", tokenPair.accessToken(),
-                "refreshToken", tokenPair.refreshToken(),
-                "redirectUrl", "/"
-        ));
+        SignupResponse response = SignupResponse.builder()
+                .message("닉네임 설정 완료, 로그인 성공")
+                .accessToken(tokenPair.accessToken())
+                .refreshToken(tokenPair.refreshToken())
+                .redirectUrl(MAIN_REDIRECT_URL)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    public ResponseEntity<?> updateMember(Member member, String nickName) {
+    public ResponseEntity<UpdateMemberResponse> updateMember(Member member, String nickName) {
         // 닉네임 유효성 검사 (중복 제거)
         validateNickName(nickName);
 
         member.setNickName(nickName);
         memberRepository.save(member);
-        return ResponseEntity.ok("업데이트 성공");
+        UpdateMemberResponse response = UpdateMemberResponse.builder()
+                .message("업데이트 성공")
+                .nickName(nickName)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @Transactional
-    public ResponseEntity<?> logout(String authHeader, Member member) {
+    public ResponseEntity<Void> logout(String authHeader, Member member) {
         // Authorization 헤더에서 토큰 추출 및 검증
         String token = extractTokenFromHeader(authHeader);
 
         // 토큰 유효성 검사
-        if (!jwtProvider.validateToken(token)) {
-            throw ErrorCode.INVALID_TOKEN.toException();
-        }
+        jwtProvider.validateOrThrow(token);
 
         // 이미 블랙리스트에 있는지 확인
         if (blacklistedTokenRepository.existsByToken(token)) {
@@ -132,6 +151,6 @@ public class MemberService {
         // 리프레시 토큰 삭제
         refreshTokenRepository.deleteByMember(member);
         log.info("사용자 로그아웃 완료: {}", member.getEmail());
-        return ResponseEntity.ok("로그아웃 완료 및 권한 변경");
+        return ResponseEntity.noContent().build();
     }
 }

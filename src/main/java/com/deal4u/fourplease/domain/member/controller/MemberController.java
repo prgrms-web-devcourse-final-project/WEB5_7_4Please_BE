@@ -1,21 +1,24 @@
 package com.deal4u.fourplease.domain.member.controller;
 
-import com.deal4u.fourplease.domain.auth.entity.BlacklistedToken;
 import com.deal4u.fourplease.domain.member.dto.SignupRequest;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.Map;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -31,7 +34,8 @@ public class MemberController {
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰")
     })
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> signUp(@PathVariable String token, @RequestBody SignupRequest request) {
+    public ResponseEntity<?> signUp(@PathVariable String token,
+                                    @RequestBody SignupRequest request) {
         return memberService.signup(token, request);
     }
 

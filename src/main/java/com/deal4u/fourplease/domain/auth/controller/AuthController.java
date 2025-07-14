@@ -17,7 +17,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping
-    public ResponseEntity<TokenPair> refreshAccessToken(@RequestHeader("Authorization") String refreshTokenHeader) {
+    public ResponseEntity<TokenPair> refreshAccessToken(
+            @RequestHeader("Authorization") String refreshTokenHeader) {
         String refreshToken = refreshTokenHeader.replace("Bearer ", "");
         TokenPair tokenPair = authService.refreshAccessToken(refreshToken);
         return ResponseEntity.ok(tokenPair);

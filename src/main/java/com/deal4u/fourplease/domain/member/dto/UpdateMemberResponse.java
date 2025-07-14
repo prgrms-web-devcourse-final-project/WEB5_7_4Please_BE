@@ -1,4 +1,10 @@
 package com.deal4u.fourplease.domain.member.dto;
 
-public record UpdateResponse {
+import lombok.Builder;
+
+@Builder
+public record UpdateMemberResponse(
+        String message,
+        String nickName
+) {
 }
