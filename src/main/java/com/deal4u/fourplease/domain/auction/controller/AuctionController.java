@@ -4,6 +4,7 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuctionController {
 
     private final AuctionService auctionService;
+    private final MemberRepository memberRepository;
 
     @Operation(summary = "경매등록")
     @ApiResponse(responseCode = "201", description = "경매 등록 성공")
@@ -36,11 +38,9 @@ public class AuctionController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void createAuction(
-            @Valid @RequestBody AuctionCreateRequest request,
-            // TODO: @AuthenticationPrincipal 추가
-            Member member
+            @Valid @RequestBody AuctionCreateRequest request
     ) {
-        auctionService.save(request, member);
+        auctionService.save(request, memberRepository.findAll().getFirst());
     }
 
     @Operation(summary = "상품 설명")
@@ -48,7 +48,8 @@ public class AuctionController {
     @ApiResponse(responseCode = "404", description = "상품을 찾을 수 없음")
     @GetMapping("/{auctionId}/description")
     @ResponseStatus(HttpStatus.OK)
-    public AuctionDetailResponse readAuction(@PathVariable @Positive Long auctionId) {
+    public AuctionDetailResponse readAuction(
+            @PathVariable(name = "auctionId") @Positive Long auctionId) {
         return auctionService.getByAuctionId(auctionId);
     }
 
@@ -57,7 +58,7 @@ public class AuctionController {
     @ApiResponse(responseCode = "409", description = "낙찰된 경매는 제거 불가능")
     @DeleteMapping("/{auctionId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAuction(@PathVariable @Positive Long auctionId) {
+    public void deleteAuction(@PathVariable(name = "auctionId") @Positive Long auctionId) {
         auctionService.deleteByAuctionId(auctionId);
     }
 
