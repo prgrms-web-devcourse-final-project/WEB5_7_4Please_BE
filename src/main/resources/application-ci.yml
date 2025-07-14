@@ -6,8 +6,12 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
         format_sql: true
+  sql:
+    init:
+      #애플리케이션 시작 시 항상 data.sql / schema.sql 실행
+      mode: always
