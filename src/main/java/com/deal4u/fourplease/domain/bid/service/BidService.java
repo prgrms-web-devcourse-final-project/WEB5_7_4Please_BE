@@ -115,7 +115,7 @@ public class BidService {
                 throw ErrorCode.AUCTION_NOT_OPEN.toException();
             }
 
-            // 6. 기존 일찰 취소
+            // 6. 기존 입찰 취소
             existBid.delete();
 
             // 7. `WebSocket`의 모든 `Session`에 입찰 취소 정보 전송
@@ -144,7 +144,7 @@ public class BidService {
     private Bidder getBidder(long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
-        return new Bidder(member);
+        return Bidder.createBidder(member);
     }
 
 }

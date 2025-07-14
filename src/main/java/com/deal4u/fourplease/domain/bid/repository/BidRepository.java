@@ -3,6 +3,7 @@ package com.deal4u.fourplease.domain.bid.repository;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
+import com.deal4u.fourplease.domain.member.entity.Member;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -21,9 +22,17 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "AND b.auction.auctionId = :auctionId order by b.price desc")
     List<Long> findPricesByAuctionIdOrderByPriceDesc(@Param("auctionId") Long auctionId);
 
+    @Query("SELECT b FROM Bid b "
+            + "WHERE b.auction.auctionId = :auctionId "
+            + "AND b.bidder.member = :member "
+            + "AND b.isSuccessfulBidder = true")
+    Optional<Bid> findSuccessFulBid(@Param("auctionId") Long auctionId,
+                                    @Param("member") Member member);
+
+
     Optional<Bid> findByBidIdAndBidder(Long bidId, Bidder bidder);
 
     @SuppressWarnings("checkstyle:MethodName")
     Page<Bid> findByAuctionAndDeletedFalseOrderByPriceDescBidTimeAsc(Auction auction,
-            Pageable pageable);
+                                                                     Pageable pageable);
 }

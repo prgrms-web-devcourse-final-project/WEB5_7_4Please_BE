@@ -9,13 +9,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Getter
-@AllArgsConstructor
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseDateEntity {
 
@@ -28,6 +30,7 @@ public class Member extends BaseDateEntity {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
     @Enumerated(EnumType.STRING)
     private Status status;
 }

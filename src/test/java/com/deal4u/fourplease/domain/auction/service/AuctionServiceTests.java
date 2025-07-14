@@ -133,7 +133,7 @@ class AuctionServiceTests {
                     auctionService.getByAuctionId(auctionId);
                 }
         ).isInstanceOf(GlobalException.class)
-                .hasMessage("경매를 찾을 수 없습니다.");
+                .hasMessage("해당 경매를 찾을 수 없습니다.");
 
     }
 
@@ -167,7 +167,7 @@ class AuctionServiceTests {
                     auctionService.deleteByAuctionId(auctionId);
                 }
         ).isInstanceOf(GlobalException.class)
-                .hasMessage("경매를 찾을 수 없습니다.");
+                .hasMessage("해당 경매를 찾을 수 없습니다.");
 
     }
 

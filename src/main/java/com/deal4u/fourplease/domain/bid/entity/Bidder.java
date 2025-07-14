@@ -6,22 +6,23 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Embeddable
 @Getter
+@Embeddable
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Bidder {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bidder_member_id")
     private Member member;
 
-    public Bidder(Member member) {
-        this.member = member;
+    public static Bidder createBidder(Member member) {
+        return new Bidder(member);
     }
-
 }

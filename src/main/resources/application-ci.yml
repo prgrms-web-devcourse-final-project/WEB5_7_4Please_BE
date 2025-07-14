@@ -12,6 +12,9 @@ spring:
         show_sql: true
         format_sql: true
     defer-datasource-initialization: true
+toss:
+  secret-key: ${TOSS_SECRET_KEY}
+
   sql:
     init:
       mode: always

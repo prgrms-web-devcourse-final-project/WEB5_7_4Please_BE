@@ -17,7 +17,7 @@ import java.util.List;
 
 public class TestUtils {
 
-    public static ProductCreateDto genProductCreateDto() {
+     public static ProductCreateDto genProductCreateDto() {
         return new ProductCreateDto(
                 genMember(),
                 "칫솔",
@@ -34,13 +34,13 @@ public class TestUtils {
 
     public static Member genMember() {
         // TODO: Member 추후 확인 필요
-        return new Member(
-                1L,
-                "user1@user.com",
-                "유저1",
-                Role.USER,
-                Status.ACTIVE
-        );
+        return Member.builder()
+                .memberId(1L)
+                .email("user1@user.com")
+                .nickName("유저1")
+                .role(Role.USER)
+                .status(Status.ACTIVE)
+                .build();
     }
 
     public static Product genProduct() {

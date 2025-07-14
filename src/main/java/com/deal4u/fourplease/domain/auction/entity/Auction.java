@@ -51,11 +51,11 @@ public class Auction extends BaseDateEntity {
 
     private boolean deleted;
 
-    public void delete() {
-        this.deleted = true;
-    }
-
     public void close() {
         this.status = AuctionStatus.CLOSED;
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 }

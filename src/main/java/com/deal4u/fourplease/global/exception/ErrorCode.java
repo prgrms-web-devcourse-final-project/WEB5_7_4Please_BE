@@ -9,6 +9,20 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "엔티티를 찾을 수 없습니다."),
+    AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 경매를 찾을 수 없습니다."),
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
+    INVALID_AUCTION_BIDDER(HttpStatus.BAD_REQUEST, "해당 사용자는 경매의 낙찰자가 아닙니다."),
+    INVALID_ORDER_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 타입입니다."),
+    INVALID_INSTANT_BID_PRICE(HttpStatus.BAD_REQUEST, "요청된 가격이 즉시 입찰가와 일치하지 않습니다."),
+    INVALID_BID_PRICE(HttpStatus.BAD_REQUEST, "요청된 가격이 낙찰가와 일치하지 않습니다."),
+
+    INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 주문 금액과 일치하지 않습니다."),
+    INVALID_USER(HttpStatus.BAD_REQUEST, "결제자 정보가 올바르지 않습니다."),
+    PAYMENT_CONFIRMATION_FAILED(HttpStatus.BAD_REQUEST, "결제 승인이 실패했습니다."),
+    PAYMENT_ERROR(HttpStatus.BAD_REQUEST, "결제 처리 중 오류가 발생했습니다."),
+
+    PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
 
     BID_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 입찰 내역을 찾을 수 없습니다."),
 
@@ -26,8 +40,8 @@ public enum ErrorCode {
 
     EMPTY_LIST(HttpStatus.BAD_REQUEST, "빈 리스트 입니다."),
 
-    AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "경매를 찾을 수 없습니다."),
-  
+    BIDPERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
+
     BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다.");
 
 

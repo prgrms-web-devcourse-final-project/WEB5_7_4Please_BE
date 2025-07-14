@@ -14,13 +14,17 @@ import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
+@Builder
 @SQLRestriction("deleted = false")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bid extends BaseDateEntity {
 

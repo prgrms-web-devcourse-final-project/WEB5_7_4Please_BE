@@ -68,7 +68,7 @@ class BidServiceIntegrationTest {
         bidService.createBid(memberId1, initialRequest);
         Member member = memberRepository.findById(memberId1)
                 .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
-        Bidder bidder = new Bidder(member);
+        Bidder bidder = Bidder.createBidder(member);
         Auction auction = auctionRepository.findById(auctionId2)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
