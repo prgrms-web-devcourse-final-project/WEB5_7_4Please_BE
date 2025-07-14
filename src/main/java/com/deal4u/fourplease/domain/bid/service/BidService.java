@@ -41,7 +41,8 @@ public class BidService {
         Bidder bidder = getBidder(memberId);
 
         // 3. 기존 입찰 내역 조회
-        Optional<Bid> existBidOptional = bidRepository.findByAuctionAndBidderOrderByPriceDesc(auction, bidder);
+        Optional<Bid> existBidOptional = bidRepository.findByAuctionAndBidderOrderByPriceDesc(
+                auction, bidder);
 
         if (existBidOptional.isPresent()) {
             Bid existBid = existBidOptional.get();
