@@ -81,7 +81,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("auctionId로 특정 경매를 조회 후 AuctionDetailResponse를 반환한다")
-    void getByAuctionId_should_return_AuctionDetailResponse() throws Exception {
+    void get_by_auctionId_should_return_auction_detail_response() throws Exception {
 
         Long auctionId = 1L;
 
