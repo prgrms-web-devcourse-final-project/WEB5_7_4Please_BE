@@ -72,7 +72,7 @@ class BidServiceIntegrationTest {
         Auction auction = auctionRepository.findById(auctionId2)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
-        this.initialBid = bidRepository.findByAuctionAndBidderOrderByPriceDesc(auction, bidder)
+        this.initialBid = bidRepository.findTopByAuctionAndBidderOrderByPriceDesc(auction, bidder)
                 .orElseThrow(ErrorCode.BID_NOT_FOUND::toException);
     }
 

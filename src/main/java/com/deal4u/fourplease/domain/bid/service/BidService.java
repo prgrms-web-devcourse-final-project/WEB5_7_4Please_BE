@@ -2,6 +2,7 @@ package com.deal4u.fourplease.domain.bid.service;
 
 import com.deal4u.fourplease.config.BidWebSocketHandler;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.dto.BidRequest;
 import com.deal4u.fourplease.domain.bid.dto.BidResponse;
@@ -14,6 +15,8 @@ import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
+import com.deal4u.fourplease.global.lock.NamedLock;
+import com.deal4u.fourplease.global.lock.NamedLockProvider;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,41 +33,60 @@ public class BidService {
     private final AuctionRepository auctionRepository;
     private final MemberRepository memberRepository;
     private final BidWebSocketHandler bidWebSocketHandler;
+    private final NamedLockProvider namedLockProvider;
 
     @Transactional
     public void createBid(long memberId, BidRequest request) {
-        // 1. Auction 조회
-        Auction auction = auctionRepository.findById(request.auctionId())
-                .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
+        // 1. 경매 ID를 기반으로 Lock 키 생성
+        String lockKey = "auction-lock:" + request.auctionId();
+        NamedLock lock = namedLockProvider.getPassLock(lockKey);
 
-        // 2. 로그인 유저의 정보를 기반으로 Bidder 객체 생성
-        Bidder bidder = getBidder(memberId);
+        try {
+            // 1. Lock 처리
+            lock.lock();
 
-        // 3. 기존 입찰 내역 조회
-        Optional<Bid> existBidOptional = bidRepository.findByAuctionAndBidderOrderByPriceDesc(
-                auction, bidder);
+            // 2. Auction 조회
+            Auction auction = auctionRepository.findById(request.auctionId())
+                    .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
-        if (existBidOptional.isPresent()) {
-            Bid existBid = existBidOptional.get();
-            // 3-1. 기존 입찰 금액보다 신규 입찰 금액이 큰 경우
-            if (request.price() > existBid.getPrice().intValue()) {
-                createBid(request, auction, bidder);
-            } else {
-                throw ErrorCode.BID_FORBIDDEN_PRICE.toException();
+            // 3. Lock 처리 이후에 경매 상태 확인
+            if (auction.getStatus() != AuctionStatus.OPEN) {
+                throw ErrorCode.AUCTION_NOT_OPEN.toException();
             }
-        } else {
-            createBid(request, auction, bidder);
+
+            // 4. 로그인 유저의 정보를 기반으로 Bidder 객체 생성
+            Bidder bidder = getBidder(memberId);
+
+            // 5. 기존 입찰 내역 조회
+            Optional<Bid> existBidOptional = bidRepository.findTopByAuctionAndBidderOrderByPriceDesc(
+                    auction, bidder);
+
+            if (existBidOptional.isPresent()) {
+                Bid existBid = existBidOptional.get();
+                // 5-1. 기존 입찰 금액보다 신규 입찰 금액이 큰 경우
+                if (request.price() > existBid.getPrice().intValue()) {
+                    createBid(request, auction, bidder);
+                } else {
+                    throw ErrorCode.BID_FORBIDDEN_PRICE.toException();
+                }
+            } else {
+                // 5-2. 신규 입찰
+                createBid(request, auction, bidder);
+            }
+        } finally {
+            lock.unlock();
         }
+
     }
 
     private void createBid(BidRequest request, Auction auction, Bidder bidder) {
-        // 4. Bid Entity 객체 생성
+        // 1. Bid Entity 객체 생성
         Bid bid = BidMapper.toEntity(auction, bidder, request.price());
 
-        // 5. DB에 저장
+        // 2. DB에 저장
         Bid save = bidRepository.save(bid);
 
-        // 6. `WebSocket`의 모든 `Session`에 새 입찰 정보 전송
+        // 3. `WebSocket`의 모든 `Session`에 새 입찰 정보 전송
         bidWebSocketHandler.broadcastBid(save, BidMessageStatus.BID_CREATED);
     }
 
@@ -77,11 +99,31 @@ public class BidService {
         Bid existBid = bidRepository.findByBidIdAndBidder(bidId, bidder)
                 .orElseThrow(ErrorCode.BID_NOT_FOUND::toException);
 
-        // 3. 기존 일찰 취소
-        existBid.delete();
+        String lockKey = "auction-lock:" + existBid.getAuction().getAuctionId();
+        NamedLock lock = namedLockProvider.getPassLock(lockKey);
 
-        // 4. `WebSocket`의 모든 `Session`에 입찰 취소 정보 전송
-        bidWebSocketHandler.broadcastBid(existBid, BidMessageStatus.BID_DELETED);
+        try {
+            // 3. Lock 처리
+            lock.lock();
+
+            // 4. Auction 조회
+            Auction auction = auctionRepository.findById(existBid.getAuction().getAuctionId())
+                    .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
+
+            // 5. Lock 처리 이후에 경매 상태 확인
+            if (auction.getStatus() != AuctionStatus.OPEN) {
+                throw ErrorCode.AUCTION_NOT_OPEN.toException();
+            }
+
+            // 6. 기존 일찰 취소
+            existBid.delete();
+
+            // 7. `WebSocket`의 모든 `Session`에 입찰 취소 정보 전송
+            bidWebSocketHandler.broadcastBid(existBid, BidMessageStatus.BID_DELETED);
+
+        } finally {
+            lock.unlock();
+        }
     }
 
     public PageResponse<BidResponse> getBidListForAuction(Long auctionId, Pageable pageable) {

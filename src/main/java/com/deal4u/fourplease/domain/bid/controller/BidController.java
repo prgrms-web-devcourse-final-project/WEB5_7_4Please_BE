@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,17 +47,20 @@ public class BidController {
 
     @PostMapping("/bids")
     @ResponseStatus(HttpStatus.OK)
-    public void createBid(@Valid @RequestBody BidRequest request) {
-        // 1. 로그인한 유저 정보 취득 (현재는 하드 코딩)
-        long memberId = 1L;
+    public void createBid(@Valid @RequestBody BidRequest request,
+            @RequestParam("memberId") Long memberId) {
+        // 1. 로그인한 유저 정보 취득
+        // (현재는 `RequestParam`으로 처리하고 있으나 추후에 로그인 유저 정보에서 취득할 예정)
+
         // 2. 입찰 생성 호출
         bidService.createBid(memberId, request);
     }
 
     @DeleteMapping("/bids/{bidId}")
-    public void deleteBid(@PathVariable long bidId) {
-        // 1. 로그인한 유저 정보 취득 (현재는 하드 코딩)
-        long memberId = 1L;
+    public void deleteBid(@PathVariable("bidId") long bidId, @RequestParam("memberId") Long memberId) {
+        // 1. 로그인한 유저 정보 취득
+        // (현재는 `RequestParam`으로 처리하고 있으나 추후에 로그인 유저 정보에서 취득할 예정)
+
         // 2. 입찰 취소 호출
         bidService.deleteBid(memberId, bidId);
     }
