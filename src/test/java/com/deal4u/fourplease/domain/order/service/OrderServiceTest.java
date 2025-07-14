@@ -86,12 +86,10 @@ class OrderServiceTest {
 
         orderCreateRequest = OrderCreateRequest.builder()
                 .price(20000L)
-                .memberId(1L)
                 .build();
 
         awardOrderCreateRequest = OrderCreateRequest.builder()
                 .price(15000L)
-                .memberId(1L)
                 .build();
 
         address = new Address(
@@ -165,7 +163,6 @@ class OrderServiceTest {
 
             OrderCreateRequest invalidPriceRequest = OrderCreateRequest.builder()
                     .price(10000L)
-                    .memberId(1L)
                     .build();
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
@@ -220,7 +217,6 @@ class OrderServiceTest {
 
             OrderCreateRequest invalidPriceRequest = OrderCreateRequest.builder()
                     .price(10000L)  // 낙찰가(15000L)와 다른 가격
-                    .memberId(1L)
                     .build();
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(
