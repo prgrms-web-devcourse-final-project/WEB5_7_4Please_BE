@@ -14,6 +14,6 @@ public interface TempBidRepository extends JpaRepository<Bid, Long> {
             + "WHERE b.auction.auctionId = :auctionId "
             + "AND b.bidder.member = :member "
             + "AND b.isSuccessFulBidder = true")
-    Optional<Bid> findSuccessfulBid(@Param("auctionId") Long auctionId,
+    Optional<Bid> findSuccessFulBid(@Param("auctionId") Long auctionId,
                                     @Param("member") Member member);
 }

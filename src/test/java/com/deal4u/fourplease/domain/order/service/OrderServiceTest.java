@@ -189,7 +189,7 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(tempBidRepository.findSuccessfulBid(auction.getAuctionId(), member))
+            when(tempBidRepository.findSuccessFulBid(auction.getAuctionId(), member))
                     .thenReturn(Optional.of(winningBid));
 
             // When
@@ -223,7 +223,7 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(tempBidRepository.findSuccessfulBid(auction.getAuctionId(), member))
+            when(tempBidRepository.findSuccessFulBid(auction.getAuctionId(), member))
                     .thenReturn(Optional.of(winningBid));
 
             // When, Then
@@ -286,7 +286,7 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(tempBidRepository.findSuccessfulBid(auctionId, member))
+            when(tempBidRepository.findSuccessFulBid(auctionId, member))
                     .thenReturn(Optional.empty());  // 낙찰 입찰이 없음
 
             // When, Then
@@ -372,7 +372,7 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(tempBidRepository.findSuccessfulBid(auctionId, member))
+            when(tempBidRepository.findSuccessFulBid(auctionId, member))
                     .thenReturn(Optional.of(winningBid));
 
             // When
