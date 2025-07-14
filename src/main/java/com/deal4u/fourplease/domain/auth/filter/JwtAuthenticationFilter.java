@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
@@ -37,9 +39,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                        member, null, List.of(new SimpleGrantedAuthority("ROLE_" + member.getRole()))
                );
                SecurityContextHolder.getContext().setAuthentication(auth);
+               log.info("Authorization Header: {}", header);
+               log.info("추출한 토큰: {}", token);
+               log.info("토큰 유효: {}", jwtProvider.validateToken(token));
+               log.info("토큰에서 추출한 이메일: {}", email);
+               log.info("SecurityContext 설정됨: {}", auth.getName());
            }
 
         }
+
         chain.doFilter(request, response);
     }
 

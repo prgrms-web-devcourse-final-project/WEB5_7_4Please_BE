@@ -44,11 +44,11 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         if (member.getStatus() == Status.PENDING) {
             // 아직 닉네임 설정 안했으므로, 프론트 닉네임 설정 페이지로 redirect
-            String token = jwtProvider.generateTokenPair(member).accessToken(); // 혹은 따로 generate 임시 토큰
+            String token = jwtProvider.generateTokenPair(member).accessToken(); // 임시 토큰 발급
             log.info("token: "+token);
             responseBody.put("message", "닉네임 설정이 필요합니다.");
             responseBody.put("token", token);
-            responseBody.put("redirectUrl", "/signup"); // 회원가입
+            responseBody.put("redirectUrl", "/signup"); // 회원가입 페이지 (닉네임 설정 페이지)
         } else {
             // 새로운 JWT 발급
             TokenPair tokenPair = authService.createTokenPair(member);

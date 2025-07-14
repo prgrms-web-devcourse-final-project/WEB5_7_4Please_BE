@@ -40,7 +40,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         }
 
         // 2. 없다면 생성
-        Member newMember = memberRepository.save(Member.builder()
+        Member newMember = memberRepository.save(
+                Member.builder()
                 .email(email)
                 .provider("google")
                 .role(Role.USER)

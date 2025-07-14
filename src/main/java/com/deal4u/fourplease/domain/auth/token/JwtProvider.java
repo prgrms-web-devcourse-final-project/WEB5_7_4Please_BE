@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Component
@@ -65,7 +67,7 @@ public class JwtProvider {
     // 토큰에서 이메일 추출
     public String getEmailFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(secretKey)
+                .setSigningKey(getSigningKey())
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
@@ -74,7 +76,7 @@ public class JwtProvider {
     // 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            Jwts.parser().setSigningKey(getSigningKey()).parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
@@ -84,7 +86,7 @@ public class JwtProvider {
     // 토큰 타입 확인
     public String getTokenType(String token) {
         return Jwts.parser()
-                .setSigningKey(secretKey)
+                .setSigningKey(getSigningKey())
                 .parseClaimsJws(token)
                 .getBody()
                 .get("type", String.class);
@@ -96,5 +98,14 @@ public class JwtProvider {
     }
 
 
-
+    public LocalDateTime getExpirationFromToken(String token) {
+        Date expiration = Jwts.parser()
+                .setSigningKey(getSigningKey())
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+        return expiration.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
 }

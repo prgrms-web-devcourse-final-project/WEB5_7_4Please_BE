@@ -45,6 +45,10 @@ public class Member extends BaseDateEntity {
         this.provider = provider;
     }
 
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     public void setStatus(Status status) {
         this.status = status;
     }
