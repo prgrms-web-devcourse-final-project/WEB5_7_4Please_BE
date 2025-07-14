@@ -17,7 +17,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     Optional<Bid> findTopByAuctionAndBidderOrderByPriceDesc(Auction auction, Bidder bidder);
 
-    @Query("select b.price from Bid b where b.deleted = false AND b.auction.auctionId = :auctionId order by b.price desc")
+    @Query("select b.price from Bid b where b.deleted = false "
+            + "AND b.auction.auctionId = :auctionId order by b.price desc")
     List<Long> findPricesByAuctionIdOrderByPriceDesc(@Param("auctionId") Long auctionId);
 
     Optional<Bid> findByBidIdAndBidder(Long bidId, Bidder bidder);

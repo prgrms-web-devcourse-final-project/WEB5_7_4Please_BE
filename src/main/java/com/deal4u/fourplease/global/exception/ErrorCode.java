@@ -14,8 +14,6 @@ public enum ErrorCode {
 
     BID_FORBIDDEN_PRICE(HttpStatus.FORBIDDEN, "기존 입찰 금액보다 높은 금액을 입력해주세요."),
 
-    AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 경매를 찾을 수 없습니다."),
-
     AUCTION_NOT_OPEN(HttpStatus.FORBIDDEN, "해당 경매는 종료되었습니다."),
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
@@ -30,7 +28,7 @@ public enum ErrorCode {
 
     AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "경매를 찾을 수 없습니다."),
   
-    BIDPERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다.");
+    BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다.");
 
 
     private final HttpStatus status;

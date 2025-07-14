@@ -4,9 +4,9 @@
 DELETE
 FROM bid;
 DELETE
-FROM auction;
+FROM auctions;
 DELETE
-FROM product;
+FROM products;
 DELETE
 FROM product_categories;
 DELETE
@@ -17,9 +17,9 @@ ALTER TABLE member
     ALTER COLUMN id RESTART WITH 1;
 ALTER TABLE product_categories
     ALTER COLUMN category_id RESTART WITH 1;
-ALTER TABLE product
+ALTER TABLE products
     ALTER COLUMN product_id RESTART WITH 1;
-ALTER TABLE auction
+ALTER TABLE auctions
     ALTER COLUMN auction_id RESTART WITH 1;
 ALTER TABLE bid
     ALTER COLUMN bid_id RESTART WITH 1;
@@ -84,27 +84,37 @@ VALUES ('bidderA@example.com', '입찰자A', 'USER', 'ACTIVE', CURRENT_TIMESTAMP
 -- =================================================================
 
 -- 카테고리 정보
-INSERT INTO product_categories (name)
-VALUES ('전자기기');
+INSERT INTO product_categories (category_id, name)
+VALUES (0, '패션');
+INSERT INTO product_categories (category_id, name)
+VALUES (1, '전자제품');
+INSERT INTO product_categories (category_id, name)
+VALUES (2, '스포츠');
+INSERT INTO product_categories (category_id, name)
+VALUES (3, '가구');
+INSERT INTO product_categories (category_id, name)
+VALUES (4, '생활용품');
+INSERT INTO product_categories (category_id, name)
+VALUES (5, '기타');
 
 -- 상품 정보
-INSERT INTO product (name, description, thumbnail_url, address, detail_address, zip_code,
-                     seller_member_id, category_category_id, phone,
-                     created_at, updated_at)
+INSERT INTO products (name, description, thumbnail_url, address, detail_address, zip_code,
+                      seller_member_id, category_category_id, phone, deleted,
+                      created_at, updated_at)
 VALUES ('최신형 노트북', '한 번도 사용하지 않은 최신형 노트북입니다. 성능이 매우 뛰어납니다.',
         'https://example.com/images/laptop.jpg', '경기도 평택시 안산로 25번길 21', '100동 102호', '12345', 1, 1,
-        '010-1234-5678',
+        '010-1234-5678', false,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        ('최신형 IPhone 16', '미개봉 IPhone 16입니다. 256gb, 컬러는 화이트입니다. 쿨거래시 네고 가능합니다.',
         'https://example.com/images/iPhone16.jpg', '경기도 오산시 안산로 25번길 21', '100동 1004호', '12333', 2,
         1,
-        '010-2222-1111',
+        '010-2222-1111', false,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 경메 정보
 -- TIMESTAMPADD를 H2 호환 함수인 DATEADD로 변경하고, status 컬럼을 감쌌습니다.
-INSERT INTO auction(product_product_id, starting_price, instant_bid_price, start_time,
-                    end_time, `status`, deleted, created_at, updated_at)
+INSERT INTO auctions (product_product_id, starting_price, instant_bid_price, start_time,
+                      end_time, `status`, deleted, created_at, updated_at)
 VALUES (1, 100000, 800000, CURRENT_TIMESTAMP, DATEADD('DAY', 7, CURRENT_TIMESTAMP), 'OPEN',
         false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        (2, 1200000, 1500000, CURRENT_TIMESTAMP, DATEADD('DAY', 7, CURRENT_TIMESTAMP), 'OPEN',

@@ -56,7 +56,6 @@ class AuctionServiceTests {
         Member member = genMember();
         AuctionCreateRequest req = genAuctionCreateRequest();
 
-        int bidPeriod = 3;
 
         ProductCreateDto productDto = req.toProductCreateDto(member);
         Product product = genProduct();
@@ -69,6 +68,8 @@ class AuctionServiceTests {
 
         verify(auctionRepository).save(auctionCaptor.capture());
         Auction auction = auctionCaptor.getValue();
+
+        int bidPeriod = 3;
 
         assertThat(auction.getStartingPrice()).isEqualTo(req.startingPrice());
         assertThat(auction.getInstantBidPrice()).isEqualTo(req.buyNowPrice());
