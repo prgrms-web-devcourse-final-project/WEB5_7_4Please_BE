@@ -43,9 +43,11 @@ public class OrderService {
     public String saveOrder(Long auctionId, String orderType,
                             OrderCreateRequest orderCreateRequest) {
 
+        // todo: 나중에 컨텍스트 홀더에서 받을 예정
+        Long memberId = 1L;
         validateType(orderType);
 
-        Member member = getMemberOrThrow(orderCreateRequest.memberId());
+        Member member = getMemberOrThrow(memberId);
         Auction auction = getAuctionOrThrow(auctionId);
 
         BigDecimal expectedPrice = determineOrderPrice(auction, member, orderType);
