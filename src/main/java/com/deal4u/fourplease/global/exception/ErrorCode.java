@@ -22,7 +22,12 @@ public enum ErrorCode {
     PAYMENT_CONFIRMATION_FAILED(HttpStatus.BAD_REQUEST, "결제 승인이 실패했습니다."),
     PAYMENT_ERROR(HttpStatus.BAD_REQUEST, "결제 처리 중 오류가 발생했습니다."),
 
-    PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다");
+    PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
+
+    EMPTY_LIST(HttpStatus.BAD_REQUEST, "빈 리스트 입니다."),
+
+    BIDPERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

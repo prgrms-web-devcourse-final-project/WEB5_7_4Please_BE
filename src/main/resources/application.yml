@@ -1,3 +1,6 @@
+# application.yml의 경우 개발 시에 Local에서 사용하기 때문에,
+# gitIgnore을 통해서 제외하고 Commit해야합니다.
+# gitIgnore은 dev에서 설정해두었으나 git add 시에 한 번 확인해주세요.
 spring:
   datasource:
     url: jdbc:h2:mem:testdb
@@ -11,9 +14,7 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-toss:
-  secret-key: ${TOSS_SECRET_KEY}
-
+    defer-datasource-initialization: true
   sql:
     init:
       #애플리케이션 시작 시 항상 data.sql / schema.sql 실행
