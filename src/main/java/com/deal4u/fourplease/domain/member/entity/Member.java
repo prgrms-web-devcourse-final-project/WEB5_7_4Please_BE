@@ -26,7 +26,6 @@ public class Member extends BaseDateEntity {
     private String email;
     private String nickName;
 
-    @Enumerated(EnumType.STRING)
     private Role role;
     @Enumerated(EnumType.STRING)
     private Status status;
