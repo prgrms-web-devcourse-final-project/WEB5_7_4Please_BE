@@ -72,8 +72,12 @@ VALUES ('bidderA@example.com', '입찰자A', 'USER', 'ACTIVE', CURRENT_TIMESTAMP
 -- =================================================================
 
 -- 카테고리 정보
-INSERT INTO product_categories (name)
-VALUES ('전자기기');
+INSERT INTO product_categories (category_id, name) VALUES (0, '패션');
+INSERT INTO product_categories (category_id, name) VALUES (1, '전자제품');
+INSERT INTO product_categories (category_id, name) VALUES (2, '스포츠');
+INSERT INTO product_categories (category_id, name) VALUES (3, '가구');
+INSERT INTO product_categories (category_id, name) VALUES (4, '생활용품');
+INSERT INTO product_categories (category_id, name) VALUES (5, '기타');
 
 -- 상품 정보
 INSERT INTO product (name, description, thumbnail_url, address, detail_address, zip_code,
@@ -146,4 +150,3 @@ VALUES (1, 2, 200000, TIMESTAMPADD(SECOND, -20, CURRENT_TIMESTAMP), false, false
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        (1, 20, 200000, TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), false, false,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
