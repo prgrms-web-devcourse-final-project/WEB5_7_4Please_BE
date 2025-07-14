@@ -9,8 +9,11 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.ORDER_NOT_FOUND;
 import static com.deal4u.fourplease.global.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
+import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.domain.order.dto.OrderCreateRequest;
 import com.deal4u.fourplease.domain.order.dto.OrderResponse;
 import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
@@ -20,9 +23,6 @@ import com.deal4u.fourplease.domain.order.entity.OrderType;
 import com.deal4u.fourplease.domain.order.entity.Orderer;
 import com.deal4u.fourplease.domain.order.mapper.OrderMapper;
 import com.deal4u.fourplease.domain.order.repository.OrderRepository;
-import com.deal4u.fourplease.domain.order.repository.TempAuctionRepository;
-import com.deal4u.fourplease.domain.order.repository.TempBidRepository;
-import com.deal4u.fourplease.domain.order.repository.TempMemberRepository;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,10 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final TempMemberRepository memberRepository;
-    private final TempAuctionRepository auctionRepository;
+    private final MemberRepository memberRepository;
+    private final AuctionRepository auctionRepository;
     private final OrderRepository orderRepository;
-    private final TempBidRepository bidRepository;
+    private final BidRepository bidRepository;
 
     @Transactional
     public String saveOrder(Long auctionId, String orderType,

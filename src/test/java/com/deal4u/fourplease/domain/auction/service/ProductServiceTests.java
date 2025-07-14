@@ -1,6 +1,8 @@
 package com.deal4u.fourplease.domain.auction.service;
 
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.*;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProduct;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProductCreateDto;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

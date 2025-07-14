@@ -17,7 +17,7 @@ import java.util.List;
 
 public class TestUtils {
 
-    public static ProductCreateDto genProductCreateDto() {
+     public static ProductCreateDto genProductCreateDto() {
         return new ProductCreateDto(
                 genMember(),
                 "칫솔",

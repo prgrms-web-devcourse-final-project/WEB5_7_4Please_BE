@@ -40,7 +40,6 @@ import org.springframework.stereotype.Component;
  *
  * @author 고지훈
  */
-
 @Component
 public class NamedLockProvider implements NameLockStore {
 

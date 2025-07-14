@@ -12,6 +12,18 @@ FROM product_categories;
 DELETE
 FROM member;
 
+-- H2 DB의 경우 ID 시퀀스 초기화
+ALTER TABLE member
+    ALTER COLUMN id RESTART WITH 1;
+ALTER TABLE product_categories
+    ALTER COLUMN category_id RESTART WITH 1;
+ALTER TABLE products
+    ALTER COLUMN product_id RESTART WITH 1;
+ALTER TABLE auctions
+    ALTER COLUMN auction_id RESTART WITH 1;
+ALTER TABLE bid
+    ALTER COLUMN bid_id RESTART WITH 1;
+
 -- =================================================================
 -- 1. 회원 정보 (Member)
 -- =================================================================

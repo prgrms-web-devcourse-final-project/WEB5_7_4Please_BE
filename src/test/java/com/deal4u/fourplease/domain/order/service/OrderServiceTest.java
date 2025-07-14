@@ -12,11 +12,14 @@ import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.Seller;
+import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
+import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
+import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.domain.order.dto.OrderCreateRequest;
 import com.deal4u.fourplease.domain.order.dto.OrderResponse;
 import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
@@ -25,9 +28,6 @@ import com.deal4u.fourplease.domain.order.entity.OrderId;
 import com.deal4u.fourplease.domain.order.entity.OrderType;
 import com.deal4u.fourplease.domain.order.entity.Orderer;
 import com.deal4u.fourplease.domain.order.repository.OrderRepository;
-import com.deal4u.fourplease.domain.order.repository.TempAuctionRepository;
-import com.deal4u.fourplease.domain.order.repository.TempBidRepository;
-import com.deal4u.fourplease.domain.order.repository.TempMemberRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -47,11 +47,11 @@ import org.springframework.http.HttpStatus;
 class OrderServiceTest {
 
     @Mock
-    private TempAuctionRepository tempAuctionRepository;
+    private AuctionRepository auctionRepository;
     @Mock
-    private TempMemberRepository tempMemberRepository;
+    private MemberRepository memberRepository;
     @Mock
-    private TempBidRepository tempBidRepository;
+    private BidRepository bidRepository;
     @Mock
     private OrderRepository orderRepository;
 
@@ -125,7 +125,7 @@ class OrderServiceTest {
                 .bidder(bidder)
                 .price(new BigDecimal("15000"))
                 .bidTime(LocalDateTime.now())
-                .isSuccessFulBidder(true)
+                .isSuccessfulBidder(true)
                 .deleted(false)
                 .build();
     }
@@ -140,9 +140,9 @@ class OrderServiceTest {
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
+            when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(1L))
+            when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
 
             // When
@@ -164,9 +164,9 @@ class OrderServiceTest {
                     .price(10000L)
                     .build();
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
+            when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(1L))
+            when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
 
             // When, Then
@@ -184,12 +184,12 @@ class OrderServiceTest {
             // Given
             String orderType = "AWARD";
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(
+            when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(
                     auction.getAuctionId()))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(1L))
+            when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(tempBidRepository.findSuccessFulBid(auction.getAuctionId(), member))
+            when(bidRepository.findSuccessFulBid(auction.getAuctionId(), member))
                     .thenReturn(Optional.of(winningBid));
 
             // When
@@ -218,12 +218,12 @@ class OrderServiceTest {
                     .price(10000L)  // 낙찰가(15000L)와 다른 가격
                     .build();
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(
+            when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(
                     auction.getAuctionId()))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(1L))
+            when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(tempBidRepository.findSuccessFulBid(auction.getAuctionId(), member))
+            when(bidRepository.findSuccessFulBid(auction.getAuctionId(), member))
                     .thenReturn(Optional.of(winningBid));
 
             // When, Then
@@ -242,9 +242,9 @@ class OrderServiceTest {
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
 
-            when(tempMemberRepository.findById(1L))
+            when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
+            when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.empty());
 
             // When, Then
@@ -263,7 +263,7 @@ class OrderServiceTest {
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
 
-            when(tempMemberRepository.findById(1L))
+            when(memberRepository.findById(1L))
                     .thenReturn(Optional.empty());
 
             // When, Then
@@ -282,11 +282,11 @@ class OrderServiceTest {
             Long auctionId = 1L;
             String orderType = "AWARD";
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
+            when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(1L))
+            when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(tempBidRepository.findSuccessFulBid(auctionId, member))
+            when(bidRepository.findSuccessFulBid(auctionId, member))
                     .thenReturn(Optional.empty());  // 낙찰 입찰이 없음
 
             // When, Then
@@ -321,9 +321,9 @@ class OrderServiceTest {
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
+            when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(1L))
+            when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
 
             // When
@@ -348,11 +348,11 @@ class OrderServiceTest {
             Long auctionId = 1L;
             String orderType = "AWARD";
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
+            when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
-            when(tempMemberRepository.findById(1L))
+            when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(tempBidRepository.findSuccessFulBid(auctionId, member))
+            when(bidRepository.findSuccessFulBid(auctionId, member))
                     .thenReturn(Optional.of(winningBid));
 
             // When
