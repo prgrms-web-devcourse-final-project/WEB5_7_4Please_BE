@@ -22,7 +22,4 @@ public class AuthController {
         TokenPair tokenPair = authService.refreshAccessToken(refreshToken);
         return ResponseEntity.ok(tokenPair);
     }
-
-
-
 }
