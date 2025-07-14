@@ -51,7 +51,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("경매를 등록할 수 있다")
-    void save_should_save_auction() throws Exception {
+    void saveShouldSaveAuction() throws Exception {
 
         Member member = genMember();
         AuctionCreateRequest req = genAuctionCreateRequest();
@@ -81,7 +81,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("auctionId로 특정 경매를 조회 후 AuctionDetailResponse를 반환한다")
-    void getByAuctionId_should_return_AuctionDetailResponse() throws Exception {
+    void getByAuctionIdShouldReturnAuctionDetailResponse() throws Exception {
 
         Long auctionId = 1L;
 
@@ -119,7 +119,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("존재하지 않는 auctionId로 조회를 시도하면 404 예외가 발생한다")
-    void throws_when_try_to_get_if_auction_not_exist() throws Exception {
+    void throwsWhenTryToGetIfAuctionNotExist() throws Exception {
 
         Long auctionId = 1L;
         List<Long> bidList = List.of(200_0000L, 150_0000L, 100_0000L);
@@ -139,7 +139,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("auctionId로 경매를 삭제한다")
-    void deleteByAuctionId_should_soft_delete_auction_by_auction_id() throws Exception {
+    void deleteByAuctionIdShouldSoftDeleteAuctionByAuctionId() throws Exception {
 
         Long auctionId = 1L;
 
@@ -156,7 +156,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("존재하지 않는 auctionId로 삭제를 시도하면 404 예외가 발생한다")
-    void throws_when_try_to_delete_if_auction_not_exist() throws Exception {
+    void throwsWhenTryToDeleteIfAuctionNotExist() throws Exception {
 
         Long auctionId = 1L;
 
