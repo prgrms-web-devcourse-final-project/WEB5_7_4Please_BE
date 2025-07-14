@@ -10,7 +10,7 @@ public enum ErrorCode {
 
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "엔티티를 찾을 수 없습니다."),
     INVALID_FILE(HttpStatus.BAD_REQUEST, "처리할수 없는 파일입니다."),
-    FILE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "요청을 처리 할 수 없습니다.");
+    FILE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "요청을 처리 할 수 없습니다."),
     AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 경매를 찾을 수 없습니다."),
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
