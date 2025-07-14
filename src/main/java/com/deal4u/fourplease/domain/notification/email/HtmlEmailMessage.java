@@ -30,8 +30,8 @@ public class HtmlEmailMessage {
 
         private String templateName;
         private String subject;
-        private Map<String, Object> data = new HashMap<>();
-        private List<String> emails = new ArrayList<>();
+        private final Map<String, Object> data = new HashMap<>();
+        private final List<String> emails = new ArrayList<>();
 
         private EmailMessageBuilder() {
         }
