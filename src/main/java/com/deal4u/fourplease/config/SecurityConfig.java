@@ -40,6 +40,9 @@ public class SecurityConfig {
                                 "/api/v1/login/**",
                                 "/api/v1/signup/**"
                         ).permitAll()
+                        .requestMatchers(
+                                "/api/v1/members"
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
