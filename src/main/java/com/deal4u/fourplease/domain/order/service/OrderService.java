@@ -120,7 +120,7 @@ public class OrderService {
     }
 
     private Auction getAuctionOrThrow(Long auctionId) {
-        return auctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId)
+        return auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId)
                 .orElseThrow(AUCTION_NOT_FOUND::toException);
     }
 

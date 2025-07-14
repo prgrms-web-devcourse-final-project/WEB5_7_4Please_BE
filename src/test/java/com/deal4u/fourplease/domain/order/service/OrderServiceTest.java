@@ -140,7 +140,7 @@ class OrderServiceTest {
             Long auctionId = 1L;
             OrderType orderType = OrderType.BUY_NOW;
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
+            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
@@ -164,7 +164,7 @@ class OrderServiceTest {
                     .price(10000L)
                     .build();
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
+            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
@@ -184,7 +184,7 @@ class OrderServiceTest {
             // Given
             OrderType orderType = OrderType.AWARD;
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(
+            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(
                     auction.getAuctionId()))
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
@@ -218,7 +218,7 @@ class OrderServiceTest {
                     .price(10000L)  // 낙찰가(15000L)와 다른 가격
                     .build();
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(
+            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(
                     auction.getAuctionId()))
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
@@ -244,7 +244,7 @@ class OrderServiceTest {
 
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
+            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.empty());
 
             // When, Then
@@ -282,7 +282,7 @@ class OrderServiceTest {
             Long auctionId = 1L;
             OrderType orderType = OrderType.AWARD;
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
+            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
@@ -341,7 +341,7 @@ class OrderServiceTest {
             Long auctionId = 1L;
             OrderType orderType = OrderType.BUY_NOW;
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
+            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
@@ -368,7 +368,7 @@ class OrderServiceTest {
             Long auctionId = 1L;
             OrderType orderType = OrderType.AWARD;
 
-            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId))
+            when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));

@@ -13,5 +13,5 @@ public interface TempAuctionRepository extends JpaRepository<Auction, Long> {
             + "WHERE a.auctionId = :auctionId "
             + "AND a.deleted = false "
             + "AND a.status = 'OPEN'")
-    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(Long auctionId);
+    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusOpen(Long auctionId);
 }
