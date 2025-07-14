@@ -41,10 +41,8 @@ public class OrderService {
     public String saveOrder(Long auctionId, String orderType,
                             OrderCreateRequest orderCreateRequest) {
 
-        // String 값을 OrderType Enum으로 변환 및 검증
         OrderType orderTypeEnum = validateType(orderType);
 
-        // 나머지 로직
         Long memberId = 1L;
         Member member = getMemberOrThrow(memberId);
         Auction auction = getAuctionOrThrow(auctionId);
