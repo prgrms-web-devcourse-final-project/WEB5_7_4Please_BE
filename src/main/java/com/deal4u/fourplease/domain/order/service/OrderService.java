@@ -97,7 +97,7 @@ public class OrderService {
         if (OrderType.BUY_NOW.equals(orderType)) {
             return BigDecimal.valueOf(auction.getInstantBidPrice());
         } else if (OrderType.AWARD.equals(orderType)) {
-            return getSuccessfulBidPrice(auction, member);
+            return getSuccessFulBidPrice(auction, member);
         }
 
         throw INVALID_ORDER_TYPE.toException();
@@ -113,8 +113,8 @@ public class OrderService {
                 .build();
     }
 
-    private BigDecimal getSuccessfulBidPrice(Auction auction, Member member) {
-        return bidRepository.findSuccessfulBid(auction.getAuctionId(), member)
+    private BigDecimal getSuccessFulBidPrice(Auction auction, Member member) {
+        return bidRepository.findSuccessFulBid(auction.getAuctionId(), member)
                 .map(Bid::getPrice)
                 .orElseThrow(INVALID_AUCTION_BIDDER::toException);
     }
