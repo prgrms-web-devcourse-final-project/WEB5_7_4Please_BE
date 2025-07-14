@@ -40,7 +40,8 @@ public enum ErrorCode {
 
     EMPTY_LIST(HttpStatus.BAD_REQUEST, "빈 리스트 입니다."),
 
-    BIDPERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
+    REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 리뷰가 작성되었습니다."),
+
 
     BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다.");
 
