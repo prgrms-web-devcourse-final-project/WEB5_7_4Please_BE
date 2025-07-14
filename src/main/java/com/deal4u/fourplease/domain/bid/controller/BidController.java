@@ -57,7 +57,8 @@ public class BidController {
     }
 
     @DeleteMapping("/bids/{bidId}")
-    public void deleteBid(@PathVariable("bidId") long bidId, @RequestParam("memberId") Long memberId) {
+    public void deleteBid(@PathVariable("bidId") long bidId,
+            @RequestParam("memberId") Long memberId) {
         // 1. 로그인한 유저 정보 취득
         // (현재는 `RequestParam`으로 처리하고 있으나 추후에 로그인 유저 정보에서 취득할 예정)
 

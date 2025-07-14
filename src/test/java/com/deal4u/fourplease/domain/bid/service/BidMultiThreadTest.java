@@ -25,7 +25,7 @@ public class BidMultiThreadTest {
     private NameLockStore lockStore;
 
     @Test
-    void 결제중혹은정산시_입찰은_동시에_진행되지_않는다() throws InterruptedException {
+    void bid_has_lock_test() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(1);
         AtomicInteger count = new AtomicInteger(0);
