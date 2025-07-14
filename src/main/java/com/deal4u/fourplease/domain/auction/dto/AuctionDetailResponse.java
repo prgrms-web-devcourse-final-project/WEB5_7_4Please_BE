@@ -33,15 +33,15 @@ public record AuctionDetailResponse(
 ) {
 
     public static AuctionDetailResponse toAuctionDetailResponse(
-            List<Long> bidList,
+            BidSummaryDto bidSummaryDto,
             Auction auction,
             List<String> productImageUrls
     ) {
         Product product = auction.getProduct();
         return new AuctionDetailResponse(
-                BigDecimal.valueOf(bidList.getFirst()),
+                bidSummaryDto.maxPrice(),
                 auction.getInstantBidPrice(),
-                bidList.size(),
+                bidSummaryDto.bidCount(),
                 auction.getStartingPrice(),
                 product.getName(),
                 product.getCategory().getCategoryId(),

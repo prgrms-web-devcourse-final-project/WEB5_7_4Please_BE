@@ -2,6 +2,8 @@ package com.deal4u.fourplease.domain.auction.service;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
+import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
@@ -10,6 +12,7 @@ import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import jakarta.validation.constraints.Positive;
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,7 +51,12 @@ public class AuctionService {
         List<String> productImageUrls = productImageService.getByProduct(product)
                 .toProductImageUrlList();
 
-        return AuctionDetailResponse.toAuctionDetailResponse(bidList, auction, productImageUrls);
+        BidSummaryDto bidSummaryDto = BidSummaryDto.toBidSummaryDto(bidList);
+        return AuctionDetailResponse.toAuctionDetailResponse(
+                bidSummaryDto,
+                auction,
+                productImageUrls
+        );
     }
 
     @Transactional
