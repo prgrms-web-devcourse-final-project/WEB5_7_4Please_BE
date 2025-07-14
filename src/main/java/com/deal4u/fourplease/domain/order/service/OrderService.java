@@ -38,20 +38,21 @@ public class OrderService {
     private final TempBidRepository bidRepository;
 
     @Transactional
-    public String saveOrder(Long auctionId, OrderType orderType,
+    public String saveOrder(Long auctionId, String orderType,
                             OrderCreateRequest orderCreateRequest) {
 
-        // todo: 나중에 컨텍스트 홀더에서 받을 예정
-        Long memberId = 1L;
-        validateType(orderType);
+        // String 값을 OrderType Enum으로 변환 및 검증
+        OrderType orderTypeEnum = validateType(orderType);
 
+        // 나머지 로직
+        Long memberId = 1L;
         Member member = getMemberOrThrow(memberId);
         Auction auction = getAuctionOrThrow(auctionId);
 
-        BigDecimal expectedPrice = determineOrderPrice(auction, member, orderType);
+        BigDecimal expectedPrice = determineOrderPrice(auction, member, orderTypeEnum);
 
         validateOrderPrice(BigDecimal.valueOf(orderCreateRequest.price()), expectedPrice,
-                orderType);
+                orderTypeEnum);
 
         OrderId orderId = OrderId.generate();
         Orderer orderer = Orderer.createOrderer(member);
@@ -75,11 +76,12 @@ public class OrderService {
         order.updateOrder(orderUpdateRequest);
     }
 
-    private void validateType(OrderType orderType) {
-        if (orderType == OrderType.BUY_NOW || orderType == OrderType.AWARD) {
-            return;
+    private OrderType validateType(String orderType) {
+        try {
+            return OrderType.fromString(orderType);
+        } catch (IllegalArgumentException e) {
+            throw INVALID_ORDER_TYPE.toException();
         }
-        throw INVALID_ORDER_TYPE.toException();
     }
 
     private void validateOrderPrice(BigDecimal requestPrice, BigDecimal expectedPrice,

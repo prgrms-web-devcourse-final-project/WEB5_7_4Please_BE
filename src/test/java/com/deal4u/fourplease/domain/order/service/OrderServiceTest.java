@@ -138,7 +138,7 @@ class OrderServiceTest {
         void testCreateOrder_BuyNowSuccessful() {
             // Given
             Long auctionId = 1L;
-            OrderType orderType = OrderType.BUY_NOW;
+            String orderType = "BUY_NOW";
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
@@ -158,7 +158,7 @@ class OrderServiceTest {
         void testCreateOrder_BuyNowInvalidPrice() {
             // Given
             Long auctionId = 1L;
-            OrderType orderType = OrderType.BUY_NOW;
+            String orderType = "BUY_NOW";
 
             OrderCreateRequest invalidPriceRequest = OrderCreateRequest.builder()
                     .price(10000L)
@@ -182,7 +182,7 @@ class OrderServiceTest {
         @DisplayName("낙찰자가 AWARD 타입의 주문을 정상적으로 생성하는 경우")
         void testCreateOrder_AwardSuccessful() {
             // Given
-            OrderType orderType = OrderType.AWARD;
+            String orderType = "AWARD";
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(
                     auction.getAuctionId()))
@@ -212,7 +212,7 @@ class OrderServiceTest {
         @DisplayName("AWARD 타입의 주문에서 가격이 일치하지 않는 경우 예외 발생")
         void testCreateOrder_AwardInvalidPrice() {
             // Given
-            OrderType orderType = OrderType.AWARD;
+            String orderType = "AWARD";
 
             OrderCreateRequest invalidPriceRequest = OrderCreateRequest.builder()
                     .price(10000L)  // 낙찰가(15000L)와 다른 가격
@@ -240,7 +240,7 @@ class OrderServiceTest {
         void testCreateOrder_AuctionNotFound() {
             // Given
             Long auctionId = 1L;
-            OrderType orderType = OrderType.BUY_NOW;
+            String orderType = "BUY_NOW";
 
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
@@ -261,7 +261,7 @@ class OrderServiceTest {
         void testCreateOrder_UserNotFound() {
             // Given
             Long auctionId = 1L;
-            OrderType orderType = OrderType.BUY_NOW;
+            String orderType = "BUY_NOW";
 
             when(tempMemberRepository.findById(1L))
                     .thenReturn(Optional.empty());
@@ -280,7 +280,7 @@ class OrderServiceTest {
         void testCreateOrder_InvalidBidderForAward() {
             // Given
             Long auctionId = 1L;
-            OrderType orderType = OrderType.AWARD;
+            String orderType = "AWARD";
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
@@ -299,11 +299,11 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("null인 주문 유형인 경우 예외 발생")
-        void testCreateOrder_NullOrderType() {
+        @DisplayName("유효하지 않은 주문 타입인 경우 예외 발생")
+        void testCreateOrder_InvalidOrderType() {
             // Given
             Long auctionId = 1L;
-            OrderType orderType = null;
+            String orderType = "INVALID_TYPE";
 
             // When, Then
             assertThatThrownBy(
@@ -315,31 +315,11 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("OrderType enum의 value가 올바른지 확인")
-        void testOrderType_EnumValues() {
-            // Given & When & Then
-            assertThat(OrderType.BUY_NOW.getValue()).isEqualTo("BUY_NOW");
-            assertThat(OrderType.AWARD.getValue()).isEqualTo("AWARD");
-        }
-
-        @Test
-        @DisplayName("OrderType enum의 모든 값이 올바르게 정의되었는지 확인")
-        void testOrderType_AllEnumValues() {
-            // Given & When
-            OrderType[] orderTypes = OrderType.values();
-
-            // Then
-            assertThat(orderTypes).hasSize(2);
-            assertThat(orderTypes[0]).isEqualTo(OrderType.BUY_NOW);
-            assertThat(orderTypes[1]).isEqualTo(OrderType.AWARD);
-        }
-
-        @Test
         @DisplayName("BUY_NOW 타입 주문에서 즉시 구매가 정확히 처리되는지 확인")
         void testCreateOrder_BuyNowTypeValidation() {
             // Given
             Long auctionId = 1L;
-            OrderType orderType = OrderType.BUY_NOW;
+            String orderType = "BUY_NOW";
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
@@ -366,7 +346,7 @@ class OrderServiceTest {
         void testCreateOrder_AwardTypeValidation() {
             // Given
             Long auctionId = 1L;
-            OrderType orderType = OrderType.AWARD;
+            String orderType = "AWARD";
 
             when(tempAuctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
                     .thenReturn(Optional.of(auction));
@@ -387,6 +367,34 @@ class OrderServiceTest {
             Order capturedOrder = orderCaptor.getValue();
             assertThat(capturedOrder.getPrice()).isEqualByComparingTo(winningBid.getPrice());
             assertThat(capturedOrder.getAuction().getAuctionId()).isEqualTo(auction.getAuctionId());
+        }
+
+        @Test
+        @DisplayName("OrderType enum의 fromString 메서드 - 유효한 타입들 검증")
+        void testOrderType_FromStringValidation() {
+            // Given & When & Then
+            assertThat(OrderType.fromString("BUY_NOW")).isEqualTo(OrderType.BUY_NOW);
+            assertThat(OrderType.fromString("AWARD")).isEqualTo(OrderType.AWARD);
+
+            // 대소문자 구분 없이 작동하는지 확인
+            assertThat(OrderType.fromString("buy_now")).isEqualTo(OrderType.BUY_NOW);
+            assertThat(OrderType.fromString("award")).isEqualTo(OrderType.AWARD);
+        }
+
+        @Test
+        @DisplayName("OrderType enum의 fromString 메서드 - 유효하지 않은 문자열 예외 검증")
+        void testOrderType_FromStringInvalidValue() {
+            // Given & When & Then
+            assertThatThrownBy(() -> OrderType.fromString("INVALID"))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("OrderType enum의 fromString 메서드 - null 값 예외 검증")
+        void testOrderType_FromStringNullValue() {
+            // Given & When & Then
+            assertThatThrownBy(() -> OrderType.fromString(null))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
