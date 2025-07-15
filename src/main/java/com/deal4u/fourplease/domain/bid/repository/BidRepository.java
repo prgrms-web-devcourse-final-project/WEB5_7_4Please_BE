@@ -4,6 +4,7 @@ import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,17 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "AND b.isSuccessfulBidder = true")
     Optional<Bid> findSuccessFulBid(@Param("auctionId") Long auctionId,
                                     @Param("member") Member member);
+
+    @Query("SELECT MAX(b.price) FROM Bid b WHERE b.auction.auctionId = :auctionId AND b.deleted = false")
+    Optional<BigDecimal> findMaxBidPriceByAuctionId(Long auctionId);
+
+    @Query("SELECT b FROM Bid b " +
+            "JOIN FETCH b.auction " +
+            "WHERE b.auction.auctionId = :auctionId " +
+            "AND b.deleted = false " +
+            "AND b.isSuccessfulBidder = false " +
+            "ORDER BY b.price DESC, b.bidTime ASC")
+    Optional<Bid> findSecondHighestBidderByAuctionId(@Param("auctionId") Long auctionId);
 
 
     Optional<Bid> findByBidIdAndBidder(Long bidId, Bidder bidder);

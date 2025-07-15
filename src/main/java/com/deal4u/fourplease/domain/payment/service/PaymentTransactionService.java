@@ -29,13 +29,18 @@ class PaymentTransactionService {
     }
 
     @Transactional
-    public void savePayment(Order order,
-                            TossPaymentConfirmRequest req,
-                            TossPaymentConfirmResponse resp,
-                            Auction auction
+    public Payment savePayment(Order order,
+                               TossPaymentConfirmRequest req,
+                               TossPaymentConfirmResponse resp,
+                               Auction auction
     ) {
         Payment payment = PaymentMapper.toPayment(order, req, resp);
-        auction.close();
-        paymentRepository.save(payment);
+        return paymentRepository.save(payment);
+    }
+
+    @Transactional
+    public void updatePaymentStatusToFailed(Payment payment, Order order) {
+        payment.statusFailed();
+        order.failed();
     }
 }

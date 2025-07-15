@@ -19,6 +19,7 @@ import com.deal4u.fourplease.domain.order.dto.OrderResponse;
 import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
+import com.deal4u.fourplease.domain.order.entity.OrderStatus;
 import com.deal4u.fourplease.domain.order.entity.OrderType;
 import com.deal4u.fourplease.domain.order.entity.Orderer;
 import com.deal4u.fourplease.domain.order.mapper.OrderMapper;
@@ -45,7 +46,8 @@ public class OrderService {
 
         Long memberId = 1L;
         Member member = getMemberOrThrow(memberId);
-        Auction auction = getAuctionOrThrow(auctionId);
+
+        Auction auction = getAuctionForOrder(auctionId, orderTypeEnum);
 
         BigDecimal expectedPrice = determineOrderPrice(auction, member, orderTypeEnum);
 
@@ -55,8 +57,7 @@ public class OrderService {
         OrderId orderId = OrderId.generate();
         Orderer orderer = Orderer.createOrderer(member);
 
-        Order order = createOrder(auction, orderer, orderId, expectedPrice);
-
+        Order order = createOrder(auction, orderer, orderId, expectedPrice, orderTypeEnum);
         orderRepository.save(order);
 
         return orderId.getOrderId();
@@ -74,9 +75,14 @@ public class OrderService {
         order.updateOrder(orderUpdateRequest);
     }
 
+    @Transactional
+    public void closeAuction(Auction auction) {
+        auction.close();
+    }
+
     private OrderType validateType(String orderType) {
         try {
-            return OrderType.fromString(orderType);
+            return OrderType.valueOf(orderType);
         } catch (IllegalArgumentException e) {
             throw INVALID_ORDER_TYPE.toException();
         }
@@ -104,13 +110,24 @@ public class OrderService {
     }
 
     private Order createOrder(Auction auction, Orderer orderer, OrderId orderId,
-                              BigDecimal orderPrice) {
+                              BigDecimal orderPrice, OrderType orderType) {
         return Order.builder()
                 .orderId(orderId)
                 .auction(auction)
                 .orderer(orderer)
                 .price(orderPrice)
+                .orderStatus(OrderStatus.SUCCESS)
+                .orderType(orderType)
                 .build();
+    }
+
+    private Auction getAuctionForOrder(Long auctionId, OrderType orderTypeEnum) {
+        if (orderTypeEnum.equals(OrderType.BUY_NOW)) {
+            return getOPENAuctionOrThrow(auctionId);
+        } else if (orderTypeEnum.equals(OrderType.AWARD)) {
+            return getCLOSEDAuctionOrThrow(auctionId);
+        }
+        throw INVALID_ORDER_TYPE.toException();
     }
 
     private BigDecimal getSuccessFulBidPrice(Auction auction, Member member) {
@@ -119,8 +136,13 @@ public class OrderService {
                 .orElseThrow(INVALID_AUCTION_BIDDER::toException);
     }
 
-    private Auction getAuctionOrThrow(Long auctionId) {
+    private Auction getOPENAuctionOrThrow(Long auctionId) {
         return auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId)
+                .orElseThrow(AUCTION_NOT_FOUND::toException);
+    }
+
+    private Auction getCLOSEDAuctionOrThrow(Long auctionId) {
+        return auctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId)
                 .orElseThrow(AUCTION_NOT_FOUND::toException);
     }
 

@@ -376,7 +376,6 @@ class OrderServiceTest {
             assertThat(OrderType.fromString("BUY_NOW")).isEqualTo(OrderType.BUY_NOW);
             assertThat(OrderType.fromString("AWARD")).isEqualTo(OrderType.AWARD);
 
-            // 대소문자 구분 없이 작동하는지 확인
             assertThat(OrderType.fromString("buy_now")).isEqualTo(OrderType.BUY_NOW);
             assertThat(OrderType.fromString("award")).isEqualTo(OrderType.AWARD);
         }
