@@ -24,6 +24,7 @@ import com.deal4u.fourplease.domain.order.entity.OrderType;
 import com.deal4u.fourplease.domain.order.entity.Orderer;
 import com.deal4u.fourplease.domain.order.mapper.OrderMapper;
 import com.deal4u.fourplease.domain.order.repository.OrderRepository;
+import com.deal4u.fourplease.global.exception.GlobalException;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,25 +42,20 @@ public class OrderService {
     @Transactional
     public String saveOrder(Long auctionId, String orderType,
                             OrderCreateRequest orderCreateRequest) {
+        OrderType orderTypeEnum = validateOrderType(orderType);
 
-        OrderType orderTypeEnum = validateType(orderType);
-
-        Long memberId = 1L;
-        Member member = getMemberOrThrow(memberId);
-
+        // todo: 컨텍스트 홀더에서 주문자 꺼내기
+        Member member = getMemberOrThrow(1L);
         Auction auction = getAuctionForOrder(auctionId, orderTypeEnum);
-
         BigDecimal expectedPrice = determineOrderPrice(auction, member, orderTypeEnum);
-
         validateOrderPrice(BigDecimal.valueOf(orderCreateRequest.price()), expectedPrice,
                 orderTypeEnum);
 
         OrderId orderId = OrderId.generate();
         Orderer orderer = Orderer.createOrderer(member);
-
         Order order = createOrder(auction, orderer, orderId, expectedPrice, orderTypeEnum);
-        orderRepository.save(order);
 
+        orderRepository.save(order);
         return orderId.getOrderId();
     }
 
@@ -80,7 +76,7 @@ public class OrderService {
         auction.close();
     }
 
-    private OrderType validateType(String orderType) {
+    private OrderType validateOrderType(String orderType) {
         try {
             return OrderType.valueOf(orderType);
         } catch (IllegalArgumentException e) {
@@ -91,12 +87,13 @@ public class OrderService {
     private void validateOrderPrice(BigDecimal requestPrice, BigDecimal expectedPrice,
                                     OrderType orderType) {
         if (requestPrice.compareTo(expectedPrice) != 0) {
-            if (OrderType.BUY_NOW.equals(orderType)) {
-                throw INVALID_INSTANT_BID_PRICE.toException();
-            } else {
-                throw INVALID_BID_PRICE.toException();
-            }
+            throw getOrderPriceException(orderType);
         }
+    }
+
+    private GlobalException getOrderPriceException(OrderType orderType) {
+        return OrderType.BUY_NOW.equals(orderType) ? INVALID_INSTANT_BID_PRICE.toException() :
+                INVALID_BID_PRICE.toException();
     }
 
     private BigDecimal determineOrderPrice(Auction auction, Member member, OrderType orderType) {
@@ -105,7 +102,6 @@ public class OrderService {
         } else if (OrderType.AWARD.equals(orderType)) {
             return getSuccessFulBidPrice(auction, member);
         }
-
         throw INVALID_ORDER_TYPE.toException();
     }
 
@@ -122,9 +118,9 @@ public class OrderService {
     }
 
     private Auction getAuctionForOrder(Long auctionId, OrderType orderTypeEnum) {
-        if (orderTypeEnum.equals(OrderType.BUY_NOW)) {
+        if (OrderType.BUY_NOW.equals(orderTypeEnum)) {
             return getOPENAuctionOrThrow(auctionId);
-        } else if (orderTypeEnum.equals(OrderType.AWARD)) {
+        } else if (OrderType.AWARD.equals(orderTypeEnum)) {
             return getCLOSEDAuctionOrThrow(auctionId);
         }
         throw INVALID_ORDER_TYPE.toException();
