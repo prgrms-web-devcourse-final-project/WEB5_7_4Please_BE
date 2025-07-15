@@ -23,7 +23,7 @@ import java.util.List;
 
 public class TestUtils {
 
-     public static ProductCreateDto genProductCreateDto() {
+    public static ProductCreateDto genProductCreateDto() {
         return new ProductCreateDto(
                 genMember(),
                 "칫솔",
@@ -107,41 +107,41 @@ public class TestUtils {
     }
 
     public static List<AuctionListResponse> genAuctionListResponseList() {
-         return List.of(
-                 new AuctionListResponse(
-                         1L,
-                         "http://example.com/thumbnail1.jpg",
-                         new CategoryDto(0L, "패션"),
-                         "목도리",
-                         BigDecimal.valueOf(200000),
-                         BigDecimal.valueOf(250000),
-                         5,
-                         LocalDateTime.now().plusDays(3),
-                         false
-                 ),
-                 new AuctionListResponse(
-                         2L,
-                         "http://example.com/thumbnail2.jpg",
-                         new CategoryDto(2L, "스포츠"),
-                         "축구공",
-                         BigDecimal.valueOf(10000000),
-                         null,
-                         150,
-                         LocalDateTime.now().plusDays(7),
-                         true
-                 ),
-                 new AuctionListResponse(
-                         3L,
-                         "http://example.com/thumbnail3.jpg",
-                         new CategoryDto(4L, "생활용품"),
-                         "칫솔",
-                         BigDecimal.valueOf(2000000),
-                         null,
-                         20,
-                         LocalDateTime.now(),
-                         false
-                 )
-         );
+        return List.of(
+                new AuctionListResponse(
+                        1L,
+                        "http://example.com/thumbnail1.jpg",
+                        new CategoryDto(0L, "패션"),
+                        "목도리",
+                        BigDecimal.valueOf(200000),
+                        BigDecimal.valueOf(250000),
+                        5,
+                        LocalDateTime.now().plusDays(3),
+                        false
+                ),
+                new AuctionListResponse(
+                        2L,
+                        "http://example.com/thumbnail2.jpg",
+                        new CategoryDto(2L, "스포츠"),
+                        "축구공",
+                        BigDecimal.valueOf(10000000),
+                        null,
+                        150,
+                        LocalDateTime.now().plusDays(7),
+                        true
+                ),
+                new AuctionListResponse(
+                        3L,
+                        "http://example.com/thumbnail3.jpg",
+                        new CategoryDto(4L, "생활용품"),
+                        "칫솔",
+                        BigDecimal.valueOf(2000000),
+                        null,
+                        20,
+                        LocalDateTime.now(),
+                        false
+                )
+        );
     }
 
     public static List<Auction> genAuctionList() {
@@ -167,8 +167,7 @@ public class TestUtils {
                         .instantBidPrice(BigDecimal.valueOf(250000))
                         .duration(new AuctionDuration(LocalDateTime.now(),
                                 LocalDateTime.now().plusDays(3)))
-                        .build()
-                ,
+                        .build(),
                 Auction.builder()
                         .auctionId(2L)
                         .product(
