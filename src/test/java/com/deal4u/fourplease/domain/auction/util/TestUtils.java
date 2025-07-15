@@ -2,6 +2,8 @@ package com.deal4u.fourplease.domain.auction.util;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
+import com.deal4u.fourplease.domain.auction.dto.CategoryDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.BidPeriod;
@@ -97,5 +99,43 @@ public class TestUtils {
                 new ProductImage(1L, product, "http://example.com/image1.jpg"),
                 new ProductImage(2L, product, "http://example.com/image2.jpg")
         );
+    }
+
+    public static List<AuctionListResponse> genAuctionListResponseList() {
+         return List.of(
+                 new AuctionListResponse(
+                         1L,
+                         "http://example.com/thumbnail1.jpg",
+                         new CategoryDto(0L, "패션"),
+                         "목도리",
+                         BigDecimal.valueOf(200_000),
+                         BigDecimal.valueOf(250_000),
+                         5,
+                         LocalDateTime.now().plusDays(3),
+                         false
+                 ),
+                 new AuctionListResponse(
+                         2L,
+                         "http://example.com/thumbnail2.jpg",
+                         new CategoryDto(2L, "스포츠"),
+                         "축구공",
+                         BigDecimal.valueOf(10_000_000),
+                         null,
+                         150,
+                         LocalDateTime.now().plusDays(7),
+                         true
+                 ),
+                 new AuctionListResponse(
+                         3L,
+                         "http://example.com/thumbnail3.jpg",
+                         new CategoryDto(4L, "생활용품"),
+                         "칫솔",
+                         BigDecimal.valueOf(200_0000),
+                         null,
+                         20,
+                         LocalDateTime.now(),
+                         false
+                 )
+         );
     }
 }
