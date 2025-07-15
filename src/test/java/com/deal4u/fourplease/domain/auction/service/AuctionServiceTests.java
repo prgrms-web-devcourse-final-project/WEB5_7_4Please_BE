@@ -23,6 +23,7 @@ import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -177,7 +178,7 @@ class AuctionServiceTests {
         when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(2L)).thenReturn(
                 List.of(new BigDecimal("10000000")));
         when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(3L)).thenReturn(
-                List.of());  // 빈 리스트
+                List.of());
 
 
         List<AuctionListResponse> resp = auctionService.findAll();
@@ -185,16 +186,28 @@ class AuctionServiceTests {
         assertThat(resp).hasSize(3);
 
         // 1번 경매: maxPrice 200,000, bidCount 2
-        assertThat(resp.get(0).maxPrice()).isEqualByComparingTo("200000");
+        assertThat(resp.get(0).maxPrice()).isEqualTo(new BigDecimal("200000"));
         assertThat(resp.get(0).bidCount()).isEqualTo(2);
 
         // 2번 경매: maxPrice 10,000,000, bidCount 1
-        assertThat(resp.get(1).maxPrice()).isEqualByComparingTo("10000000");
+        assertThat(resp.get(1).maxPrice()).isEqualTo(new BigDecimal("10000000"));
         assertThat(resp.get(1).bidCount()).isEqualTo(1);
 
         // 3번 경매: 입찰없음 -> maxPrice 0, bidCount 0
-        assertThat(resp.get(2).maxPrice()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(resp.get(2).maxPrice()).isEqualTo(BigDecimal.ZERO);
         assertThat(resp.get(2).bidCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("경매 목록이 없을 경우 빈 리스트를 반환한다")
+    void findAllShouldReturnEmptyListWhenNoAuctionsExist() {
+
+        when(auctionRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<AuctionListResponse> resp = auctionService.findAll();
+
+        assertThat(resp).isNotNull();
+        assertThat(resp).isEmpty();
     }
 
 }

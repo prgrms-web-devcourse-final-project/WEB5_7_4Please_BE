@@ -107,6 +107,7 @@ class AuctionControllerTests {
         mockMvc.perform(
                         get("/api/v1/auctions")
                 ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(resp.size()))
                 .andExpect(jsonPath("$[0].name").value(resp.get(0).name()))
                 .andExpect(jsonPath("$[1].name").value(resp.get(1).name()))
                 .andExpect(jsonPath("$[2].name").value(resp.get(2).name()))
