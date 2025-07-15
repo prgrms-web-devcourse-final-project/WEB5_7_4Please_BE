@@ -38,7 +38,7 @@ public class AuthService {
         return tokenPair;
     }
 
-    //리프레시 토큰을 통해 새로운 액세스토큰과 리프레시 토큰을 재발급
+    // 리프레시 토큰을 통해 새로운 액세스토큰과 리프레시 토큰을 재발급
     public TokenPair refreshAccessToken(String refreshToken) {
         // 토큰 유효성 검사
         jwtProvider.validateOrThrow(refreshToken);

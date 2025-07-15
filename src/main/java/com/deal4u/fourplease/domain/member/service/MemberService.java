@@ -95,7 +95,6 @@ public class MemberService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> ErrorCode.MEMBER_NOT_FOUND.toException());
 
-        //멤버 유효성 검사
         validateMember(member);
 
         member.setNickName(request.nickName());
