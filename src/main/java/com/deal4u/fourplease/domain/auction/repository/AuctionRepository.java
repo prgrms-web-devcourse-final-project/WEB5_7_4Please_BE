@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.domain.auction.repository;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,11 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "AND a.deleted = false "
             + "AND a.status = 'OPEN'")
     Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusOpen(Long auctionId);
+
+    @Query("select a "
+            + "from Auction a "
+            + "join fetch a.product p "
+            + "where p.productId in :productIdList "
+            + "and a.deleted = false")
+    List<Auction> findAllByProductId(@Param("productIdList") List<Long> productIdList);
 }

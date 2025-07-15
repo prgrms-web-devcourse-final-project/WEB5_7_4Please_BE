@@ -42,8 +42,11 @@ public enum ErrorCode {
 
     BIDPERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
 
-    BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다.");
+    BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
 
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다."),
+
+    STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "일치하는 상태를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

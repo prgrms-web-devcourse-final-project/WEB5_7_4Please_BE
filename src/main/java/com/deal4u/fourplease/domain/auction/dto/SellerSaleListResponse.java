@@ -23,10 +23,10 @@ public record SellerSaleListResponse(
 
     public static SellerSaleListResponse toSellerSaleListResponse(
             Auction auction,
-            Product product,
             BidSummaryDto bidSummaryDto,
             SaleAuctionStatus status
     ) {
+        Product product = auction.getProduct();
         return new SellerSaleListResponse(
                 auction.getAuctionId(),
                 product.getThumbnailUrl(),
