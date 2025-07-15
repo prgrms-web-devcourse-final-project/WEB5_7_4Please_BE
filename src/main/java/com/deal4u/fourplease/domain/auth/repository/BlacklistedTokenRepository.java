@@ -7,7 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BlacklistedTokenRepository extends JpaRepository<BlacklistedToken, Long> {
-    Optional<BlacklistedToken> findByToken(String token);
-
     boolean existsByToken(String token);
 }

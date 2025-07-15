@@ -16,12 +16,10 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final MemberService memberService;
 
     // 로그인 시 토큰 생성 및 저장
     public TokenPair createTokenPair(Member member) {
 
-        memberService.validateMember(member);
 
         TokenPair tokenPair = jwtProvider.generateTokenPair(member);
 
@@ -40,21 +38,22 @@ public class AuthService {
         return tokenPair;
     }
 
+    //리프레시 토큰을 통해 새로운 액세스토큰과 리프레시 토큰을 재발급
     public TokenPair refreshAccessToken(String refreshToken) {
-        // 1. 토큰 유효성 검사
+        // 토큰 유효성 검사
         jwtProvider.validateOrThrow(refreshToken);
 
-        // 2. 토큰 타입 확인 (refresh인지 확인)
+        // 토큰 타입 확인 (refresh인지 확인)
         String tokenType = jwtProvider.getTokenType(refreshToken);
         if (!"refresh".equals(tokenType)) {
             throw ErrorCode.INVALID_TOKEN_TYPE.toException();
         }
 
-        // 3. DB에 저장된 토큰인지 확인
+        // DB에 저장된 토큰인지 확인
         RefreshToken savedToken = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> ErrorCode.INVALID_REFRESH_TOKEN.toException());
 
-        // 4. DB 기준으로 만료 여부 확인
+        // DB 기준으로 만료 여부 확인
         if (savedToken.isExpired()) {
             refreshTokenRepository.delete(savedToken); // 만료된 토큰 삭제
             throw ErrorCode.TOKEN_EXPIRED.toException();

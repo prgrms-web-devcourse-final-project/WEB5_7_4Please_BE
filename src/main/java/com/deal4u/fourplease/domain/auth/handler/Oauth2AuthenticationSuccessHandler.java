@@ -66,7 +66,6 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             responseBody.put("redirectUrl", SIGNUP_REDIRECT_URL); // 메인 페이지로
         }
 
-        // JSON 응답 전송
         response.getWriter().write(objectMapper.writeValueAsString(responseBody));
         response.getWriter().flush();
 

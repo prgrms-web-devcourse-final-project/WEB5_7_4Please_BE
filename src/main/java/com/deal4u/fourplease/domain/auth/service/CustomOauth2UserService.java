@@ -23,12 +23,12 @@ import org.springframework.stereotype.Service;
 public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
+    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate;
+
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) {
         log.info("CustomOAuth2UserService.loadUser 진입");
-        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
-
         OAuth2User oauth2User = delegate.loadUser(request); // Spring이 가져온 사용자 정보
         Map<String, Object> attributes = oauth2User.getAttributes();
         String email = (String) attributes.get("email");

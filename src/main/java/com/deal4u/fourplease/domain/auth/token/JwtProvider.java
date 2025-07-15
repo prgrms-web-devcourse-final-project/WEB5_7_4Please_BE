@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class JwtProvider {
-    private final MemberService memberService;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -34,12 +33,7 @@ public class JwtProvider {
     @Value("${jwt.refresh-token-expiration}")
     private long refreshTokenExpiration;
 
-    public JwtProvider(MemberService memberService) {
-        this.memberService = memberService;
-    }
-
     public TokenPair generateTokenPair(Member member) {
-        memberService.validateMember(member);
         return new TokenPair(
                 generateAccessToken(member),
                 generateRefreshToken(member)

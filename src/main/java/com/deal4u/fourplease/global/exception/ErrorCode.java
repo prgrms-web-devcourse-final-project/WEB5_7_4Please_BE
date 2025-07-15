@@ -57,4 +57,6 @@ public enum ErrorCode {
     public GlobalException toException(Throwable cause, String message, Object... args) {
         return new GlobalException(cause, status, message, args);
     }
+
+
 }
