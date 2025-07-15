@@ -49,8 +49,8 @@ public class AuctionController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createAuction(
             @Valid @RequestBody AuctionCreateRequest request
-            // TODO: member 추후 수정 필요
     ) {
+        // TODO: member 추후 수정 필요
         auctionService.save(request, memberRepository.findAll().getFirst());
     }
 
