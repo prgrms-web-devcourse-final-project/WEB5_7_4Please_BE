@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class HtmlEmailSender {
+public class HtmlEmailService {
 
     private final HtmlTemplateRenderer htmlTemplateRenderer;
     private final EmailSender mailSender;
