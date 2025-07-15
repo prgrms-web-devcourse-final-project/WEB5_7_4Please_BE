@@ -1,8 +1,6 @@
 package com.deal4u.fourplease.domain.review.controller;
 
 import com.deal4u.fourplease.domain.review.dto.ReviewRequest;
-import com.deal4u.fourplease.domain.review.entity.Review;
-import com.deal4u.fourplease.domain.review.repository.ReviewRepository;
 import com.deal4u.fourplease.domain.review.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

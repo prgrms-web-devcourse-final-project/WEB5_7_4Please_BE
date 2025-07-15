@@ -1,12 +1,19 @@
 package com.deal4u.fourplease.domain.review.service;
 
+import static com.deal4u.fourplease.global.exception.ErrorCode.AUCTION_NOT_FOUND;
+import static com.deal4u.fourplease.global.exception.ErrorCode.ORDER_NOT_FOUND;
+import static com.deal4u.fourplease.global.exception.ErrorCode.PAYMENT_NOT_SUCCESS;
+import static com.deal4u.fourplease.global.exception.ErrorCode.USER_NOT_FOUND;
+
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
-import com.deal4u.fourplease.domain.bid.entity.Bid;
-import com.deal4u.fourplease.domain.bid.entity.Bidder;
-import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
+import com.deal4u.fourplease.domain.order.entity.Order;
+import com.deal4u.fourplease.domain.order.entity.OrderStatus;
+import com.deal4u.fourplease.domain.order.entity.Orderer;
+import com.deal4u.fourplease.domain.order.repository.OrderRepository;
+import com.deal4u.fourplease.domain.payment.repository.PaymentRepository;
 import com.deal4u.fourplease.domain.review.dto.ReviewRequest;
 import com.deal4u.fourplease.domain.review.entity.Review;
 import com.deal4u.fourplease.domain.review.entity.Reviewer;
@@ -22,59 +29,73 @@ import org.springframework.stereotype.Service;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
     private final MemberRepository memberRepository;
+    private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
 
     public void createReview(ReviewRequest request, Long memberId) {
-        // 1. Auction 조회
-        Auction auction = auctionRepository.findById(request.auctionId())
-                .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
+        // 1. 경매 검증
+        Auction auction = getAuctionOrThrow(request.auctionId());
 
-        // 2. 로그인 유저의 정보를 기반으로 Bidder 객체 생성
-        Bidder bidder = getBidder(memberId);
+        // 2. 로그인 유저의 정보를 기반으로 주문 및 결제 검증
+        Member member = validatePaidOrderAndGetMember(memberId, auction);
 
-        // 3. 기존 리뷰 존재 유무 확인
-        Optional<Review> existReviewOptional = reviewRepository.findByAuctionAndBidder(auction,
-                bidder);
+        // 3. 기존 리뷰 유무를 확인
+        Reviewer reviewer = getReviewerOrThrowIfExists(member, auction);
 
-        // 3-1. 기존 리뷰가 존재하는 경우 예외 처리
+        // 4. 리뷰 작성
+        saveReview(request, auction, reviewer);
+    }
+
+    private void saveReview(ReviewRequest request, Auction auction, Reviewer reviewer) {
+        Review review = ReviewMapper.toEntity(auction, reviewer, auction.getProduct()
+                .getSeller(), request.rating(), request.content());
+        reviewRepository.save(review);
+    }
+
+    private Reviewer getReviewerOrThrowIfExists(Member member, Auction auction) {
+        Reviewer reviewer = Reviewer.createReviewer(member);
+        validateReviewAbsence(auction, reviewer);
+        return reviewer;
+    }
+
+    private void validateReviewAbsence(Auction auction, Reviewer reviewer) {
+        Optional<Review> existReviewOptional = reviewRepository
+                .findByAuctionAndReviewer(auction, reviewer);
+
         if (existReviewOptional.isPresent()) {
             throw ErrorCode.REVIEW_ALREADY_EXISTS.toException();
         }
-
-        // 4. 기존 입찰 내역 조회
-        Optional<Bid> existBidOptional = bidRepository
-                .findTopByAuctionAndBidderOrderByPriceDesc(auction, bidder);
-
-        // 4. 기존 입찰 내여 존재 유무 확인
-        if (existBidOptional.isPresent()) {
-            Bid bid = existBidOptional.get();
-            // 4-1. 낙찰된 입찰인지 확인
-            if (bid.isSuccessfulBidder()) {
-                // Reviewer 생성
-                Reviewer reviewer = Reviewer.createReviewer(bidder.getMember());
-
-                // Review 생성
-                Review review = ReviewMapper.toEntity(auction, reviewer, auction.getProduct()
-                        .getSeller(), request.rating(), request.content());
-                // Review 등록
-                reviewRepository.save(review);
-            } else {
-                // 4-2. 낙찰된 입찰이 아닌 경우 예외 처리
-                throw ErrorCode.INVALID_AUCTION_BIDDER.toException();
-            }
-        } else {
-            // 5. 입찰 내역이 없는 경우 예외 처리
-            throw ErrorCode.BID_NOT_FOUND.toException();
-        }
-
     }
 
-    // getBidder 부분은 `util`로 분리할지 검토중입니다.
-    private Bidder getBidder(long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
-        return Bidder.createBidder(member);
+    private Member validatePaidOrderAndGetMember(Long memberId, Auction auction) {
+        Member member = getMemberOrThrow(memberId);
+        Orderer orderer = Orderer.createOrderer(member);
+        Order order = getOrderOrThrow(orderer, auction);
+        getPaymentOrThrow(order);
+        return member;
+    }
+
+    // 以下 검증 로직 (他 서비스에서도 이용하기 때문에, Util Class 등으로 추출 검토)
+    private Auction getAuctionOrThrow(Long auctionId) {
+        return auctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId)
+                .orElseThrow(AUCTION_NOT_FOUND::toException);
+    }
+
+    private Member getMemberOrThrow(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(USER_NOT_FOUND::toException);
+    }
+
+    private Order getOrderOrThrow(Orderer orderer, Auction auction) {
+        return orderRepository.findByOrdererAndAuctionAndStatus(orderer, auction,
+                        OrderStatus.SUCCESS)
+                .orElseThrow(ORDER_NOT_FOUND::toException);
+    }
+
+    private void getPaymentOrThrow(Order order) {
+        paymentRepository.findByOrderId(order.getOrderId())
+                .orElseThrow(PAYMENT_NOT_SUCCESS::toException);
     }
 }
