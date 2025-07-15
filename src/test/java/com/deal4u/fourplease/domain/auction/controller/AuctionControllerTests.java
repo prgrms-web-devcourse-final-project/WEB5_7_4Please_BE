@@ -2,6 +2,7 @@ package com.deal4u.fourplease.domain.auction.controller;
 
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionCreateRequest;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionDetailResponse;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionListResponseList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
@@ -50,7 +52,9 @@ class AuctionControllerTests {
     void create_auction_should_return201() throws Exception {
 
         AuctionCreateRequest req = genAuctionCreateRequest();
+
         when(memberRepository.findAll()).thenReturn(List.of(Mockito.mock(Member.class)));
+
         mockMvc.perform(
                         post("/api/v1/auctions")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -92,5 +96,24 @@ class AuctionControllerTests {
                 .andDo(print());
 
         verify(auctionService).deleteByAuctionId(auctionId);
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/auctions가 성공하면 전체 경매 목록과 200을 반환한다")
+    void readAllAuctionsShouldReturn200() throws Exception {
+
+        List<AuctionListResponse> resp = genAuctionListResponseList();
+
+        when(auctionService.getAll()).thenReturn(resp);
+
+        mockMvc.perform(
+                        get("/api/v1/auctions")
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value(resp.get(0).name()))
+                .andExpect(jsonPath("$[1].name").value(resp.get(1).name()))
+                .andExpect(jsonPath("$[2].name").value(resp.get(2).name()))
+                .andDo(print());
+
+
     }
 }
