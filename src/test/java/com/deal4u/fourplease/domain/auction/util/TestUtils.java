@@ -5,6 +5,7 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.CategoryDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
+import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionDuration;
@@ -213,6 +214,41 @@ public class TestUtils {
                                 LocalDateTime.now().plusDays(1)))
                         .build()
 
+        );
+    }
+
+    public static List<SellerSaleListResponse> genSellerSaleListResponseList() {
+        return List.of(
+                new SellerSaleListResponse(
+                        1L,
+                        "http://example.com/thumbnail1.jpg",
+                        "목도리",
+                        BigDecimal.valueOf(2000000),
+                        BigDecimal.valueOf(1000000),
+                        "목에 둘러도 따뜻하지 않은 목도리",
+                        5,
+                        "OPEN"
+                ),
+                new SellerSaleListResponse(
+                        2L,
+                        "http://example.com/thumbnail2.jpg",
+                        "축구공",
+                        BigDecimal.valueOf(10000000),
+                        BigDecimal.valueOf(5000000),
+                        "손흥민의 싸인이 있는 축구공",
+                        20,
+                        "OPEN"
+                ),
+                new SellerSaleListResponse(
+                        3L,
+                        "http://example.com/thumbnail3.jpg",
+                        "칫솔",
+                        BigDecimal.valueOf(2000000),
+                        BigDecimal.valueOf(100000),
+                        "한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.",
+                        20,
+                        "CLOSE"
+                )
         );
     }
 }
