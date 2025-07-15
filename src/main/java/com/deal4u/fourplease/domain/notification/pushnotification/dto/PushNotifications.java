@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.domain.notification.platorm.dto;
+package com.deal4u.fourplease.domain.notification.pushnotification.dto;
 
 import java.util.List;
 import lombok.EqualsAndHashCode;

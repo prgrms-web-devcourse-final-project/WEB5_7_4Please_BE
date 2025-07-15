@@ -2,9 +2,9 @@ package com.deal4u.fourplease.domain.notification;
 
 import com.deal4u.fourplease.domain.notification.email.HtmlEmailMessage;
 import com.deal4u.fourplease.domain.notification.email.HtmlEmailService;
-import com.deal4u.fourplease.domain.notification.platorm.message.PushNotificationMessage;
-import com.deal4u.fourplease.domain.notification.platorm.exception.PushNotificationMappingException;
-import com.deal4u.fourplease.domain.notification.platorm.service.PushNotificationService;
+import com.deal4u.fourplease.domain.notification.pushnotification.message.PushNotificationMessage;
+import com.deal4u.fourplease.domain.notification.pushnotification.exception.PushNotificationMappingException;
+import com.deal4u.fourplease.domain.notification.pushnotification.service.PushNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailSendException;

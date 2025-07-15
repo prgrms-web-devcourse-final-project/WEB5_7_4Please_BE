@@ -1,11 +1,10 @@
-package com.deal4u.fourplease.domain.notification.platorm.service;
+package com.deal4u.fourplease.domain.notification.pushnotification.service;
 
 import static org.mockito.Mockito.when;
 
-import com.deal4u.fourplease.domain.notification.platorm.dto.PushNotifications;
-import com.deal4u.fourplease.domain.notification.platorm.mapper.PushNotificationMapper;
-import com.deal4u.fourplease.domain.notification.platorm.message.PushNotificationMessage;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotifications;
+import com.deal4u.fourplease.domain.notification.pushnotification.mapper.PushNotificationMapper;
+import com.deal4u.fourplease.domain.notification.pushnotification.message.PushNotificationMessage;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

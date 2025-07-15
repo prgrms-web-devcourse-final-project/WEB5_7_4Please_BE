@@ -1,9 +1,9 @@
-package com.deal4u.fourplease.domain.notification.platorm.mapper;
+package com.deal4u.fourplease.domain.notification.pushnotification.mapper;
 
-import com.deal4u.fourplease.domain.notification.platorm.dto.PushNotifications;
-import com.deal4u.fourplease.domain.notification.platorm.exception.PushNotificationMappingException;
-import com.deal4u.fourplease.domain.notification.platorm.message.PushNotificationMessage;
-import com.deal4u.fourplease.domain.notification.platorm.message.PushMessageBody;
+import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotifications;
+import com.deal4u.fourplease.domain.notification.pushnotification.exception.PushNotificationMappingException;
+import com.deal4u.fourplease.domain.notification.pushnotification.message.PushNotificationMessage;
+import com.deal4u.fourplease.domain.notification.pushnotification.message.PushMessageBody;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;

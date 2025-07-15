@@ -2,8 +2,8 @@ package com.deal4u.fourplease.domain.notification;
 
 import com.deal4u.fourplease.domain.notification.email.HtmlEmailMessage;
 import com.deal4u.fourplease.domain.notification.email.HtmlEmailService;
-import com.deal4u.fourplease.domain.notification.platorm.message.PushNotificationMessage;
-import com.deal4u.fourplease.domain.notification.platorm.service.PushNotificationService;
+import com.deal4u.fourplease.domain.notification.pushnotification.message.PushNotificationMessage;
+import com.deal4u.fourplease.domain.notification.pushnotification.service.PushNotificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

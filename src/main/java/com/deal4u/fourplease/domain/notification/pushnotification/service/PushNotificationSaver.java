@@ -1,6 +1,6 @@
-package com.deal4u.fourplease.domain.notification.platorm.service;
+package com.deal4u.fourplease.domain.notification.pushnotification.service;
 
-import com.deal4u.fourplease.domain.notification.platorm.dto.PushNotificationCreateCommand;
+import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationCreateCommand;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;

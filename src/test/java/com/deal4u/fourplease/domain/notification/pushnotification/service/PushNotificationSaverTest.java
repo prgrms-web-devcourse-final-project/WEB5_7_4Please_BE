@@ -1,10 +1,10 @@
-package com.deal4u.fourplease.domain.notification.platorm.service;
+package com.deal4u.fourplease.domain.notification.pushnotification.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
-import com.deal4u.fourplease.domain.notification.platorm.dto.PushNotificationCreateCommand;
-import com.deal4u.fourplease.domain.notification.platorm.entity.PushNotification;
+import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationCreateCommand;
+import com.deal4u.fourplease.domain.notification.pushnotification.entity.PushNotification;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
