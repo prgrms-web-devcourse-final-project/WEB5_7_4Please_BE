@@ -21,8 +21,10 @@ import com.deal4u.fourplease.global.lock.NamedLockProvider;
 import feign.FeignException;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -40,13 +42,14 @@ public class PaymentService {
         OrderId orderId = OrderId.create(tossPaymentConfirmRequest.orderId());
         Order order = paymentTransactionService.getOrderOrThrow(orderId);
         Auction auction = order.getAuction();
+
         validateAmount(tossPaymentConfirmRequest, order);
 
         NamedLock lock = getNamedLock(auction);
         lock.lock();
 
         Payment payment = null;
-        boolean shouldCloseAuction = true;
+        boolean shouldCloseAuction = false;
 
         try {
             TossPaymentConfirmResponse response = callTossPaymentApi(tossPaymentConfirmRequest);
@@ -55,20 +58,23 @@ public class PaymentService {
             payment = paymentTransactionService.savePayment(order, tossPaymentConfirmRequest,
                     response, auction);
 
-            if (order.getOrderType().equals(OrderType.BUY_NOW)) {
+            if (OrderType.BUY_NOW.equals(order.getOrderType())) {
                 BigDecimal currentMaxBidPrice = getCurrentMaxBidPrice(auction.getAuctionId());
-
                 shouldCloseAuction = validateInstantBidPrice(auction, currentMaxBidPrice);
 
                 if (!shouldCloseAuction) {
                     paymentTransactionService.updatePaymentStatusToFailed(payment, order);
+                    throw INVALID_PRICE_NOT_UPPER.toException();
                 }
+            } else {
+                shouldCloseAuction = true;
             }
 
         } catch (GlobalException e) {
             if (payment != null) {
                 paymentTransactionService.updatePaymentStatusToFailed(payment, order);
             }
+            throw e;
         } finally {
             if (shouldCloseAuction) {
                 orderService.closeAuction(auction);
@@ -102,25 +108,29 @@ public class PaymentService {
         try {
             return tossApiClient.confirmPayment(request);
         } catch (FeignException e) {
+            log.error("토스 API 호출 오류: {}", e.getMessage());
             throw PAYMENT_ERROR.toException();
-        } catch (GlobalException e) {
+        } catch (Exception e) {
+            log.error("결제 API 호출 중 예상치 못한 오류: {}", e.getMessage());
             throw PAYMENT_CONFIRMATION_FAILED.toException();
         }
     }
 
     private void validatePaymentSuccess(TossPaymentConfirmResponse response) {
         if (!PAYMENT_SUCCESS.equals(response.status())) {
+            log.warn("결제 승인 실패. 상태: {}", response.status());
             throw PAYMENT_CONFIRMATION_FAILED.toException();
         }
     }
 
     private static void validateInstancePrice(Auction auction, BigDecimal currentMaxBidPrice) {
-        if (auction.getInstantBidPrice().compareTo(currentMaxBidPrice) < 0) {
+        if (auction.getInstantBidPrice().compareTo(currentMaxBidPrice) <= 0) {
             throw INVALID_PRICE_NOT_UPPER.toException();
         }
     }
 
     private BigDecimal getCurrentMaxBidPrice(Long auctionId) {
-        return bidRepository.findMaxBidPriceByAuctionId(auctionId).orElse(BigDecimal.ZERO);
+        return bidRepository.findMaxBidPriceByAuctionId(auctionId)
+                .orElse(BigDecimal.ZERO);
     }
 }
