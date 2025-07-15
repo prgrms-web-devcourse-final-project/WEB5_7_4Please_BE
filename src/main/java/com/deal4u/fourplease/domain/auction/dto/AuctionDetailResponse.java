@@ -9,33 +9,28 @@ import java.util.List;
 public record AuctionDetailResponse(
 
         BigDecimal highestBidPrice,
-
         BigDecimal instantBidPrice,
 
-        Integer bidCount,
+        int bidCount,
 
         BigDecimal startingPrice,
 
         String productName,
-
-        Long categoryId,
-
+        long categoryId,
         String categoryName,
-
         String description,
 
         LocalDateTime endTime,
 
         String thumbnailUrl,
-
         List<String> imageUrls
 
 ) {
 
     public static AuctionDetailResponse toAuctionDetailResponse(
-            BidSummaryDto bidSummaryDto,
             Auction auction,
-            List<String> productImageUrls
+            List<String> productImageUrls,
+            BidSummaryDto bidSummaryDto
     ) {
         Product product = auction.getProduct();
         return new AuctionDetailResponse(

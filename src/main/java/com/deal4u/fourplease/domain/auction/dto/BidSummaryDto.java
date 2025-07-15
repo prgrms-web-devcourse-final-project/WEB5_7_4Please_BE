@@ -7,10 +7,10 @@ public record BidSummaryDto(
         BigDecimal maxPrice,
         int bidCount
 ) {
-    public static BidSummaryDto toBidSummaryDto(List<Long> bidList) {
+    public static BidSummaryDto toBidSummaryDto(List<BigDecimal> bidList) {
         if (bidList.isEmpty()) {
             return new BidSummaryDto(BigDecimal.ZERO, 0);
         }
-        return new BidSummaryDto(BigDecimal.valueOf(bidList.getFirst()), bidList.size());
+        return new BidSummaryDto(bidList.getFirst(), bidList.size());
     }
 }

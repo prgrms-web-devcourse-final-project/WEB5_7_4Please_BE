@@ -5,11 +5,16 @@ import java.math.BigDecimal;
 public record SellerSaleListResponse(
         String thumbnailUrl,
         String name,
+
         BigDecimal maxPrice,
         BigDecimal startBidPrice,
+
         String description,
-        Integer salesCount,
-        Integer bidCount,
+
+        int salesCount,
+
+        int bidCount,
+
         String status
 ) {
 
