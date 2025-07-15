@@ -85,7 +85,11 @@ class AuctionServiceTests {
 
         Long auctionId = 1L;
 
-        List<Long> bidList = List.of(200_0000L, 150_0000L, 100_0000L);
+        List<BigDecimal> bidList = List.of(
+                BigDecimal.valueOf(200_0000L),
+                BigDecimal.valueOf(150_0000L),
+                BigDecimal.valueOf(100_0000L)
+        );
         Product product = genProduct();
         Auction auction = genAuctionCreateRequest().toEntity(product);
 
@@ -94,7 +98,6 @@ class AuctionServiceTests {
                 "http://example.com/image1.jpg", "http://example.com/image2.jpg"
         );
 
-        // TODO: Long -> BigDecimal로 변경 예정
         when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId)).thenReturn(bidList);
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
 
@@ -103,7 +106,7 @@ class AuctionServiceTests {
 
         AuctionDetailResponse actualResp = auctionService.getByAuctionId(auctionId);
 
-        assertThat(actualResp.highestBidPrice()).isEqualTo(BigDecimal.valueOf(bidList.getFirst()));
+        assertThat(actualResp.highestBidPrice()).isEqualTo(bidList.getFirst());
         assertThat(actualResp.instantBidPrice()).isEqualTo(auction.getInstantBidPrice());
         assertThat(actualResp.bidCount()).isEqualTo(bidList.size());
         assertThat(actualResp.productName()).isEqualTo(product.getName());
@@ -122,9 +125,12 @@ class AuctionServiceTests {
     void throwsWhenTryToGetIfAuctionNotExist() throws Exception {
 
         Long auctionId = 1L;
-        List<Long> bidList = List.of(200_0000L, 150_0000L, 100_0000L);
+        List<BigDecimal> bidList = List.of(
+                BigDecimal.valueOf(200_0000L),
+                BigDecimal.valueOf(150_0000L),
+                BigDecimal.valueOf(100_0000L)
+        );
 
-        // TODO: Long -> BigDecimal로 변경 예정
         when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId)).thenReturn(bidList);
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.empty());
 

@@ -4,6 +4,7 @@ import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     @Query("select b.price from Bid b where b.deleted = false "
             + "AND b.auction.auctionId = :auctionId order by b.price desc")
-    List<Long> findPricesByAuctionIdOrderByPriceDesc(@Param("auctionId") Long auctionId);
+    List<BigDecimal> findPricesByAuctionIdOrderByPriceDesc(@Param("auctionId") Long auctionId);
 
     @Query("SELECT b FROM Bid b "
             + "WHERE b.auction.auctionId = :auctionId "
