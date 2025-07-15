@@ -2,7 +2,7 @@ package com.deal4u.fourplease.domain.file.service.s3;
 
 import static com.deal4u.fourplease.domain.file.util.FileUtil.getFileExtension;
 
-import com.deal4u.fourplease.domain.file.service.FileType;
+import com.deal4u.fourplease.domain.file.type.FileType;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
