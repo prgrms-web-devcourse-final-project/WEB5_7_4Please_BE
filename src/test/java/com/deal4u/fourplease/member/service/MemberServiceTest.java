@@ -138,6 +138,22 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("회원 정보 업데이트 중 중복 닉네임은 예외 발생")
+    void updateMember_shouldFailIfNicknameExists() {
+        String newNickName = "DuplicatedNick";
+        Member member = Member.builder()
+                .email(email)
+                .status(Status.ACTIVE)
+                .build();
+
+        when(memberRepository.existsByNickName(newNickName)).thenReturn(true);
+
+        assertThatThrownBy(() -> memberService.updateMember(member, newNickName))
+                .isInstanceOf(GlobalException.class)
+                .hasMessage(ErrorCode.NICKNAME_ALREADY_EXISTS.getMessage());
+    }
+
+    @Test
     @DisplayName("로그 아웃 성공 시 블랙리스트 등록 및 리프레시 토큰 삭제 처리")
     void logout_success() {
         String authHeader = "Bearer " + validToken;
