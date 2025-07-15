@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.auth.handler;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
@@ -39,9 +40,6 @@ public class Oauth2AuthenticationSuccessHandlerTest {
     private AuthService authService;
 
     @Mock
-    private ObjectMapper objectMapper;
-
-    @Mock
     private MemberService memberService;
 
     @Mock
@@ -57,7 +55,11 @@ public class Oauth2AuthenticationSuccessHandlerTest {
     private Customoauth2User customOauth2User;
 
     @Mock
+    private ObjectMapper objectMapper;
+
+    @Mock
     private Member member;
+
     private final String TEMP_TOKEN = "temp.jwt.token";
     private final String ACCESS_TOKEN = "access.jwt.token";
     private final String REFRESH_TOKEN = "refresh.jwt.token";
@@ -70,24 +72,46 @@ public class Oauth2AuthenticationSuccessHandlerTest {
         when(authentication.getPrincipal()).thenReturn(customOauth2User);
         when(customOauth2User.getMember()).thenReturn(member);
         when(response.getWriter()).thenReturn(new PrintWriter(outputStream, true));
+        when(objectMapper.writeValueAsString(any())).thenAnswer(invocation -> {
+            Object obj = invocation.getArgument(0);
+            return obj.toString(); // 또는 간단한 JSON 흉내
+        });
     }
 
-//    @Test
-//    @DisplayName("상태가 PENDING일 때 임시 토큰과 닉네임 설정 메시지 반환")
-//    void onAuthenticationSuccess_PendingStatus_ReturnsTempTokenAndRedirectToSignup() throws Exception {
-//        // given
-//        when(member.getStatus()).thenReturn(Status.PENDING);
-//        when(jwtProvider.generateTokenPair(member)).thenReturn(new TokenPair(TEMP_TOKEN, "ignored"));
-//        when(member.getEmail()).thenReturn("test@example.com");
-//
-//        // when
-//        successHandler.onAuthenticationSuccess(request, response, authentication);
-//
-//        // then
-//        String responseJson = outputStream.toString();
-//        assertThat(responseJson).contains("닉네임 설정이 필요합니다.");
-//        assertThat(responseJson).contains(TEMP_TOKEN);
-//        assertThat(responseJson).contains("/");
-//    }
+    @Test
+    @DisplayName("상태가 PENDING일 때 임시 토큰과 닉네임 설정 메시지 반환")
+    void onAuthenticationSuccess_PendingStatus_ReturnsTempTokenAndRedirectToSignup() throws Exception {
+        // given
+        when(member.getStatus()).thenReturn(Status.PENDING);
+        when(jwtProvider.generateTokenPair(member)).thenReturn(new TokenPair(TEMP_TOKEN, "ignored"));
+        when(member.getEmail()).thenReturn("test@example.com");
 
+        // when
+        successHandler.onAuthenticationSuccess(request, response, authentication);
+
+        // then
+        String responseJson = outputStream.toString();
+        assertThat(responseJson).contains("닉네임 설정이 필요합니다.");
+        assertThat(responseJson).contains(TEMP_TOKEN);
+        assertThat(responseJson).contains("/");
+    }
+
+    @Test
+    @DisplayName("상태가 ACTIVE일 때 accessToken, refreshToken, 로그인 성공 메시지 반환")
+    void onAuthenticationSuccess_ActiveStatus_ReturnsTokenPairAndRedirectToMain() throws Exception {
+        // given
+        when(member.getStatus()).thenReturn(Status.ACTIVE);
+        when(authService.createTokenPair(member)).thenReturn(new TokenPair(ACCESS_TOKEN, REFRESH_TOKEN));
+        when(member.getEmail()).thenReturn("test@example.com");
+
+        // when
+        successHandler.onAuthenticationSuccess(request, response, authentication);
+
+        // then
+        String responseJson = outputStream.toString();
+        assertThat(responseJson).contains("로그인 성공");
+        assertThat(responseJson).contains(ACCESS_TOKEN);
+        assertThat(responseJson).contains(REFRESH_TOKEN);
+        assertThat(responseJson).contains("/signup"); // SIGNUP_REDIRECT_URL
+    }
 }
