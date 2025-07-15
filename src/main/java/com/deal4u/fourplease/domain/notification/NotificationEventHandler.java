@@ -1,25 +1,39 @@
 package com.deal4u.fourplease.domain.notification;
 
 import com.deal4u.fourplease.domain.notification.email.HtmlEmailMessage;
-import com.deal4u.fourplease.domain.notification.email.HtmlEmailSender;
+import com.deal4u.fourplease.domain.notification.email.HtmlEmailService;
+import com.deal4u.fourplease.domain.notification.platorm.message.PushNotificationMessage;
+import com.deal4u.fourplease.domain.notification.platorm.exception.PushNotificationMappingException;
+import com.deal4u.fourplease.domain.notification.platorm.service.PushNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class NotificationEventHandler {
 
-    private final HtmlEmailSender mailSender;
+    private final HtmlEmailService mailSender;
+    private final PushNotificationService pushNotificationService;
 
-    @EventListener(HtmlEmailMessage.class)
-    public void sendEmail(HtmlEmailMessage htmlEmailMessage) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void sendPushNotification(HtmlEmailMessage htmlEmailMessage) {
         try {
             mailSender.send(htmlEmailMessage);
         } catch (MailSendException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void sendPushNotification(PushNotificationMessage pushNotificationMessage) {
+        try {
+            pushNotificationService.send(pushNotificationMessage);
+        } catch (PushNotificationMappingException e) {
             log.error(e.getMessage(), e);
         }
     }
