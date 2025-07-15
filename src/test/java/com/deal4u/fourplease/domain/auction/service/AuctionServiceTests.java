@@ -56,7 +56,6 @@ class AuctionServiceTests {
         Member member = genMember();
         AuctionCreateRequest req = genAuctionCreateRequest();
 
-        int bidPeriod = 3;
 
         ProductCreateDto productDto = req.toProductCreateDto(member);
         Product product = genProduct();
@@ -70,6 +69,8 @@ class AuctionServiceTests {
         verify(auctionRepository).save(auctionCaptor.capture());
         Auction auction = auctionCaptor.getValue();
 
+        int bidPeriod = 3;
+
         assertThat(auction.getStartingPrice()).isEqualTo(req.startingPrice());
         assertThat(auction.getInstantBidPrice()).isEqualTo(req.buyNowPrice());
         assertThat(auction.getDuration().getStartTime()).isEqualTo(req.startDate());
@@ -80,7 +81,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("auctionId로 특정 경매를 조회 후 AuctionDetailResponse를 반환한다")
-    void getByAuctionId_should_return_AuctionDetailResponse() throws Exception {
+    void get_by_auctionId_should_return_auction_detail_response() throws Exception {
 
         Long auctionId = 1L;
 
@@ -132,13 +133,13 @@ class AuctionServiceTests {
                     auctionService.getByAuctionId(auctionId);
                 }
         ).isInstanceOf(GlobalException.class)
-                .hasMessage("경매를 찾을 수 없습니다.");
+                .hasMessage("해당 경매를 찾을 수 없습니다.");
 
     }
 
     @Test
     @DisplayName("auctionId로 경매를 삭제한다")
-    void deleteByAuctionId_should_soft_delete_auction_by_auction_id() throws Exception {
+    void delete_by_auction_id_should_soft_delete_auction_by_auction_id() throws Exception {
 
         Long auctionId = 1L;
 
@@ -166,7 +167,7 @@ class AuctionServiceTests {
                     auctionService.deleteByAuctionId(auctionId);
                 }
         ).isInstanceOf(GlobalException.class)
-                .hasMessage("경매를 찾을 수 없습니다.");
+                .hasMessage("해당 경매를 찾을 수 없습니다.");
 
     }
 

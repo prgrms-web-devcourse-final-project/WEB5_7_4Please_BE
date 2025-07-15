@@ -11,7 +11,11 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+    defer-datasource-initialization: true
+toss:
+  secret-key: ${TOSS_SECRET_KEY}
+
   sql:
     init:
-      #애플리케이션 시작 시 항상 data.sql / schema.sql 실행
       mode: always
+      data-locations: classpath:data-ci.sql
