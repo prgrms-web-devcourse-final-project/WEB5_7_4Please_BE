@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.domain.auction.service;
 
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionCreateRequest;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionList;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProduct;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductImageListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
@@ -56,7 +58,6 @@ class AuctionServiceTests {
         Member member = genMember();
         AuctionCreateRequest req = genAuctionCreateRequest();
 
-
         ProductCreateDto productDto = req.toProductCreateDto(member);
         Product product = genProduct();
 
@@ -74,8 +75,8 @@ class AuctionServiceTests {
         assertThat(auction.getStartingPrice()).isEqualTo(req.startingPrice());
         assertThat(auction.getInstantBidPrice()).isEqualTo(req.buyNowPrice());
         assertThat(auction.getDuration().getStartTime()).isEqualTo(req.startDate());
-        assertThat(auction.getDuration().getEndTime())
-                .isEqualTo(req.startDate().plusDays(bidPeriod));
+        assertThat(auction.getDuration().getEndTime()).isEqualTo(
+                req.startDate().plusDays(bidPeriod));
         assertThat(auction.getStatus()).isEqualTo(AuctionStatus.OPEN);
     }
 
@@ -85,18 +86,14 @@ class AuctionServiceTests {
 
         Long auctionId = 1L;
 
-        List<BigDecimal> bidList = List.of(
-                BigDecimal.valueOf(200_0000L),
-                BigDecimal.valueOf(150_0000L),
-                BigDecimal.valueOf(100_0000L)
-        );
+        List<BigDecimal> bidList = List.of(BigDecimal.valueOf(2000000L),
+                BigDecimal.valueOf(1500000L), BigDecimal.valueOf(1000000L));
         Product product = genProduct();
         Auction auction = genAuctionCreateRequest().toEntity(product);
 
         ProductImageListResponse productImageListResp = mock(ProductImageListResponse.class);
-        List<String> productImageUrls = List.of(
-                "http://example.com/image1.jpg", "http://example.com/image2.jpg"
-        );
+        List<String> productImageUrls = List.of("http://example.com/image1.jpg",
+                "http://example.com/image2.jpg");
 
         when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId)).thenReturn(bidList);
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
@@ -125,21 +122,15 @@ class AuctionServiceTests {
     void throws_when_try_to_get_if_auction_not_exist() {
 
         Long auctionId = 1L;
-        List<BigDecimal> bidList = List.of(
-                BigDecimal.valueOf(200_0000L),
-                BigDecimal.valueOf(150_0000L),
-                BigDecimal.valueOf(100_0000L)
-        );
+        List<BigDecimal> bidList = List.of(BigDecimal.valueOf(2000000L),
+                BigDecimal.valueOf(1500000L), BigDecimal.valueOf(1000000L));
 
         when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId)).thenReturn(bidList);
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(
-                () -> {
-                    auctionService.getByAuctionId(auctionId);
-                }
-        ).isInstanceOf(GlobalException.class)
-                .hasMessage("해당 경매를 찾을 수 없습니다.");
+        assertThatThrownBy(() -> {
+            auctionService.getByAuctionId(auctionId);
+        }).isInstanceOf(GlobalException.class).hasMessage("해당 경매를 찾을 수 없습니다.");
 
     }
 
@@ -168,13 +159,42 @@ class AuctionServiceTests {
 
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(
-                () -> {
-                    auctionService.deleteByAuctionId(auctionId);
-                }
-        ).isInstanceOf(GlobalException.class)
-                .hasMessage("해당 경매를 찾을 수 없습니다.");
+        assertThatThrownBy(() -> {
+            auctionService.deleteByAuctionId(auctionId);
+        }).isInstanceOf(GlobalException.class).hasMessage("해당 경매를 찾을 수 없습니다.");
 
+    }
+
+    @Test
+    @DisplayName("전체 경매 목록을 조회한다")
+    void findAllShouldReturnAuctionList() throws Exception {
+
+        List<Auction> mockAuctions = genAuctionList();
+        when(auctionRepository.findAll()).thenReturn(mockAuctions);
+
+        when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(1L)).thenReturn(
+                List.of(new BigDecimal("200000"), new BigDecimal("150000")));
+        when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(2L)).thenReturn(
+                List.of(new BigDecimal("10000000")));
+        when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(3L)).thenReturn(
+                List.of());  // 빈 리스트
+
+
+        List<AuctionListResponse> resp = auctionService.findAll();
+
+        assertThat(resp).hasSize(3);
+
+        // 1번 경매: maxPrice 200,000, bidCount 2
+        assertThat(resp.get(0).maxPrice()).isEqualByComparingTo("200000");
+        assertThat(resp.get(0).bidCount()).isEqualTo(2);
+
+        // 2번 경매: maxPrice 10,000,000, bidCount 1
+        assertThat(resp.get(1).maxPrice()).isEqualByComparingTo("10000000");
+        assertThat(resp.get(1).bidCount()).isEqualTo(1);
+
+        // 3번 경매: 입찰없음 -> maxPrice 0, bidCount 0
+        assertThat(resp.get(2).maxPrice()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(resp.get(2).bidCount()).isEqualTo(0);
     }
 
 }
