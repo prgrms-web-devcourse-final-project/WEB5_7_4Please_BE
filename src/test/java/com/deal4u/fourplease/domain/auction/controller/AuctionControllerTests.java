@@ -102,7 +102,7 @@ class AuctionControllerTests {
 
         List<AuctionListResponse> resp = genAuctionListResponseList();
 
-        when(auctionService.getAll()).thenReturn(resp);
+        when(auctionService.findAll()).thenReturn(resp);
 
         mockMvc.perform(
                         get("/api/v1/auctions")
@@ -111,7 +111,6 @@ class AuctionControllerTests {
                 .andExpect(jsonPath("$[1].name").value(resp.get(1).name()))
                 .andExpect(jsonPath("$[2].name").value(resp.get(2).name()))
                 .andDo(print());
-
 
     }
 }

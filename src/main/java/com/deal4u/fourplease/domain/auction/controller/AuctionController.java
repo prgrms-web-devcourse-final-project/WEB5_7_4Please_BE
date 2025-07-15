@@ -39,7 +39,7 @@ public class AuctionController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<AuctionListResponse> readAllAuctions() {
-        return auctionService.getAll();
+        return auctionService.findAll();
     }
 
     @Operation(summary = "경매등록")
