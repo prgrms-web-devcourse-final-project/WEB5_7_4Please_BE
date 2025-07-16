@@ -43,8 +43,6 @@ public enum ErrorCode {
     // 409 - Conflict
     PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
 
-    BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
-
     DOES_MODIFIED_URL(HttpStatus.INTERNAL_SERVER_ERROR, "알수없는 에러입니다."),
 
     INVALID_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "사용할 수 없는 타입입니다"),
