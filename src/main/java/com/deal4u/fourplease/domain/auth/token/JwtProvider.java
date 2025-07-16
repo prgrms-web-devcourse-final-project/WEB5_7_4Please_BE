@@ -2,7 +2,6 @@ package com.deal4u.fourplease.domain.auth.token;
 
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
 import com.deal4u.fourplease.domain.member.entity.Member;
-import com.deal4u.fourplease.domain.member.service.MemberService;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -73,8 +72,9 @@ public class JwtProvider {
     public String getEmailFromToken(String token) {
         validateOrThrow(token);
 
-        return Jwts.parser()
+        return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
@@ -83,8 +83,9 @@ public class JwtProvider {
     // 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
+            Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
+                    .build()
                     .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
@@ -96,8 +97,9 @@ public class JwtProvider {
     public String getTokenType(String token) {
         validateOrThrow(token);
 
-        String type = Jwts.parser()
+        String type = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .get("type", String.class);
@@ -117,8 +119,9 @@ public class JwtProvider {
     public LocalDateTime getExpirationFromToken(String token) {
         validateOrThrow(token);
 
-        Date expiration = Jwts.parser()
+        Date expiration = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getExpiration();
@@ -130,7 +133,10 @@ public class JwtProvider {
 
     public void validateOrThrow(String token) {
         try {
-            Jwts.parser().setSigningKey(getSigningKey()).parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
             throw ErrorCode.TOKEN_EXPIRED.toException(e);
         } catch (MalformedJwtException e) {
