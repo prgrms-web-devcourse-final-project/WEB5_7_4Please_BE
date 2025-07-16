@@ -12,6 +12,7 @@ import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.Seller;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.bid.entity.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
@@ -25,12 +26,14 @@ import com.deal4u.fourplease.domain.payment.entity.Payment;
 import com.deal4u.fourplease.domain.payment.entity.PaymentStatus;
 import com.deal4u.fourplease.domain.payment.repository.PaymentRepository;
 import com.deal4u.fourplease.domain.review.dto.ReviewRequest;
+import com.deal4u.fourplease.domain.review.dto.ReviewResponse;
 import com.deal4u.fourplease.domain.review.entity.Review;
 import com.deal4u.fourplease.domain.review.entity.Reviewer;
 import com.deal4u.fourplease.domain.review.repository.ReviewRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +43,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTests {
@@ -240,5 +247,63 @@ class ReviewServiceTests {
                 .hasMessage(ErrorCode.REVIEW_ALREADY_EXISTS.getMessage());
 
         verify(reviewRepository, never()).save(any(Review.class));
+    }
+
+    @Test
+    @DisplayName("판매자 리뷰 목록 조회 성공")
+    void get_review_list_for_member_success() {
+        // Given
+        Long sellerId = seller.getMemberId();
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Review review1 = Review.builder()
+                .reviewId(1L).content("좋은 상품입니다!").rating(4)
+                .seller(Seller.create(seller)).reviewer(Reviewer.create(buyer))
+                .build();
+        Review review2 = Review.builder()
+                .reviewId(2L).content("좋은 상품입니다!").rating(2)
+                .seller(Seller.create(seller)).reviewer(Reviewer.create(buyer))
+                .build();
+
+        List<Review> reviews = List.of(review1, review2);
+        Page<Review> reviewPage = new PageImpl<>(reviews, pageable, reviews.size());
+
+        when(memberRepository.findByMemberIdAndStatus(sellerId, Status.ACTIVE)).thenReturn(
+                Optional.of(seller));
+        when(reviewRepository.findBySeller(any(Seller.class), any(Pageable.class))).thenReturn(
+                reviewPage);
+
+        // When
+        PageResponse<ReviewResponse> response = reviewService.getReviewListForMember(sellerId,
+                pageable);
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.getContent()).hasSize(2);
+        assertThat(response.getTotalElements()).isEqualTo(2);
+        assertThat(response.getContent().getFirst().content()).isEqualTo("좋은 상품입니다!");
+
+        verify(memberRepository).findByMemberIdAndStatus(sellerId, Status.ACTIVE);
+        verify(reviewRepository).findBySeller(any(Seller.class), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("판매자 리뷰 목록 조회 실패 (존재하지 않거나 비활성 상태인 회원)")
+    void get_review_list_for_member_fail_member_not_found_or_not_active() {
+        // Given
+        Long nonExistentMemberId = 999L;
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(memberRepository.findByMemberIdAndStatus(nonExistentMemberId,
+                Status.ACTIVE)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(
+                () -> reviewService.getReviewListForMember(nonExistentMemberId, pageable))
+                .isInstanceOf(GlobalException.class)
+                .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
+
+        // Then
+        verify(reviewRepository, never()).findBySeller(any(Seller.class), any(Pageable.class));
     }
 }

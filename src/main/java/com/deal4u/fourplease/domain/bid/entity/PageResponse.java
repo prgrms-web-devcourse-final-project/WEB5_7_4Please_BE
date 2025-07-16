@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 public class PageResponse<T> {
 
     private List<T> content;
-    private int bidCount;
     private int page;
     private int size;
     private int totalPages;

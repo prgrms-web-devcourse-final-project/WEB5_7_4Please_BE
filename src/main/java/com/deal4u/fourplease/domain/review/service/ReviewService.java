@@ -6,8 +6,11 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.PAYMENT_NOT_SUCCE
 import static com.deal4u.fourplease.global.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.entity.Seller;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.bid.entity.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderStatus;
@@ -15,6 +18,7 @@ import com.deal4u.fourplease.domain.order.entity.Orderer;
 import com.deal4u.fourplease.domain.order.repository.OrderRepository;
 import com.deal4u.fourplease.domain.payment.repository.PaymentRepository;
 import com.deal4u.fourplease.domain.review.dto.ReviewRequest;
+import com.deal4u.fourplease.domain.review.dto.ReviewResponse;
 import com.deal4u.fourplease.domain.review.entity.Review;
 import com.deal4u.fourplease.domain.review.entity.Reviewer;
 import com.deal4u.fourplease.domain.review.mapper.ReviewMapper;
@@ -22,6 +26,8 @@ import com.deal4u.fourplease.domain.review.repository.ReviewRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -48,6 +54,19 @@ public class ReviewService {
         saveReview(request, auction, reviewer);
     }
 
+    public PageResponse<ReviewResponse> getReviewListForMember(Long memberId, Pageable pageable) {
+        // 1. 판매자 검증
+        Seller seller = getSellerOrThrowIfNotActive(memberId);
+
+        // 2. 판매자를 기반으로 리뷰 내역 조회
+        Page<Review> reviewPage = reviewRepository.findBySeller(seller, pageable);
+
+        // 3. `ReviewResponse`로 `Mapper`를 이용해서 Mapping
+        Page<ReviewResponse> reviewResponsePage = reviewPage.map(ReviewMapper::toResponse);
+
+        return PageResponse.fromPage(reviewResponsePage);
+    }
+
     private void saveReview(ReviewRequest request, Auction auction, Reviewer reviewer) {
         Review review = ReviewMapper.toEntity(auction, reviewer, auction.getProduct()
                 .getSeller(), request.rating(), request.content());
@@ -55,7 +74,7 @@ public class ReviewService {
     }
 
     private Reviewer getReviewerOrThrowIfExists(Member member, Auction auction) {
-        Reviewer reviewer = Reviewer.createReviewer(member);
+        Reviewer reviewer = Reviewer.create(member);
         validateReviewAbsence(auction, reviewer);
         return reviewer;
     }
@@ -98,4 +117,11 @@ public class ReviewService {
         paymentRepository.findByOrderId(order.getOrderId())
                 .orElseThrow(PAYMENT_NOT_SUCCESS::toException);
     }
+
+    private Seller getSellerOrThrowIfNotActive(Long memberId) {
+        Member member = memberRepository.findByMemberIdAndStatus(memberId, Status.ACTIVE)
+                .orElseThrow(USER_NOT_FOUND::toException);
+        return Seller.create(member);
+    }
+
 }

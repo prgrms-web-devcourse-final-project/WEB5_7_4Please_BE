@@ -22,7 +22,7 @@ public class Reviewer {
     @JoinColumn(name = "reviewer_member_id")
     private Member reviewer;
 
-    public static Reviewer createReviewer(Member member) {
+    public static Reviewer create(Member member) {
         return new Reviewer(member);
     }
 }
