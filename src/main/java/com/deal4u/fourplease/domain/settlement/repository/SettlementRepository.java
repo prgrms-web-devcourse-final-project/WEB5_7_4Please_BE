@@ -3,12 +3,9 @@ package com.deal4u.fourplease.domain.settlement.repository;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
-import com.deal4u.fourplease.domain.shipment.entity.ShipmentStatus;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

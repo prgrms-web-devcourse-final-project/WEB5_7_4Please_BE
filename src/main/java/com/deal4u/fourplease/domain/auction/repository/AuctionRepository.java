@@ -24,6 +24,13 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "AND a.status = 'OPEN'")
     Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusOpen(Long auctionId);
 
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "WHERE a.auctionId = :auctionId "
+            + "AND a.deleted = false "
+            + "AND a.status = 'CLOSED'")
+    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(Long auctionId);
+
     @Query("select a "
             + "from Auction a "
             + "join fetch a.product p "
