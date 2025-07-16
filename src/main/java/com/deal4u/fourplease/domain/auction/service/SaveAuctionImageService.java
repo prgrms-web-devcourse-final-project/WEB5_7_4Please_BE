@@ -12,19 +12,27 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-@RequiredArgsConstructor
 public class SaveAuctionImageService {
 
     private final AuctionSaveDataFactory auctionSaveDataFactory;
     private final FileSaver fileSaver;
-    @Value("${deal4u.host-url}")
-    private String hostUrl;
+
+    private final String hostUrl;
+
+    @Autowired
+    public SaveAuctionImageService(AuctionSaveDataFactory auctionSaveDataFactory,
+            FileSaver fileSaver,
+            @Value("${deal4u.host-url}") String hostUrl) {
+        this.auctionSaveDataFactory = auctionSaveDataFactory;
+        this.fileSaver = fileSaver;
+        this.hostUrl = hostUrl;
+    }
 
     public AuctionImageUrlResponse upload(Member member, MultipartFile file) {
         ImageType imageType = ImageType.findTypeByStr(file.getOriginalFilename()).orElseThrow(

@@ -32,7 +32,7 @@ class SaveAuctionImageServiceTest {
         FakeFileSaver fakeFileSaver = new FakeFileSaver();
         SaveAuctionImageService saveAuctionImageService = new SaveAuctionImageService(
                 saveDataFactory,
-                fakeFileSaver);
+                fakeFileSaver,"test.com");
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -47,7 +47,7 @@ class SaveAuctionImageServiceTest {
         assertThat(new SaveData(path, fileName + ".png")).isEqualTo(
                 fakeFileSaver.getInputSaveData());
         assertThat(file).isEqualTo(fakeFileSaver.getFile());
-        assertThat(upload.url()).isEqualTo("https://example.com" + path);
+        assertThat(upload.url()).isEqualTo("https://test.com" + path);
     }
 
     @Test
@@ -57,7 +57,7 @@ class SaveAuctionImageServiceTest {
                 () -> "test");
 
         SaveAuctionImageService saveAuctionImageService = new SaveAuctionImageService(
-                saveDataFactory, new FakeFileSaver());
+                saveDataFactory, new FakeFileSaver(),"test.com");
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "file.txt",

@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
+import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +43,9 @@ class AuctionControllerTests {
 
     @MockitoBean
     private MemberRepository memberRepository;
+
+    @MockitoBean
+    private SaveAuctionImageService saveAuctionImageService;
 
     @Test
     @DisplayName("POST /api/v1/auctions가 성공하면 경매를 등록한 후 201을 반환한다")
