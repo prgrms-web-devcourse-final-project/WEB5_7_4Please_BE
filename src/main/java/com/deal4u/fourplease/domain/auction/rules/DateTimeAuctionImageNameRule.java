@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class DateTimeAuctionImageNameRule implements AuctionImageNameRule {
 
     private static final DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 
     @Override
     public String createAuctionPath() {
