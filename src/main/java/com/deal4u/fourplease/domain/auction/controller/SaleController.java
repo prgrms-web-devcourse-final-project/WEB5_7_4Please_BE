@@ -33,7 +33,7 @@ public class SaleController {
     public List<SellerSaleListResponse> getSales(
             @PathVariable(name = "sellerId") @Positive Long sellerId
     ) {
-        return auctionService.getSalesBySellerId(sellerId);
+        return auctionService.findSalesBySellerId(sellerId);
     }
 
 }

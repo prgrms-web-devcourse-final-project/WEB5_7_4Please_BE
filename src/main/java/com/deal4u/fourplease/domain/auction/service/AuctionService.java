@@ -68,7 +68,7 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public List<SellerSaleListResponse> getSalesBySellerId(Long sellerId) {
+    public List<SellerSaleListResponse> findSalesBySellerId(Long sellerId) {
         List<Product> productList = productService.getProductListBySellerId(sellerId);
 
         List<Long> productIdList = productList.stream()

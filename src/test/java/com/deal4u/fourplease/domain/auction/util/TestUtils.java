@@ -250,4 +250,52 @@ public class TestUtils {
                 )
         );
     }
+
+    public static List<Product> genProductList() {
+        return List.of(
+                Product.builder()
+                        .productId(1L)
+                        .name("목도리")
+                        .description("목에 둘러도 따뜻하지 않은 목도리")
+                        .thumbnailUrl("http://example.com/thumbnail1.jpg")
+                        .address(new Address(
+                                "서울시 서초구",
+                                "101동 102호",
+                                "999999"
+                        ))
+                        .seller(Seller.create(genMember()))
+                        .category(new Category(0L, "패션"))
+                        .phone("010-9999-9999")
+                        .build(),
+                Product.builder()
+                        .productId(2L)
+                        .name("축구공")
+                        .description("손흥민의 싸인이 있는 축구공")
+                        .thumbnailUrl("http://example.com/thumbnail2.jpg")
+                        .address(new Address(
+                                "서울시 광진구",
+                                "101동 102호",
+                                "333333"
+                        ))
+                        .seller(Seller.create(genMember()))
+                        .category(new Category(2L, "스포츠"))
+                        .phone("010-3333-3333")
+                        .build(),
+                Product.builder()
+                        .productId(3L)
+                        .name("칫솔")
+                        .description("한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.")
+                        .thumbnailUrl("http://example.com/thumbnail3.jpg")
+                        .address(new Address(
+                                "서울시 강남구",
+                                "101동 102호",
+                                "000000"
+                        ))
+                        .seller(Seller.create(genMember()))
+                        .category(new Category(4L, "생활용품"))
+                        .phone("010-0000-0000")
+                        .build()
+        );
+    }
+
 }

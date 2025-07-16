@@ -10,7 +10,6 @@ import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.domain.shipment.repository.ShipmentRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,20 +32,6 @@ public class AuctionSupportService {
     }
 
     public List<AuctionListResponse> getAuctionListResponses(List<Auction> auctionList) {
-        List<AuctionListResponse> auctionListResponseList = new ArrayList<>();
-        for (Auction auction : auctionList) {
-            BidSummaryDto bidSummaryDto = getBidSummaryDto(auction.getAuctionId());
-
-            auctionListResponseList.add(
-                    AuctionListResponse.toAuctionListResponse(
-                            auction,
-                            bidSummaryDto,
-                            // TODO: wishList 개발 후 수정 필요
-                            false
-                    )
-            );
-        }
-
         return auctionList.stream()
                 .map(auction -> {
                     BidSummaryDto bidSummaryDto = getBidSummaryDto(auction.getAuctionId());

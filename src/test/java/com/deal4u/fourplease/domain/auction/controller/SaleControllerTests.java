@@ -34,7 +34,7 @@ class SaleControllerTests {
 
         List<SellerSaleListResponse> resp = genSellerSaleListResponseList();
 
-        when(auctionService.getSalesBySellerId(sellerId)).thenReturn(resp);
+        when(auctionService.findSalesBySellerId(sellerId)).thenReturn(resp);
 
         mockMvc.perform(
                 get("/api/v1/sales/{sellerId}", sellerId)
