@@ -40,8 +40,10 @@ public enum ErrorCode {
     BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
     SECOND_HIGHEST_BIDDER_NOT_FOUND(HttpStatus.NOT_FOUND, "차상위 입찰자를 찾을 수 없습니다."),
 
+
     // 409 - Conflict
     PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
+    SETTLEMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 차상위 입찰자에 대한 정산이 존재합니다."),
 
     // 500 - Internal Server Error
     WEBSOCKET_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "WebSocket 메시지 전송 중 오류가 발생하였습니다.");

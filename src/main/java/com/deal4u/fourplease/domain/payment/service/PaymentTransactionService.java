@@ -54,6 +54,6 @@ class PaymentTransactionService {
         }
         order.success();
         payment.statusSuccess();
-        settlementService.chagneSettlementSucess(auction);
+        settlementService.changeSettlementSuccess(auction);
     }
 }

@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.domain.settlement.repository;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
 import java.time.LocalDateTime;
@@ -24,5 +25,11 @@ public interface SettlementRepository extends CrudRepository<Settlement, Long> {
     List<Settlement> findExpiredSettlements(@Param("status") SettlementStatus status,
                                             @Param("currentTime") LocalDateTime currentTime);
 
+    boolean existsByAuctionAndBidder(Auction auction, Bidder bidder);
+
     Optional<Settlement> findByAuction(Auction auction);
+
+    List<Settlement> findByStatus(SettlementStatus status);
+
+
 }
