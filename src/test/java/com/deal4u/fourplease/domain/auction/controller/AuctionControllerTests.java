@@ -15,13 +15,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
-import com.deal4u.fourplease.domain.file.service.FileSaver;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
+import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,9 +50,6 @@ class AuctionControllerTests {
 
     @MockitoBean
     private SaveAuctionImageService saveAuctionImageService;
-
-    @MockitoBean
-    private FileSaver fileSaver;
 
     @Test
     @DisplayName("POST /api/v1/auctions가 성공하면 경매를 등록한 후 201을 반환한다")
@@ -113,16 +110,59 @@ class AuctionControllerTests {
                 new byte[]{1, 2, 3, 4}
         );
 
-        URI uri = new URI("https", "test.com", null, null);
-        when(fileSaver.save(any(), any())).thenReturn(
-                uri.toURL()
-        );
         Member member = Mockito.mock(Member.class);
         when(member.getNickName()).thenReturn("test");
         when(memberRepository.findAll()).thenReturn(List.of(member));
+        when(saveAuctionImageService.upload(member, file)).thenReturn(
+                new AuctionImageUrlResponse("test.com")
+        );
 
         mockMvc.perform(multipart("/api/v1/auctions/images").file(file)
                 ).andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/auctions/images 이미지 파일이 아니면 400를 반환한다")
+    void upload_image_should_return400() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "image",
+                "test.txt",
+                "plain/text",
+                new byte[]{1, 2, 3, 4}
+        );
+
+        Member member = Mockito.mock(Member.class);
+        when(member.getNickName()).thenReturn("test");
+        when(memberRepository.findAll()).thenReturn(List.of(member));
+        when(saveAuctionImageService.upload(member, file)).thenThrow(
+                ErrorCode.INVALID_IMAGE_TYPE.toException()
+        );
+
+        mockMvc.perform(multipart("/api/v1/auctions/images").file(file)
+                ).andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("POST /api/v1/auctions/images 잘못된 파일이 아니면 400를 반환한다")
+    void upload_image_is_invalid_file_should_return400() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "image",
+                "test.txt",
+                "plain/png",
+                new byte[]{1, 2, 3, 4}
+        );
+
+        Member member = Mockito.mock(Member.class);
+        when(member.getNickName()).thenReturn("test");
+        when(memberRepository.findAll()).thenReturn(List.of(member));
+        when(saveAuctionImageService.upload(member, file)).thenThrow(
+                ErrorCode.INVALID_FILE.toException()
+        );
+
+        mockMvc.perform(multipart("/api/v1/auctions/images").file(file)
+                ).andExpect(status().isBadRequest())
                 .andDo(print());
     }
 }
