@@ -11,11 +11,19 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
         format_sql: true
+    defer-datasource-initialization: true
+
+
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data-ci.sql
+
   security:
     oauth2:
       client:
@@ -63,3 +71,6 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-info-authentication-method: header
             user-name-attribute: id # Kakao 응답 값 id, connected_at, properties, kakao_account 중 id 지정
+
+toss:
+  secret-key: ${TOSS_SECRET_KEY}

@@ -8,27 +8,61 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
-    ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "엔티티를 찾을 수 없습니다."),
-
+    // 400 - Bad Request,
+    EMPTY_LIST(HttpStatus.BAD_REQUEST, "빈 리스트 입니다."),
+    INVALID_FILE(HttpStatus.BAD_REQUEST, "처리할수 없는 파일입니다."),
+    FILE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "요청을 처리 할 수 없습니다."),
+    INVALID_AUCTION_BIDDER(HttpStatus.BAD_REQUEST, "해당 사용자는 경매의 낙찰자가 아닙니다."),
+    INVALID_ORDER_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 타입입니다."),
+    INVALID_INSTANT_BID_PRICE(HttpStatus.BAD_REQUEST, "요청된 가격이 즉시 입찰가와 일치하지 않습니다."),
+    INVALID_BID_PRICE(HttpStatus.BAD_REQUEST, "요청된 가격이 낙찰가와 일치하지 않습니다."),
+    INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 주문 금액과 일치하지 않습니다."),
+    INVALID_USER(HttpStatus.BAD_REQUEST, "결제자 정보가 올바르지 않습니다."),
+    PAYMENT_CONFIRMATION_FAILED(HttpStatus.BAD_REQUEST, "결제 승인이 실패했습니다."),
+    PAYMENT_ERROR(HttpStatus.BAD_REQUEST, "결제 처리 중 오류가 발생했습니다."),
+    WEBSOCKET_INVALID_REQUEST_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 요청 형식입니다."),
+    INVALID_PRICE_NOT_UPPER(HttpStatus.BAD_REQUEST, "즉시 구매 가격이 현재 최고 입찰가보다 낮습니다."),
     INVALID_AUTH_HEADER(HttpStatus.BAD_REQUEST, "Authorization 헤더 형식이 잘못되었습니다."),
-    TOKEN_ALREADY_BLACKLISTED(HttpStatus.FORBIDDEN, "이미 블랙리스트 처리된 토큰입니다."),
-    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰이 유효하지 않습니다."),
-    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다."),
     INVALID_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 토큰 타입입니다."),
     MALFORMED_TOKEN(HttpStatus.BAD_REQUEST, "토큰 형식이 올바르지 않습니다."),
-    TOKEN_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "토큰 타입을 찾을 수 없습니다."),
-    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
     UNSUPPORTED_TOKEN(HttpStatus.BAD_REQUEST, "지원되지 않는 토큰 형식입니다."),
+    TOKEN_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "토큰 타입을 찾을 수 없습니다."),
     OAUTH_EMAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "소셜 로그인으로부터 이메일을 받아올 수 없습니다."),
-
-
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이메일의 회원이 존재하지 않습니다."),
-    MEMBER_WITHDRAWN(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다."),
-
-    INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "닉네임은 공백일 수 없습니다."),
-    NICKNAME_ALREADY_EXISTS(HttpStatus.UNPROCESSABLE_ENTITY, "이미 존재하는 닉네임입니다."),
     NICKNAME_LENGTH_INVALID(HttpStatus.BAD_REQUEST, "닉네임은 2~20자 사이여야 합니다."),
-    INVALID_NICKNAME_FORMAT(HttpStatus.BAD_REQUEST, "닉네임 형식이 잘못되었습니다.");
+    INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "닉네임은 공백일 수 없습니다."),
+    INVALID_NICKNAME_FORMAT(HttpStatus.BAD_REQUEST, "닉네임 형식이 잘못되었습니다."),
+
+    // 401 - Unauthorized,
+    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰이 유효하지 않습니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다."),
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
+
+    // 403 - Forbidden,
+    BID_FORBIDDEN_PRICE(HttpStatus.FORBIDDEN, "기존 입찰 금액보다 높은 금액을 입력해주세요."),
+    AUCTION_NOT_OPEN(HttpStatus.FORBIDDEN, "해당 경매는 종료되었습니다."),
+    MEMBER_WITHDRAWN(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다."),
+    TOKEN_ALREADY_BLACKLISTED(HttpStatus.FORBIDDEN, "이미 블랙리스트 처리된 토큰입니다."),
+
+    // 404 - Not Found,
+    ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "엔티티를 찾을 수 없습니다."),
+    AUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 경매를 찾을 수 없습니다."),
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
+    SETTLEMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 정산을 찾을 수 없습니다."),
+    BID_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 입찰 내역을 찾을 수 없습니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
+    BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
+    SECOND_HIGHEST_BIDDER_NOT_FOUND(HttpStatus.NOT_FOUND, "차상위 입찰자를 찾을 수 없습니다."),
+
+    // 409 - Conflict,
+    PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
+
+    // 422 - Unprocessable Entity,
+    NICKNAME_ALREADY_EXISTS(HttpStatus.UNPROCESSABLE_ENTITY, "이미 존재하는 닉네임입니다."),
+
+    // 500 - Internal Server Error,
+    WEBSOCKET_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "WebSocket 메시지 전송 중 오류가 발생하였습니다.");
 
 
     private final HttpStatus status;
@@ -57,6 +91,4 @@ public enum ErrorCode {
     public GlobalException toException(Throwable cause, String message, Object... args) {
         return new GlobalException(cause, status, message, args);
     }
-
-
 }

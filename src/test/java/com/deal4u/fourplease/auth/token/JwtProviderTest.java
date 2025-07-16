@@ -36,13 +36,7 @@ public class JwtProviderTest {
         SecretKey strongKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
         String encodedSecret = Base64.getEncoder().encodeToString(strongKey.getEncoded());
 
-        jwtProvider = new JwtProvider();
-
-        // reflection을 통해 private 필드 세팅
-        ReflectionTestUtils.setField(jwtProvider, "secretKey", encodedSecret);
-        ReflectionTestUtils.setField(jwtProvider, "accessTokenExpiration", 1000L * 60 * 15); // 15분
-        ReflectionTestUtils.setField(jwtProvider, "refreshTokenExpiration",
-                1000L * 60 * 60 * 24 * 7); // 7일
+        jwtProvider = new JwtProvider(encodedSecret, 1000L * 60 * 15, 1000L * 60 * 60 * 24 * 7);
 
         member = Member.builder()
                 .email("test@example.com")

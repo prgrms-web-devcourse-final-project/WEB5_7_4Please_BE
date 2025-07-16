@@ -16,21 +16,28 @@ import java.time.ZoneId;
 import java.util.Date;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
 @Slf4j
+@Component
 public class JwtProvider {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
 
-    @Value("${jwt.access-token-expiration}")
-    private long accessTokenExpiration;
+    private final String secretKey;
 
-    @Value("${jwt.refresh-token-expiration}")
-    private long refreshTokenExpiration;
+    private final long accessTokenExpiration;
+
+    private final long refreshTokenExpiration;
+
+    public JwtProvider(@Value("${jwt.secret}") String secretKey,
+                       @Value("${jwt.access-token-expiration}") long accessTokenExpiration,
+                       @Value("${jwt.refresh-token-expiration}") long refreshTokenExpiration) {
+        this.accessTokenExpiration = accessTokenExpiration;
+        this.secretKey = secretKey;
+        this.refreshTokenExpiration = refreshTokenExpiration;
+    }
 
     public TokenPair generateTokenPair(Member member) {
         return new TokenPair(

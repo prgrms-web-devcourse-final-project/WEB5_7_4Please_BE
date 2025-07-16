@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 
 @Entity
@@ -25,37 +26,29 @@ public class Member extends BaseDateEntity {
     @NaturalId
     private String email;
 
+    @Setter
     private String nickName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.USER;
+    @Setter
+    private Role role;
 
-    private Status status = Status.ACTIVE;
+    @Enumerated(EnumType.STRING)
+    @Setter
+    private Status status;
 
     @Column(nullable = false)
     private String provider;
 
     @Builder
-    public Member(String email, String nickName, Role role, Status status, String provider) {
+    public Member(Long memberId, String email, String nickName, Role role, Status status,
+                  String provider) {
+        this.memberId = memberId;
         this.email = email;
         this.nickName = nickName;
         this.role = role != null ? role : Role.USER;
         this.status = status != null ? status : Status.ACTIVE;
         this.provider = provider;
     }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
 }
-
-

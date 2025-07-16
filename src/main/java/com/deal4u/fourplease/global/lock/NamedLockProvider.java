@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.global.lock;
 
 import java.util.concurrent.locks.Lock;
+import org.springframework.stereotype.Component;
 
 /**
  * 문자열 키를 기준으로 동시성을 제어할 수 있는 이름 기반 락(Named Lock)을 제공합니다. 클라이언트는 동일한 키에 대해 공유 락(Read) 또는 배타 락(Write)을
@@ -39,7 +40,7 @@ import java.util.concurrent.locks.Lock;
  *
  * @author 고지훈
  */
-
+@Component
 public class NamedLockProvider implements NameLockStore {
 
     private final LockManager lockManager = new LockManager();
