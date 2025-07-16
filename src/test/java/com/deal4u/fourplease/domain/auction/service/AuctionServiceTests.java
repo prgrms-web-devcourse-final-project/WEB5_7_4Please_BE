@@ -87,34 +87,36 @@ class AuctionServiceTests {
 
         Long auctionId = 1L;
 
-        List<BigDecimal> bidList = List.of(BigDecimal.valueOf(2000000L),
-                BigDecimal.valueOf(1500000L), BigDecimal.valueOf(1000000L));
+        BidSummaryDto bidSummaryDto = new BidSummaryDto(
+                BigDecimal.valueOf(2000000L),
+                3
+        );
+
         Product product = genProduct();
         Auction auction = genAuctionCreateRequest().toEntity(product);
 
-        ProductImageListResponse productImageListResp = mock(ProductImageListResponse.class);
-        List<String> productImageUrls = List.of("http://example.com/image1.jpg",
+        ProductImageListResponse productImageListResponse = mock(ProductImageListResponse.class);
+        List<String> productImageUrlList = List.of("http://example.com/image1.jpg",
                 "http://example.com/image2.jpg");
 
-        when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId)).thenReturn(bidList);
+        when(auctionSupportService.getBidSummaryDto(auctionId)).thenReturn(bidSummaryDto);
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
-
-        when(productImageListResp.toProductImageUrlList()).thenReturn(productImageUrls);
-        when(productImageService.getByProduct(product)).thenReturn(productImageListResp);
+        when(productImageService.getByProduct(product)).thenReturn(productImageListResponse);
+        when(productImageListResponse.toProductImageUrlList()).thenReturn(productImageUrlList);
 
         AuctionDetailResponse actualResp = auctionService.getByAuctionId(auctionId);
 
-        assertThat(actualResp.highestBidPrice()).isEqualTo(bidList.getFirst());
+        assertThat(actualResp.highestBidPrice()).isEqualTo(bidSummaryDto.maxPrice());
         assertThat(actualResp.instantBidPrice()).isEqualTo(auction.getInstantBidPrice());
-        assertThat(actualResp.bidCount()).isEqualTo(bidList.size());
+        assertThat(actualResp.bidCount()).isEqualTo(bidSummaryDto.bidCount());
         assertThat(actualResp.productName()).isEqualTo(product.getName());
         assertThat(actualResp.categoryId()).isEqualTo(product.getCategory().getCategoryId());
         assertThat(actualResp.categoryName()).isEqualTo(product.getCategory().getName());
         assertThat(actualResp.description()).isEqualTo(product.getDescription());
         assertThat(actualResp.endTime()).isEqualTo(auction.getDuration().getEndTime());
         assertThat(actualResp.thumbnailUrl()).isEqualTo(product.getThumbnailUrl());
-        assertThat(actualResp.imageUrls().getFirst()).isEqualTo(productImageUrls.getFirst());
-        assertThat(actualResp.imageUrls().getLast()).isEqualTo(productImageUrls.getLast());
+        assertThat(actualResp.imageUrls().getFirst()).isEqualTo(productImageUrlList.getFirst());
+        assertThat(actualResp.imageUrls().getLast()).isEqualTo(productImageUrlList.getLast());
 
     }
 
@@ -123,10 +125,7 @@ class AuctionServiceTests {
     void throws_when_try_to_get_if_auction_not_exist() {
 
         Long auctionId = 1L;
-        List<BigDecimal> bidList = List.of(BigDecimal.valueOf(2000000L),
-                BigDecimal.valueOf(1500000L), BigDecimal.valueOf(1000000L));
 
-        when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId)).thenReturn(bidList);
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> {
@@ -169,33 +168,20 @@ class AuctionServiceTests {
     @Test
     @DisplayName("전체 경매 목록을 조회한다")
     void findAllShouldReturnAuctionList() throws Exception {
+        List<Auction> auctionList = genAuctionList();
+        when(auctionRepository.findAll()).thenReturn(auctionList);
 
-        List<Auction> mockAuctions = genAuctionList();
-        when(auctionRepository.findAll()).thenReturn(mockAuctions);
-
-        when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(1L)).thenReturn(
-                List.of(new BigDecimal("200000"), new BigDecimal("150000")));
-        when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(2L)).thenReturn(
-                List.of(new BigDecimal("10000000")));
-        when(bidRepository.findPricesByAuctionIdOrderByPriceDesc(3L)).thenReturn(
-                List.of());
-
-
+        when(auctionSupportService.getAuctionListResponses(anyList()))
+                .thenReturn(genAuctionListResponseList());
         List<AuctionListResponse> resp = auctionService.findAll();
 
         assertThat(resp).hasSize(3);
-
-        // 1번 경매: maxPrice 200,000, bidCount 2
+        assertThat(resp.get(0).name()).isEqualTo("목도리");
         assertThat(resp.get(0).maxPrice()).isEqualTo(new BigDecimal("200000"));
-        assertThat(resp.get(0).bidCount()).isEqualTo(2);
-
-        // 2번 경매: maxPrice 10,000,000, bidCount 1
+        assertThat(resp.get(1).name()).isEqualTo("축구공");
         assertThat(resp.get(1).maxPrice()).isEqualTo(new BigDecimal("10000000"));
-        assertThat(resp.get(1).bidCount()).isEqualTo(1);
-
-        // 3번 경매: 입찰없음 -> maxPrice 0, bidCount 0
-        assertThat(resp.get(2).maxPrice()).isEqualTo(BigDecimal.ZERO);
-        assertThat(resp.get(2).bidCount()).isEqualTo(0);
+        assertThat(resp.get(2).maxPrice()).isEqualTo(new BigDecimal("2000000"));
+        assertThat(resp.get(2).name()).isEqualTo("칫솔");
     }
 
     @Test
@@ -208,6 +194,48 @@ class AuctionServiceTests {
 
         assertThat(resp).isNotNull();
         assertThat(resp).isEmpty();
+    }
+
+    @Test
+    @DisplayName("판매자 id로 해당 판매자의 판매내역을 조회한다")
+    void findSalesBySellerIdShouldReturnSellerSaleList() throws Exception {
+
+        Long sellerId = 1L;
+
+        List<Product> productList = genProductList();
+        List<Long> productIdList = List.of(1L, 2L, 3L);
+        List<Auction> auctionList = genAuctionList();
+
+        when(productService.getProductListBySellerId(sellerId)).thenReturn(productList);
+        when(auctionRepository.findAllByProductId(productIdList)).thenReturn(auctionList);
+
+        when(auctionSupportService.getBidSummaryDto(anyLong()))
+                // id 별로 다른 값 반환
+                .thenAnswer(invocation -> {
+                    Long auctionId = invocation.getArgument(0);
+                    if (auctionId == 1L) {
+                        return new BidSummaryDto(BigDecimal.valueOf(2000000), 5);
+                    } else if (auctionId == 2L) {
+                        return new BidSummaryDto(BigDecimal.valueOf(10000000), 20);
+                    } else if (auctionId == 3L) {
+                        return new BidSummaryDto(BigDecimal.valueOf(2000000), 20);
+                    } else {
+                        return new BidSummaryDto(BigDecimal.ZERO, 0);
+                    }
+                });
+        when(auctionSupportService.getSaleAuctionStatus(any(Auction.class)))
+                .thenReturn(SaleAuctionStatus.OPEN);
+
+        List<SellerSaleListResponse> resp = auctionService.findSalesBySellerId(sellerId);
+
+        assertThat(resp).isNotNull();
+        assertThat(resp).hasSize(3);
+        assertThat(resp.get(0).name()).isEqualTo(productList.get(0).getName());
+        assertThat(resp.get(0).thumbnailUrl()).isEqualTo(productList.get(0).getThumbnailUrl());
+        assertThat(resp.get(1).name()).isEqualTo(productList.get(1).getName());
+        assertThat(resp.get(1).thumbnailUrl()).isEqualTo(productList.get(1).getThumbnailUrl());
+        assertThat(resp.get(2).name()).isEqualTo(productList.get(2).getName());
+        assertThat(resp.get(2).thumbnailUrl()).isEqualTo(productList.get(2).getThumbnailUrl());
     }
 
 }
