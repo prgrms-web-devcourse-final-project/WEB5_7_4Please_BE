@@ -88,7 +88,8 @@ class FileValidatorTest {
 
         // when & then
         assertThatCode(
-                () -> validator.validate(file.getOriginalFilename(), file)).doesNotThrowAnyException();
+                () -> validator.validate(file.getOriginalFilename(), file))
+                .doesNotThrowAnyException();
     }
 
 }

@@ -255,7 +255,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("BUY_NOW 타입에서 OPEN 상태가 아닌 경매에 대한 주문 시 예외 발생")
-        void testCreateOrder_BuyNowAuctionNotOpen() {
+        void testCreateOrderBuyNowAuctionNotOpen() {
             // Given
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
@@ -276,7 +276,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("AWARD 타입에서 CLOSED 상태가 아닌 경매에 대한 주문 시 예외 발생")
-        void testCreateOrder_AwardAuctionNotClosed() {
+        void testCreateOrderAwardAuctionNotClosed() {
             // Given
             Long auctionId = 2L;
             String orderType = "AWARD";
