@@ -7,7 +7,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
-import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
@@ -55,40 +54,27 @@ class PaymentServiceTest {
     @Mock
     private Payment payment;
 
+    @Mock
+    private Auction auction;  // Mock the auction
+
+    @Mock
+    private Order buyNowOrder;  // Mock the order
+
     @InjectMocks
     private PaymentService paymentService;
 
     private TossPaymentConfirmRequest confirmRequest;
-    private Order buyNowOrder;
     private Order awardOrder;
-    private Auction auction;
     private TossPaymentConfirmResponse successResponse;
     private TossPaymentConfirmResponse failedResponse;
 
     @BeforeEach
     void setUp() {
-        auction = Auction.builder()
-                .auctionId(1L)
-                .product(null)
-                .startingPrice(new BigDecimal("50000"))
-                .instantBidPrice(new BigDecimal("100000"))
-                .duration(null)
-                .status(AuctionStatus.OPEN)
-                .deleted(false)
-                .build();
-
         confirmRequest = new TossPaymentConfirmRequest(
                 "paymentKey123",
                 "order123",
                 100000
         );
-
-        buyNowOrder = Order.builder()
-                .orderId(OrderId.create("order123"))
-                .auction(auction)
-                .price(new BigDecimal("100000"))
-                .orderType(OrderType.BUY_NOW)
-                .build();
 
         awardOrder = Order.builder()
                 .orderId(OrderId.create("order123"))
@@ -118,7 +104,6 @@ class PaymentServiceTest {
 
     @Nested
     class PaymentConfirmTest {
-
         @Test
         @DisplayName("결제가 성공적으로 되고 상태가 변경되었다.")
         void paymentConfirmSuccess() {
@@ -130,14 +115,17 @@ class PaymentServiceTest {
             given(tossApiClient.confirmPayment(confirmRequest)).willReturn(successResponse);
             given(paymentTransactionService.savePayment(any(), any(), any(), any())).willReturn(
                     payment);
+            given(buyNowOrder.getAuction()).willReturn(auction);
+            given(buyNowOrder.getPrice()).willReturn(new BigDecimal("100000"));
+            given(auction.getAuctionId()).willReturn(1L);
+            given(buyNowOrder.getOrderType()).willReturn(OrderType.BUY_NOW);
+            given(auction.getInstantBidPrice()).willReturn(new BigDecimal("100000"));
 
             // when
             paymentService.paymentConfirm(confirmRequest);
 
             // then
-            verify(paymentTransactionService).paymentStatusSuccess(payment);
-            verify(orderService).succesOrder(buyNowOrder);
-            verify(orderService).closeAuction(auction);
+            verify(paymentTransactionService).paymentStatusSuccess(payment, buyNowOrder, auction);
             verify(namedLock).unlock();
         }
 
@@ -152,14 +140,17 @@ class PaymentServiceTest {
             given(tossApiClient.confirmPayment(confirmRequest)).willReturn(failedResponse);
             given(paymentTransactionService.savePayment(any(), any(), any(), any())).willReturn(
                     payment);
+            given(buyNowOrder.getAuction()).willReturn(auction);
+            given(buyNowOrder.getPrice()).willReturn(new BigDecimal("100000"));
+            given(auction.getAuctionId()).willReturn(1L);
+            given(buyNowOrder.getOrderType()).willReturn(OrderType.BUY_NOW);
+            given(auction.getInstantBidPrice()).willReturn(new BigDecimal("100000"));
 
             // when & then
             assertThatThrownBy(() -> paymentService.paymentConfirm(confirmRequest))
                     .isInstanceOf(GlobalException.class);
 
             verify(paymentTransactionService).updatePaymentStatusToFailed(payment, buyNowOrder);
-            verify(orderService).succesOrder(buyNowOrder);
-            verify(orderService).closeAuction(auction);
         }
 
         @Test
@@ -172,6 +163,7 @@ class PaymentServiceTest {
                     50000 // 주문 금액과 다른 금액
             );
             given(paymentTransactionService.getOrderOrThrow(any())).willReturn(buyNowOrder);
+            given(buyNowOrder.getPrice()).willReturn(new BigDecimal("100000"));
 
             // when & then
             assertThatThrownBy(() -> paymentService.paymentConfirm(invalidAmountRequest))
@@ -184,10 +176,16 @@ class PaymentServiceTest {
         @DisplayName("즉시구매가격이 현재최고입찰가보다 낮으면 주문이 실패로_변경된다")
         void buyNowPriceTooLow() {
             // given
+            BigDecimal orderPrice = new BigDecimal("100000"); // 예시 가격
             given(paymentTransactionService.getOrderOrThrow(any())).willReturn(buyNowOrder);
             given(namedLockProvider.getBottleLock(anyString())).willReturn(namedLock);
             given(bidRepository.findMaxBidPriceByAuctionId(1L)).willReturn(
                     Optional.of(new BigDecimal("150000"))); // 즉시구매가보다 높은 입찰가
+            given(buyNowOrder.getAuction()).willReturn(auction);
+            given(auction.getAuctionId()).willReturn(1L);
+            given(buyNowOrder.getOrderType()).willReturn(OrderType.BUY_NOW);
+            given(auction.getInstantBidPrice()).willReturn(new BigDecimal("100000"));
+            given(buyNowOrder.getPrice()).willReturn(orderPrice); // 가격을 설정
 
             // when & then
             assertThatThrownBy(() -> paymentService.paymentConfirm(confirmRequest))
@@ -195,6 +193,7 @@ class PaymentServiceTest {
 
             verify(orderService).faliedOrder(buyNowOrder);
         }
+
     }
 
     @Test
@@ -214,6 +213,13 @@ class PaymentServiceTest {
         given(tossApiClient.confirmPayment(confirmRequest)).willReturn(failedResponse);
         given(paymentTransactionService.savePayment(any(), any(), any(), any())).willReturn(
                 payment);
+        given(buyNowOrder.getAuction()).willReturn(auction);
+        given(buyNowOrder.getPrice()).willReturn(new BigDecimal("100000"));
+        given(auction.getAuctionId()).willReturn(1L);
+        given(buyNowOrder.getOrderType()).willReturn(OrderType.BUY_NOW);
+        given(auction.getInstantBidPrice()).willReturn(new BigDecimal("100000"));
+        given(bidRepository.findMaxBidPriceByAuctionId(1L)).willReturn(
+                Optional.of(new BigDecimal("90000")));
 
         // when & then
         assertThatThrownBy(() -> paymentService.paymentConfirm(confirmRequest))

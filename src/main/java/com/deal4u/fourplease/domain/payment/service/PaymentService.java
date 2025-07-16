@@ -58,12 +58,10 @@ public class PaymentService {
 
             validatePaymentSuccessOrToFailed(response, payment, order);
 
-            paymentTransactionService.paymentStatusSuccess(payment);
+            paymentTransactionService.paymentStatusSuccess(payment, order, auction);
 
 
         } finally {
-            orderService.succesOrder(order);
-            orderService.closeAuction(auction);
             lock.unlock();
         }
     }

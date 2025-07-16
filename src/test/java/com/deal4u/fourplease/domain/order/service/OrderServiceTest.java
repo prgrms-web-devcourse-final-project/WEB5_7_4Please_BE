@@ -3,7 +3,6 @@ package com.deal4u.fourplease.domain.order.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -475,25 +474,6 @@ class OrderServiceTest {
                     .isEqualTo(HttpStatus.NOT_FOUND);
 
             verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
-        }
-    }
-
-    @Nested
-    class CloseAuctionTests {
-
-        @Test
-        @DisplayName("경매 종료가 정상적으로 수행되는 경우")
-        void testCloseAuction_Successful() {
-            // Given
-            Auction auctionToClose = Auction.builder()
-                    .auctionId(1L)
-                    .status(AuctionStatus.OPEN)
-                    .build();
-
-            // When
-            orderService.closeAuction(auctionToClose);
-
-            verify(auctionRepository, times(0)).save(any());
         }
     }
 }

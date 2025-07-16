@@ -3,6 +3,7 @@ package com.deal4u.fourplease.domain.payment.service;
 import static com.deal4u.fourplease.global.exception.ErrorCode.ORDER_NOT_FOUND;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
 import com.deal4u.fourplease.domain.order.repository.OrderRepository;
@@ -45,7 +46,11 @@ class PaymentTransactionService {
     }
 
     @Transactional
-    public void paymentStatusSuccess(Payment payment) {
+    public void paymentStatusSuccess(Payment payment, Order order, Auction auction) {
+        if (auction.getStatus().equals(AuctionStatus.OPEN)) {
+            auction.close();
+        }
+        order.success();
         payment.statusSuccess();
     }
 }
