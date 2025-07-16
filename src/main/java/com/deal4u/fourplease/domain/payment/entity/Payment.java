@@ -40,4 +40,12 @@ public class Payment extends BaseDateEntity {
 
     @Embedded
     private OrderId orderId;
+
+    public void statusFailed() {
+        this.status = PaymentStatus.FAILED;
+    }
+
+    public void statusSuccess() {
+        this.status = PaymentStatus.SUCCESS;
+    }
 }

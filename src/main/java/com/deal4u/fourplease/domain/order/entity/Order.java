@@ -7,6 +7,8 @@ import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -47,11 +49,25 @@ public class Order extends BaseDateEntity {
     private String content;
     private String receiver;
 
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
+    @Enumerated(EnumType.STRING)
+    private OrderType orderType;
+
     public void updateOrder(OrderUpdateRequest orderUpdateRequest) {
         this.address = new Address(orderUpdateRequest.address(), orderUpdateRequest.addressDetail(),
                 orderUpdateRequest.zipCode());
         this.phone = orderUpdateRequest.phone();
         this.content = orderUpdateRequest.content();
         this.receiver = orderUpdateRequest.receiver();
+    }
+
+    public void success() {
+        this.orderStatus = OrderStatus.SUCCESS;
+    }
+
+    public void failed() {
+        this.orderStatus = OrderStatus.FAILED;
     }
 }
