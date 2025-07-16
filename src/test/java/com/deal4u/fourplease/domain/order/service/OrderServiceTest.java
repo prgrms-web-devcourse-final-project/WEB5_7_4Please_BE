@@ -170,7 +170,7 @@ class OrderServiceTest {
             assertThat(savedOrder.getPrice()).isEqualByComparingTo(
                     openAuction.getInstantBidPrice());
             assertThat(savedOrder.getOrderType()).isEqualTo(OrderType.BUY_NOW);
-            assertThat(savedOrder.getOrderStatus()).isEqualTo(OrderStatus.SUCCESS);
+            assertThat(savedOrder.getOrderStatus()).isEqualTo(OrderStatus.PENDING);
         }
 
         @Test
@@ -225,7 +225,7 @@ class OrderServiceTest {
             assertThat(capturedOrder.getPrice()).isEqualByComparingTo(winningBid.getPrice());
             assertThat(capturedOrder.getAuction().getAuctionId()).isEqualTo(auctionId);
             assertThat(capturedOrder.getOrderType()).isEqualTo(OrderType.AWARD);
-            assertThat(capturedOrder.getOrderStatus()).isEqualTo(OrderStatus.SUCCESS);
+            assertThat(capturedOrder.getOrderStatus()).isEqualTo(OrderStatus.PENDING);
         }
 
         @Test
