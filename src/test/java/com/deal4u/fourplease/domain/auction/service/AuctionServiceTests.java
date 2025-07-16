@@ -19,6 +19,7 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
+import com.deal4u.fourplease.domain.auction.dto.PageResponse;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductImageListResponse;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
@@ -40,6 +41,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class AuctionServiceTests {
@@ -207,13 +212,18 @@ class AuctionServiceTests {
     void findSalesBySellerIdShouldReturnSellerSaleList() throws Exception {
 
         Long sellerId = 1L;
+        Pageable pageable = PageRequest.of(0, 20);
 
         List<Product> productList = genProductList();
         List<Long> productIdList = List.of(1L, 2L, 3L);
         List<Auction> auctionList = genAuctionList();
 
+        // PageImpl로 Page 객체 모킹
+        Page<Auction> auctionPage = new PageImpl<>(auctionList, pageable, auctionList.size());
+
         when(productService.getProductListBySellerId(sellerId)).thenReturn(productList);
-        when(auctionRepository.findAllByProductId(productIdList)).thenReturn(auctionList);
+        when(auctionRepository.findAllByProductIdIn(productIdList, pageable))
+                .thenReturn(auctionPage);
 
         when(auctionSupportService.getBidSummaryDto(anyLong()))
                 // id 별로 다른 값 반환
@@ -232,16 +242,24 @@ class AuctionServiceTests {
         when(auctionSupportService.getSaleAuctionStatus(any(Auction.class)))
                 .thenReturn(SaleAuctionStatus.OPEN);
 
-        List<SellerSaleListResponse> resp = auctionService.findSalesBySellerId(sellerId);
+        PageResponse<SellerSaleListResponse> resp = auctionService.findSalesBySellerId(sellerId, pageable);
 
         assertThat(resp).isNotNull();
-        assertThat(resp).hasSize(3);
-        assertThat(resp.get(0).name()).isEqualTo(productList.get(0).getName());
-        assertThat(resp.get(0).thumbnailUrl()).isEqualTo(productList.get(0).getThumbnailUrl());
-        assertThat(resp.get(1).name()).isEqualTo(productList.get(1).getName());
-        assertThat(resp.get(1).thumbnailUrl()).isEqualTo(productList.get(1).getThumbnailUrl());
-        assertThat(resp.get(2).name()).isEqualTo(productList.get(2).getName());
-        assertThat(resp.get(2).thumbnailUrl()).isEqualTo(productList.get(2).getThumbnailUrl());
+        assertThat(resp.getContent()).hasSize(3);
+        assertThat(resp.getContent().get(0).name()).isEqualTo(productList.get(0).getName());
+        assertThat(resp.getContent().get(0).thumbnailUrl())
+                .isEqualTo(productList.get(0).getThumbnailUrl());
+        assertThat(resp.getContent().get(1).name()).isEqualTo(productList.get(1).getName());
+        assertThat(resp.getContent().get(1).thumbnailUrl())
+                .isEqualTo(productList.get(1).getThumbnailUrl());
+        assertThat(resp.getContent().get(2).name()).isEqualTo(productList.get(2).getName());
+        assertThat(resp.getContent().get(2).thumbnailUrl())
+                .isEqualTo(productList.get(2).getThumbnailUrl());
+
+        assertThat(resp.getTotalElements()).isEqualTo(3);
+        assertThat(resp.getTotalPages()).isEqualTo(1);
+        assertThat(resp.getPage()).isEqualTo(0);
+        assertThat(resp.getSize()).isEqualTo(20);
     }
 
 }

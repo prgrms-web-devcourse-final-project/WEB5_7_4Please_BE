@@ -4,6 +4,7 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.CategoryDto;
+import com.deal4u.fourplease.domain.auction.dto.PageResponse;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Address;
@@ -216,8 +217,8 @@ public class TestUtils {
         );
     }
 
-    public static List<SellerSaleListResponse> genSellerSaleListResponseList() {
-        return List.of(
+    public static PageResponse<SellerSaleListResponse> genSellerSaleListResponsePageResponse() {
+        List<SellerSaleListResponse> content = List.of(
                 new SellerSaleListResponse(
                         1L,
                         "http://example.com/thumbnail1.jpg",
@@ -249,6 +250,14 @@ public class TestUtils {
                         "CLOSE"
                 )
         );
+
+        return PageResponse.<SellerSaleListResponse>builder()
+                .content(content)
+                .totalElements(3L)
+                .totalPages(1)
+                .page(0)
+                .size(10)
+                .build();
     }
 
     public static List<Product> genProductList() {
