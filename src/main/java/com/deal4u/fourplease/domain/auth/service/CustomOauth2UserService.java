@@ -5,7 +5,6 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
-import com.deal4u.fourplease.domain.member.service.MemberService;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.util.Map;
 import java.util.Optional;
