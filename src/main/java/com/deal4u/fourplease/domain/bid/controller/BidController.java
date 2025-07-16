@@ -38,11 +38,10 @@ public class BidController {
      */
     @GetMapping("/auctions/{auctionId}/bids")
     @ResponseStatus(HttpStatus.OK)
-    public List<BidResponse> getBids(@PathVariable Long auctionId,
+    public PageResponse<BidResponse> getBids(@PathVariable Long auctionId,
             @PageableDefault Pageable pageable) {
         // 1. 일찰 내역 조회 호출
-        PageResponse<BidResponse> bidPage = bidService.getBidListForAuction(auctionId, pageable);
-        return bidPage.getContent();
+        return bidService.getBidListForAuction(auctionId, pageable);
     }
 
     @PostMapping("/bids")
