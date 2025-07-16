@@ -51,11 +51,25 @@ public class Order extends BaseDateEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
+    @Enumerated(EnumType.STRING)
+    private OrderType orderType;
+
     public void updateOrder(OrderUpdateRequest orderUpdateRequest) {
         this.address = new Address(orderUpdateRequest.address(), orderUpdateRequest.addressDetail(),
                 orderUpdateRequest.zipCode());
         this.phone = orderUpdateRequest.phone();
         this.content = orderUpdateRequest.content();
         this.receiver = orderUpdateRequest.receiver();
+    }
+
+    public void success() {
+        this.orderStatus = OrderStatus.SUCCESS;
+    }
+
+    public void failed() {
+        this.orderStatus = OrderStatus.FAILED;
     }
 }

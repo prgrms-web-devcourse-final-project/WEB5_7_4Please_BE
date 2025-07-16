@@ -83,7 +83,7 @@ class ProductServiceTests {
 
     @Test
     @DisplayName("product를 인자로 받아 soft delete를 실행한다")
-    void deleteProduct_should_soft_delete_product_by_product() throws Exception {
+    void delete_product_should_soft_delete_product_by_product() throws Exception {
 
         Product product = genProduct();
 

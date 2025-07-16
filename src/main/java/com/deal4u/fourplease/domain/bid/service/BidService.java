@@ -141,10 +141,10 @@ public class BidService {
         return PageResponse.fromPage(bidResponsePage);
     }
 
+
     private Bidder getBidder(long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
         return Bidder.createBidder(member);
     }
-
 }
