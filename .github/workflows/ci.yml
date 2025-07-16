@@ -49,6 +49,9 @@ jobs:
         run: ./gradlew test -Dspring.profiles.active=ci
         env:
           TOSS_SECRET_KEY: ${{ secrets.TOSS_SECRET_KEY }}
+          S3_ACCESS_KEY: ${{secrets.S3_ACCESS_KEY}}
+          S3_REGION: ${{secrets.S3_REGION}}
+          S3_SECRET_KEY: ${{secrets.S3_SECRET_KEY}}
 
   build:
     runs-on: ubuntu-latest
