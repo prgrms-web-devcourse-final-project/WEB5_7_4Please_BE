@@ -18,7 +18,7 @@ public class PaymentMapper {
                                     TossPaymentConfirmResponse response) {
         return Payment.builder()
                 .amount(BigDecimal.valueOf(tossPaymentConfirmRequest.amount()))
-                .status(PaymentStatus.SUCCESS)
+                .status(PaymentStatus.PENDING)
                 .paymentKey(response.paymentKey())
                 .orderId(order.getOrderId())
                 .build();

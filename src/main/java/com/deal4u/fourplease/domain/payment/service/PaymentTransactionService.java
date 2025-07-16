@@ -43,4 +43,9 @@ class PaymentTransactionService {
         payment.statusFailed();
         order.failed();
     }
+
+    @Transactional
+    public void paymentStatusSuccess(Payment payment) {
+        payment.statusSuccess();
+    }
 }

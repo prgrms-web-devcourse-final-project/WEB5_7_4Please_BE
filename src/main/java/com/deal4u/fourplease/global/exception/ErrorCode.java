@@ -19,7 +19,7 @@ public enum ErrorCode {
     PAYMENT_CONFIRMATION_FAILED(HttpStatus.BAD_REQUEST, "결제 승인이 실패했습니다."),
     PAYMENT_ERROR(HttpStatus.BAD_REQUEST, "결제 처리 중 오류가 발생했습니다."),
     WEBSOCKET_INVALID_REQUEST_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 요청 형식입니다."),
-    INVALID_PRICE_NOT_UPPER(HttpStatus.BAD_REQUEST, "요청된 가격이 즉시 입찰가보다 낮습니다."),
+    INVALID_PRICE_NOT_UPPER(HttpStatus.BAD_REQUEST, "즉시 구매 가격이 현재 최고 입찰가보다 낮습니다."),
 
     // 403 - Forbidden
     BID_FORBIDDEN_PRICE(HttpStatus.FORBIDDEN, "기존 입찰 금액보다 높은 금액을 입력해주세요."),

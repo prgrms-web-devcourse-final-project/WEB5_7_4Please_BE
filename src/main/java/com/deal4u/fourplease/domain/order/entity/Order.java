@@ -63,6 +63,10 @@ public class Order extends BaseDateEntity {
         this.receiver = orderUpdateRequest.receiver();
     }
 
+    public void success() {
+        this.orderStatus = OrderStatus.SUCCESS;
+    }
+
     public void failed() {
         this.orderStatus = OrderStatus.FAILED;
     }

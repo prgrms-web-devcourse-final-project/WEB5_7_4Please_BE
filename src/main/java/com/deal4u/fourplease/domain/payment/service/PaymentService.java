@@ -15,7 +15,6 @@ import com.deal4u.fourplease.domain.payment.config.TossApiClient;
 import com.deal4u.fourplease.domain.payment.dto.TossPaymentConfirmRequest;
 import com.deal4u.fourplease.domain.payment.dto.TossPaymentConfirmResponse;
 import com.deal4u.fourplease.domain.payment.entity.Payment;
-import com.deal4u.fourplease.global.exception.GlobalException;
 import com.deal4u.fourplease.global.lock.NamedLock;
 import com.deal4u.fourplease.global.lock.NamedLockProvider;
 import feign.FeignException;
@@ -48,53 +47,38 @@ public class PaymentService {
         NamedLock lock = getNamedLock(auction);
         lock.lock();
 
-        Payment payment = null;
-        boolean shouldCloseAuction = false;
+        validateBuyNowInstanceBidprice(order, auction);
 
         try {
             TossPaymentConfirmResponse response = callTossPaymentApi(tossPaymentConfirmRequest);
-            validatePaymentSuccess(response);
 
-            payment = paymentTransactionService.savePayment(order, tossPaymentConfirmRequest,
-                    response, auction);
+            Payment payment =
+                    paymentTransactionService.savePayment(order, tossPaymentConfirmRequest,
+                            response, auction);
 
-            if (OrderType.BUY_NOW.equals(order.getOrderType())) {
-                BigDecimal currentMaxBidPrice = getCurrentMaxBidPrice(auction.getAuctionId());
-                shouldCloseAuction = validateInstantBidPrice(auction, currentMaxBidPrice);
+            validatePaymentSuccessOrToFailed(response, payment, order);
 
-                if (!shouldCloseAuction) {
-                    paymentTransactionService.updatePaymentStatusToFailed(payment, order);
-                    throw INVALID_PRICE_NOT_UPPER.toException();
-                }
-            } else {
-                shouldCloseAuction = true;
-            }
+            paymentTransactionService.paymentStatusSuccess(payment);
 
-        } catch (GlobalException e) {
-            if (payment != null) {
-                paymentTransactionService.updatePaymentStatusToFailed(payment, order);
-            }
-            throw e;
+
         } finally {
-            if (shouldCloseAuction) {
-                orderService.closeAuction(auction);
-            }
+            orderService.succesOrder(order);
+            orderService.closeAuction(auction);
             lock.unlock();
         }
     }
 
-    private boolean validateInstantBidPrice(Auction auction, BigDecimal currentMaxBidPrice) {
-        try {
-            validateInstancePrice(auction, currentMaxBidPrice);
-            return true;
-        } catch (GlobalException e) {
-            return false;
+    private void validateBuyNowInstanceBidprice(Order order, Auction auction) {
+        if (OrderType.BUY_NOW.equals(order.getOrderType())) {
+            BigDecimal currentMaxBidPrice = getCurrentMaxBidPrice(auction.getAuctionId());
+            validateInstancePriceAndOrderFailed(order, auction, currentMaxBidPrice);
         }
     }
 
     private void validateAmount(TossPaymentConfirmRequest request, Order order) {
         BigDecimal amountFromRequest = new BigDecimal(request.amount());
         if (order.getPrice().compareTo(amountFromRequest) != 0) {
+            orderFailed(order);
             throw INVALID_PAYMENT_AMOUNT.toException();
         }
     }
@@ -116,15 +100,21 @@ public class PaymentService {
         }
     }
 
-    private void validatePaymentSuccess(TossPaymentConfirmResponse response) {
+    private void validatePaymentSuccessOrToFailed(TossPaymentConfirmResponse response,
+                                                  Payment payment,
+                                                  Order order
+    ) {
         if (!PAYMENT_SUCCESS.equals(response.status())) {
             log.warn("결제 승인 실패. 상태: {}", response.status());
+            paymentTransactionService.updatePaymentStatusToFailed(payment, order);
             throw PAYMENT_CONFIRMATION_FAILED.toException();
         }
     }
 
-    private static void validateInstancePrice(Auction auction, BigDecimal currentMaxBidPrice) {
-        if (auction.getInstantBidPrice().compareTo(currentMaxBidPrice) <= 0) {
+    private void validateInstancePriceAndOrderFailed(Order order, Auction auction,
+                                                     BigDecimal currentMaxBidPrice) {
+        if (auction.getInstantBidPrice().compareTo(currentMaxBidPrice) < 0) {
+            orderFailed(order);
             throw INVALID_PRICE_NOT_UPPER.toException();
         }
     }
@@ -132,5 +122,9 @@ public class PaymentService {
     private BigDecimal getCurrentMaxBidPrice(Long auctionId) {
         return bidRepository.findMaxBidPriceByAuctionId(auctionId)
                 .orElse(BigDecimal.ZERO);
+    }
+
+    private void orderFailed(Order order) {
+        orderService.faliedOrder(order);
     }
 }

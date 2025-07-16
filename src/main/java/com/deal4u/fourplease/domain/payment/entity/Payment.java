@@ -44,4 +44,8 @@ public class Payment extends BaseDateEntity {
     public void statusFailed() {
         this.status = PaymentStatus.FAILED;
     }
+
+    public void statusSuccess() {
+        this.status = PaymentStatus.SUCCESS;
+    }
 }

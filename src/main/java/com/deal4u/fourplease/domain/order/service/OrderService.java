@@ -9,6 +9,7 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.ORDER_NOT_FOUND;
 import static com.deal4u.fourplease.global.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
@@ -73,7 +74,19 @@ public class OrderService {
 
     @Transactional
     public void closeAuction(Auction auction) {
-        auction.close();
+        if (auction.getStatus().equals(AuctionStatus.OPEN)) {
+            auction.close();
+        }
+    }
+
+    @Transactional
+    public void faliedOrder(Order order) {
+        order.failed();
+    }
+
+    @Transactional
+    public void succesOrder(Order order) {
+        order.success();
     }
 
     private OrderType validateOrderType(String orderType) {
@@ -112,7 +125,7 @@ public class OrderService {
                 .auction(auction)
                 .orderer(orderer)
                 .price(orderPrice)
-                .orderStatus(OrderStatus.SUCCESS)
+                .orderStatus(OrderStatus.PENDING)
                 .orderType(orderType)
                 .build();
     }
