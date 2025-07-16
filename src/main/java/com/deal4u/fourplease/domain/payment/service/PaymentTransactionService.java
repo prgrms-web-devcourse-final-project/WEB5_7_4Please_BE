@@ -12,6 +12,7 @@ import com.deal4u.fourplease.domain.payment.dto.TossPaymentConfirmResponse;
 import com.deal4u.fourplease.domain.payment.entity.Payment;
 import com.deal4u.fourplease.domain.payment.mapper.PaymentMapper;
 import com.deal4u.fourplease.domain.payment.repository.PaymentRepository;
+import com.deal4u.fourplease.domain.settlement.service.SettlementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ class PaymentTransactionService {
 
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
+    private final SettlementService settlementService;
 
     @Transactional(readOnly = true)
     public Order getOrderOrThrow(OrderId orderId) {
@@ -52,5 +54,6 @@ class PaymentTransactionService {
         }
         order.success();
         payment.statusSuccess();
+        settlementService.chagneSettlementSucess(auction);
     }
 }

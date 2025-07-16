@@ -23,4 +23,6 @@ public interface SettlementRepository extends CrudRepository<Settlement, Long> {
             + "AND s.paymentDeadline < :currentTime")
     List<Settlement> findExpiredSettlements(@Param("status") SettlementStatus status,
                                             @Param("currentTime") LocalDateTime currentTime);
+
+    Optional<Settlement> findByAuction(Auction auction);
 }
