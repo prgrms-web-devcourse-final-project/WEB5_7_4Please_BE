@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.review.entity;
 
-import com.deal4u.fourplease.domain.BaseDateEntity;
+import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Seller;
 import jakarta.persistence.Column;

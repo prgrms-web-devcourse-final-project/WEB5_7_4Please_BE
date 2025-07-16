@@ -9,7 +9,7 @@ import com.deal4u.fourplease.domain.bid.dto.BidResponse;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.BidMessageStatus;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
-import com.deal4u.fourplease.domain.bid.entity.PageResponse;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.bid.mapper.BidMapper;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
