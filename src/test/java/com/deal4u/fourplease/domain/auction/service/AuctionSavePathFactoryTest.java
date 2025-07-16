@@ -3,11 +3,11 @@ package com.deal4u.fourplease.domain.auction.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.deal4u.fourplease.domain.auction.factory.AuctionSaveDataFactory;
-import com.deal4u.fourplease.domain.file.service.SaveData;
+import com.deal4u.fourplease.domain.file.service.SavePath;
 import com.deal4u.fourplease.domain.file.type.ImageType;
 import org.junit.jupiter.api.Test;
 
-class AuctionSaveDataFactoryTest {
+class AuctionSavePathFactoryTest {
 
     @Test
     void 경로생성() {
@@ -16,8 +16,8 @@ class AuctionSaveDataFactoryTest {
                 () -> "name"
         );
 
-        SaveData saveData = auctionSaveDataFactory.create("", ImageType.JPG);
+        SavePath savePath = auctionSaveDataFactory.create("", ImageType.JPG);
 
-        assertThat(saveData).isEqualTo(new SaveData("/test", "name.jpg"));
+        assertThat(savePath).isEqualTo(new SavePath("/test", "name.jpg"));
     }
 }

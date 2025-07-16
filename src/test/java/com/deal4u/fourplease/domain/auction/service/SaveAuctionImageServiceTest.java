@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.factory.AuctionSaveDataFactory;
 import com.deal4u.fourplease.domain.file.service.FileSaver;
-import com.deal4u.fourplease.domain.file.service.SaveData;
+import com.deal4u.fourplease.domain.file.service.SavePath;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.net.MalformedURLException;
@@ -44,8 +44,8 @@ class SaveAuctionImageServiceTest {
 
         AuctionImageUrlResponse upload = saveAuctionImageService.upload(test, file);
 
-        assertThat(new SaveData(path, fileName + ".png")).isEqualTo(
-                fakeFileSaver.getInputSaveData());
+        assertThat(new SavePath(path, fileName + ".png")).isEqualTo(
+                fakeFileSaver.getInputSavePath());
         assertThat(file).isEqualTo(fakeFileSaver.getFile());
         assertThat(upload.url()).isEqualTo("https://test.com" + path);
     }
@@ -73,15 +73,15 @@ class SaveAuctionImageServiceTest {
     @Getter
     private static class FakeFileSaver implements FileSaver {
 
-        private SaveData inputSaveData;
+        private SavePath inputSavePath;
         private MultipartFile file;
 
         @Override
-        public URL save(SaveData saveData, MultipartFile file) {
-            this.inputSaveData = saveData;
+        public URL save(SavePath savePath, MultipartFile file) {
+            this.inputSavePath = savePath;
             this.file = file;
             try {
-                return URL.of(new URI("https", "example.com", saveData.filePath(), null), null);
+                return URL.of(new URI("https", "example.com", savePath.filePath(), null), null);
             } catch (URISyntaxException | MalformedURLException e) {
                 throw new RuntimeException(e);
             }
