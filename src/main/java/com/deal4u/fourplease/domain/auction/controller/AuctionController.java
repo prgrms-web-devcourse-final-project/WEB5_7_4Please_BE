@@ -2,8 +2,9 @@ package com.deal4u.fourplease.domain.auction.controller;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
-import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,8 +20,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Validated
 @RestController
@@ -31,6 +34,7 @@ public class AuctionController {
 
     private final AuctionService auctionService;
     private final MemberRepository memberRepository;
+    private final SaveAuctionImageService saveAuctionImageService;
 
     @Operation(summary = "경매등록")
     @ApiResponse(responseCode = "201", description = "경매 등록 성공")
@@ -62,4 +66,9 @@ public class AuctionController {
         auctionService.deleteByAuctionId(auctionId);
     }
 
+    @PostMapping("/images")
+    public AuctionImageUrlResponse readAuctionImageUrl(
+            @RequestParam(name = "image") MultipartFile image) {
+        return saveAuctionImageService.upload(memberRepository.findAll().getFirst(), image);
+    }
 }
