@@ -2,7 +2,7 @@ package com.deal4u.fourplease.domain.auction.controller;
 
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionCreateRequest;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionDetailResponse;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionListResponseList;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionListResponsePageResponse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
+import com.deal4u.fourplease.domain.auction.dto.PageResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
@@ -26,6 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -100,17 +103,26 @@ class AuctionControllerTests {
     @DisplayName("GET /api/v1/auctions가 성공하면 전체 경매 목록과 200을 반환한다")
     void readAllAuctionsShouldReturn200() throws Exception {
 
-        List<AuctionListResponse> resp = genAuctionListResponseList();
+        Pageable pageable = PageRequest.of(0, 20);
+        PageResponse<AuctionListResponse> resp = genAuctionListResponsePageResponse();
 
-        when(auctionService.findAll()).thenReturn(resp);
+        when(auctionService.findAll(pageable)).thenReturn(resp);
 
         mockMvc.perform(
                         get("/api/v1/auctions")
+                                .param("page", "0")
+                                .param("size", "20")
                 ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(resp.size()))
-                .andExpect(jsonPath("$[0].name").value(resp.get(0).name()))
-                .andExpect(jsonPath("$[1].name").value(resp.get(1).name()))
-                .andExpect(jsonPath("$[2].name").value(resp.get(2).name()))
+                .andExpect(jsonPath("$.content[0].name")
+                        .value(resp.getContent().get(0).name()))
+                .andExpect(jsonPath("$.content[1].name")
+                        .value(resp.getContent().get(1).name()))
+                .andExpect(jsonPath("$.content[2].name")
+                        .value(resp.getContent().get(2).name()))
+                .andExpect(jsonPath("$.totalElements").value(resp.getTotalElements()))
+                .andExpect(jsonPath("$.totalPages").value(resp.getTotalPages()))
+                .andExpect(jsonPath("$.page").value(resp.getPage()))
+                .andExpect(jsonPath("$.size").value(resp.getSize()))
                 .andDo(print());
 
     }

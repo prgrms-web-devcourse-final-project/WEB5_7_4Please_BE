@@ -12,6 +12,7 @@ import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +32,8 @@ public class AuctionSupportService {
         return BidSummaryDto.toBidSummaryDto(bidList);
     }
 
-    public List<AuctionListResponse> getAuctionListResponses(List<Auction> auctionList) {
-        return auctionList.stream()
+    public Page<AuctionListResponse> getAuctionListResponses(Page<Auction> auctionPage) {
+        return auctionPage
                 .map(auction -> {
                     BidSummaryDto bidSummaryDto = getBidSummaryDto(auction.getAuctionId());
                     return AuctionListResponse.toAuctionListResponse(
@@ -41,8 +42,7 @@ public class AuctionSupportService {
                             // TODO: wishList 개발 후 수정 필요
                             false
                     );
-                })
-                .toList();
+                });
     }
 
     // TODO: 추후 개선 필요

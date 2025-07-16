@@ -145,6 +145,17 @@ public class TestUtils {
         );
     }
 
+    public static PageResponse<AuctionListResponse> genAuctionListResponsePageResponse() {
+        return PageResponse.<AuctionListResponse>builder()
+                .content(genAuctionListResponseList())
+                .totalElements(3L)
+                .totalPages(1)
+                .page(0)
+                .size(20)
+                .build();
+
+    }
+
     public static List<Auction> genAuctionList() {
         return List.of(
                 Auction.builder()
@@ -256,7 +267,7 @@ public class TestUtils {
                 .totalElements(3L)
                 .totalPages(1)
                 .page(0)
-                .size(10)
+                .size(20)
                 .build();
     }
 
