@@ -3,7 +3,6 @@ package com.deal4u.fourplease.domain.file.type;
 import com.deal4u.fourplease.domain.file.util.FileUtil;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
 
 @RequiredArgsConstructor
 public enum ImageType {
@@ -15,7 +14,7 @@ public enum ImageType {
     private final String extension;
 
     public static Optional<ImageType> findTypeByStr(String fileName) {
-        if(fileName == null) {
+        if (fileName == null) {
             return Optional.empty();
         }
         String fileExtension = FileUtil.getFileExtension(fileName);
