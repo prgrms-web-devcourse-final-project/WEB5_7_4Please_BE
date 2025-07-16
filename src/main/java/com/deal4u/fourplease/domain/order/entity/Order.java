@@ -1,8 +1,8 @@
 package com.deal4u.fourplease.domain.order.entity;
 
-import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

@@ -1,7 +1,7 @@
 package com.deal4u.fourplease.domain.shipment.entity;
 
-import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
