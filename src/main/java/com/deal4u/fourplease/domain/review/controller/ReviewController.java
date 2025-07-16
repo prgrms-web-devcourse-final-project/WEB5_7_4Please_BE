@@ -41,6 +41,6 @@ public class ReviewController {
     public PageResponse<ReviewResponse> getReviews(@PathVariable(name = "memberId") Long memberId,
             @PageableDefault Pageable pageable) {
         // 1. 리뷰 내역 조회 호출
-        return reviewService.getReviewListForMember(memberId, pageable);
+        return reviewService.getReviewListFor(memberId, pageable);
     }
 }

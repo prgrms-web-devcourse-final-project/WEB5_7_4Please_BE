@@ -42,10 +42,10 @@ public class ReviewService {
 
     public void createReview(ReviewRequest request, Long memberId) {
         // 1. 경매 검증
-        Auction auction = getAuctionOrThrow(request.auctionId());
+        Auction auction = getAuction(request.auctionId());
 
         // 2. 로그인 유저의 정보를 기반으로 주문 및 결제 검증
-        Member member = validatePaidOrderAndGetMember(memberId, auction);
+        Member member = getMemberValidatePaidOrder(memberId, auction);
 
         // 3. 기존 리뷰 유무를 확인
         Reviewer reviewer = getReviewerOrThrowIfExists(member, auction);
@@ -54,9 +54,9 @@ public class ReviewService {
         saveReview(request, auction, reviewer);
     }
 
-    public PageResponse<ReviewResponse> getReviewListForMember(Long memberId, Pageable pageable) {
+    public PageResponse<ReviewResponse> getReviewListFor(Long memberId, Pageable pageable) {
         // 1. 판매자 검증
-        Seller seller = getSellerOrThrowIfNotActive(memberId);
+        Seller seller = getActiveSeller(memberId);
 
         // 2. 판매자를 기반으로 리뷰 내역 조회
         Page<Review> reviewPage = reviewRepository.findBySeller(seller, pageable);
@@ -88,37 +88,37 @@ public class ReviewService {
         }
     }
 
-    private Member validatePaidOrderAndGetMember(Long memberId, Auction auction) {
-        Member member = getMemberOrThrow(memberId);
+    private Member getMemberValidatePaidOrder(Long memberId, Auction auction) {
+        Member member = getMember(memberId);
         Orderer orderer = Orderer.createOrderer(member);
-        Order order = getOrderOrThrow(orderer, auction);
-        getPaymentOrThrow(order);
+        Order order = getOrder(orderer, auction);
+        validatePayment(order);
         return member;
     }
 
     // 以下 검증 로직 (他 서비스에서도 이용하기 때문에, Util Class 등으로 추출 검토)
-    private Auction getAuctionOrThrow(Long auctionId) {
+    private Auction getAuction(Long auctionId) {
         return auctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId)
                 .orElseThrow(AUCTION_NOT_FOUND::toException);
     }
 
-    private Member getMemberOrThrow(Long memberId) {
+    private Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(USER_NOT_FOUND::toException);
     }
 
-    private Order getOrderOrThrow(Orderer orderer, Auction auction) {
+    private Order getOrder(Orderer orderer, Auction auction) {
         return orderRepository.findByOrdererAndAuctionAndStatus(orderer, auction,
                         OrderStatus.SUCCESS)
                 .orElseThrow(ORDER_NOT_FOUND::toException);
     }
 
-    private void getPaymentOrThrow(Order order) {
+    private void validatePayment(Order order) {
         paymentRepository.findByOrderId(order.getOrderId())
                 .orElseThrow(PAYMENT_NOT_SUCCESS::toException);
     }
 
-    private Seller getSellerOrThrowIfNotActive(Long memberId) {
+    private Seller getActiveSeller(Long memberId) {
         Member member = memberRepository.findByMemberIdAndStatus(memberId, Status.ACTIVE)
                 .orElseThrow(USER_NOT_FOUND::toException);
         return Seller.create(member);

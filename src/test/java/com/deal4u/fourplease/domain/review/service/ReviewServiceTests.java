@@ -274,7 +274,7 @@ class ReviewServiceTests {
                 reviewPage);
 
         // When
-        PageResponse<ReviewResponse> response = reviewService.getReviewListForMember(sellerId,
+        PageResponse<ReviewResponse> response = reviewService.getReviewListFor(sellerId,
                 pageable);
 
         // Then
@@ -299,7 +299,7 @@ class ReviewServiceTests {
 
         // When
         assertThatThrownBy(
-                () -> reviewService.getReviewListForMember(nonExistentMemberId, pageable))
+                () -> reviewService.getReviewListFor(nonExistentMemberId, pageable))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
 
