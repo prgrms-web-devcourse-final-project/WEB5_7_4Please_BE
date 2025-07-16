@@ -36,7 +36,7 @@ public class SaveAuctionImageService {
 
     public AuctionImageUrlResponse upload(Member member, MultipartFile file) {
         ImageType imageType = ImageType.findTypeByStr(file.getOriginalFilename()).orElseThrow(
-                ErrorCode.ENTITY_NOT_FOUND::toException);
+                ErrorCode.INVALID_IMAGE_TYPE::toException);
         SaveData saveData = auctionSaveDataFactory.create(member.getNickName(), imageType);
         URL url = fileSaver.save(saveData, file);
 
