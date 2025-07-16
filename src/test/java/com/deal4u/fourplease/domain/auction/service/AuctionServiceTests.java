@@ -81,7 +81,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("auctionId로 특정 경매를 조회 후 AuctionDetailResponse를 반환한다")
-    void getByAuctionId_should_return_AuctionDetailResponse() throws Exception {
+    void get_by_auctionId_should_return_auction_detail_response() throws Exception {
 
         Long auctionId = 1L;
 
@@ -139,7 +139,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("auctionId로 경매를 삭제한다")
-    void deleteByAuctionId_should_soft_delete_auction_by_auction_id() throws Exception {
+    void delete_by_auction_id_should_soft_delete_auction_by_auction_id() throws Exception {
 
         Long auctionId = 1L;
 

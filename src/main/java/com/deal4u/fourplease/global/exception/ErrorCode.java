@@ -10,6 +10,8 @@ public enum ErrorCode {
 
     // 400 - Bad Request,
     EMPTY_LIST(HttpStatus.BAD_REQUEST, "빈 리스트 입니다."),
+    INVALID_FILE(HttpStatus.BAD_REQUEST, "처리할수 없는 파일입니다."),
+    FILE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "요청을 처리 할 수 없습니다."),
     INVALID_AUCTION_BIDDER(HttpStatus.BAD_REQUEST, "해당 사용자는 경매의 낙찰자가 아닙니다."),
     INVALID_ORDER_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 타입입니다."),
     INVALID_INSTANT_BID_PRICE(HttpStatus.BAD_REQUEST, "요청된 가격이 즉시 입찰가와 일치하지 않습니다."),
@@ -43,7 +45,6 @@ public enum ErrorCode {
 
     // 500 - Internal Server Error
     WEBSOCKET_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "WebSocket 메시지 전송 중 오류가 발생하였습니다.");
-
 
     private final HttpStatus status;
     private final String message;
