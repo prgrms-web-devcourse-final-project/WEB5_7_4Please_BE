@@ -10,6 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileValidator {
 
     public void validate(String savedName, MultipartFile file) {
+        if (file.isEmpty()) {
+            throw ErrorCode.FILE_SAVE_FAILED.toException();
+        }
         FileType fileType = validAndGetFileType(file);
         validSameFileType(file.getOriginalFilename(), fileType);
         validSameFileType(savedName, fileType);
