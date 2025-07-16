@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.auth.Token;
+package com.deal4u.fourplease.auth.token;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -95,7 +95,11 @@ public class JwtProviderTest {
     void validateToken_shouldReturnFalseForInvalidToken() {
         // 다른 키로 직접 만든 잘못된 토큰
         byte[] otherKeyBytes =
-                "this-is-a-super-secure-and-very-very-very-long-secret-key-used-for-testing-hs512-algorithm-purposes-only-please-make-it-safe-and-strong-just-in-case!"
+                (
+                        "this-is-a-super-secure-and-very-very-very-long-secret-key-"
+                                + "used-for-testing-hs512-algorithm-purposes-only-please-"
+                                + "make-it-safe-and-strong-just-in-case!"
+                )
                         .getBytes(StandardCharsets.UTF_8);
         SecretKey otherKey = Keys.hmacShaKeyFor(otherKeyBytes);
 

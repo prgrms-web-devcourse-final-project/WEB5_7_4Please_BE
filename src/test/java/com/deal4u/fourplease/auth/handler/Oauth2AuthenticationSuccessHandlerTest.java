@@ -18,7 +18,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,42 +29,30 @@ import org.springframework.security.core.Authentication;
 
 @ExtendWith(MockitoExtension.class)
 public class Oauth2AuthenticationSuccessHandlerTest {
+    private final String tempToken = "temp.jwt.token";
+    private final String accessToken = "access.jwt.token";
+    private final String refreshToken = "refresh.jwt.token";
+    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     @InjectMocks
     private Oauth2AuthenticationSuccessHandler successHandler;
-
     @Mock
     private JwtProvider jwtProvider;
-
     @Mock
     private AuthService authService;
-
     @Mock
     private MemberService memberService;
-
     @Mock
     private HttpServletRequest request;
-
     @Mock
     private HttpServletResponse response;
-
     @Mock
     private Authentication authentication;
-
     @Mock
     private Customoauth2User customOauth2User;
-
     @Mock
     private ObjectMapper objectMapper;
-
     @Mock
     private Member member;
-
-    private final String TEMP_TOKEN = "temp.jwt.token";
-    private final String ACCESS_TOKEN = "access.jwt.token";
-    private final String REFRESH_TOKEN = "refresh.jwt.token";
-
-    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
 
     @BeforeEach
     void setUp() throws IOException {
@@ -80,10 +67,12 @@ public class Oauth2AuthenticationSuccessHandlerTest {
 
     @Test
     @DisplayName("상태가 PENDING일 때 임시 토큰과 닉네임 설정 메시지 반환")
-    void onAuthenticationSuccess_PendingStatus_ReturnsTempTokenAndRedirectToSignup() throws Exception {
+    void onAuthenticationSuccessPendingStatusReturnsTempTokenAndRedirectToSignup()
+            throws Exception {
         // given
         when(member.getStatus()).thenReturn(Status.PENDING);
-        when(jwtProvider.generateTokenPair(member)).thenReturn(new TokenPair(TEMP_TOKEN, "ignored"));
+        when(jwtProvider.generateTokenPair(member)).thenReturn(
+                new TokenPair(tempToken, "ignored"));
         when(member.getEmail()).thenReturn("test@example.com");
 
         // when
@@ -92,16 +81,17 @@ public class Oauth2AuthenticationSuccessHandlerTest {
         // then
         String responseJson = outputStream.toString();
         assertThat(responseJson).contains("닉네임 설정이 필요합니다.");
-        assertThat(responseJson).contains(TEMP_TOKEN);
+        assertThat(responseJson).contains(tempToken);
         assertThat(responseJson).contains("/");
     }
 
     @Test
     @DisplayName("상태가 ACTIVE일 때 accessToken, refreshToken, 로그인 성공 메시지 반환")
-    void onAuthenticationSuccess_ActiveStatus_ReturnsTokenPairAndRedirectToMain() throws Exception {
+    void onAuthenticationSuccessActiveStatusReturnsTokenPairAndRedirectToMain() throws Exception {
         // given
         when(member.getStatus()).thenReturn(Status.ACTIVE);
-        when(authService.createTokenPair(member)).thenReturn(new TokenPair(ACCESS_TOKEN, REFRESH_TOKEN));
+        when(authService.createTokenPair(member)).thenReturn(
+                new TokenPair(accessToken, refreshToken));
         when(member.getEmail()).thenReturn("test@example.com");
 
         // when
@@ -110,8 +100,8 @@ public class Oauth2AuthenticationSuccessHandlerTest {
         // then
         String responseJson = outputStream.toString();
         assertThat(responseJson).contains("로그인 성공");
-        assertThat(responseJson).contains(ACCESS_TOKEN);
-        assertThat(responseJson).contains(REFRESH_TOKEN);
+        assertThat(responseJson).contains(accessToken);
+        assertThat(responseJson).contains(refreshToken);
         assertThat(responseJson).contains("/signup"); // SIGNUP_REDIRECT_URL
     }
 }

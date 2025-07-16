@@ -3,7 +3,6 @@ package com.deal4u.fourplease.member.service;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,7 +22,6 @@ import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,27 +34,21 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 public class MemberServiceTest {
 
-    @InjectMocks
-    private MemberService memberService;
-
-    @Mock
-    private MemberRepository memberRepository;
-
-    @Mock
-    private JwtProvider jwtProvider;
-
-    @Mock
-    private AuthService authService;
-
-    @Mock
-    private BlacklistedTokenRepository blacklistedTokenRepository;
-
-    @Mock
-    private RefreshTokenRepository refreshTokenRepository;
-
     private final String validToken = "mocked.jwt.token";
     private final String email = "test@example.com";
     private final String nickname = "테스터";
+    @InjectMocks
+    private MemberService memberService;
+    @Mock
+    private MemberRepository memberRepository;
+    @Mock
+    private JwtProvider jwtProvider;
+    @Mock
+    private AuthService authService;
+    @Mock
+    private BlacklistedTokenRepository blacklistedTokenRepository;
+    @Mock
+    private RefreshTokenRepository refreshTokenRepository;
 
     @Test
     @DisplayName("회원가입 성공 시 토큰 재발급 및 닉네임 설정")
@@ -162,7 +154,8 @@ public class MemberServiceTest {
                 .status(Status.ACTIVE)
                 .build();
 
-        when(jwtProvider.getExpirationFromToken(validToken)).thenReturn(LocalDateTime.now().plusMinutes(15));
+        when(jwtProvider.getExpirationFromToken(validToken)).thenReturn(
+                LocalDateTime.now().plusMinutes(15));
         when(blacklistedTokenRepository.existsByToken(validToken)).thenReturn(false);
         doNothing().when(jwtProvider).validateOrThrow(validToken);
 

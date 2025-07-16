@@ -4,7 +4,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -88,7 +87,8 @@ public class AuthServiceTest {
         String validRefresh = "valid-refresh-token";
 
         when(jwtProvider.getTokenType(validRefresh)).thenReturn("refresh");
-        when(refreshTokenRepository.findByToken(validRefresh)).thenReturn(Optional.of(refreshToken));
+        when(refreshTokenRepository.findByToken(validRefresh)).thenReturn(
+                Optional.of(refreshToken));
         when(refreshToken.isExpired()).thenReturn(false);
         when(refreshToken.getMember()).thenReturn(member);
         when(jwtProvider.generateTokenPair(member)).thenReturn(tokenPair);
@@ -137,7 +137,8 @@ public class AuthServiceTest {
         // given
         String expiredRefreshToken = "expired-token";
         when(jwtProvider.getTokenType(expiredRefreshToken)).thenReturn("refresh");
-        when(refreshTokenRepository.findByToken(expiredRefreshToken)).thenReturn(Optional.of(refreshToken));
+        when(refreshTokenRepository.findByToken(expiredRefreshToken)).thenReturn(
+                Optional.of(refreshToken));
         when(refreshToken.isExpired()).thenReturn(true);
 
         // when & then

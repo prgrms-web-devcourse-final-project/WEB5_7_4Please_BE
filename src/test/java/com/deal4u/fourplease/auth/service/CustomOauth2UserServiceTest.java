@@ -2,7 +2,6 @@ package com.deal4u.fourplease.auth.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -48,10 +47,10 @@ public class CustomOauth2UserServiceTest {
     private MemberService memberService;
 
     @Mock
-    private OAuth2UserRequest oAuth2UserRequest;
+    private OAuth2UserRequest oauth2UserRequest;
 
     @Mock
-    private OAuth2User oAuth2User;
+    private OAuth2User oauth2User;
 
     @Mock
     private OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate; // 주입된 delegate
@@ -67,12 +66,12 @@ public class CustomOauth2UserServiceTest {
         attributes.put("picture", "https://example.com/picture.jpg");
 
         // OAuth2User Mock 설정
-        when(oAuth2User.getAttributes()).thenReturn(attributes);
+        when(oauth2User.getAttributes()).thenReturn(attributes);
     }
 
     @Test
     @DisplayName("기존 회원이 존재할 때 해당 회원 정보로 OAuth2User 반환")
-    void loadUser_ExistingMember_ReturnsCustomOauth2User() {
+    void loadUserExistingMemberReturnsCustomOauth2User() {
         // given
         Member existingMember = Member.builder()
                 .email(TEST_EMAIL)
@@ -80,11 +79,11 @@ public class CustomOauth2UserServiceTest {
                 .role(Role.USER)
                 .status(Status.ACTIVE)
                 .build();
-        when(delegate.loadUser(oAuth2UserRequest)).thenReturn(oAuth2User);
+        when(delegate.loadUser(oauth2UserRequest)).thenReturn(oauth2User);
         when(memberRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(existingMember));
 
         // when
-        OAuth2User result = customOauth2UserService.loadUser(oAuth2UserRequest);
+        OAuth2User result = customOauth2UserService.loadUser(oauth2UserRequest);
 
         // then
         assertTrue(result instanceof Customoauth2User);
@@ -101,9 +100,9 @@ public class CustomOauth2UserServiceTest {
 
     @Test
     @DisplayName("기존 회원이 존재하지 않을 때 새 회원 생성 후 OAuth2User 반환")
-    void loadUser_NewMember_CreatesNewMemberAndReturnsCustomOauth2User() {
+    void loadUserNewMemberCreatesNewMemberAndReturnsCustomOauth2User() {
         // Given
-        when(delegate.loadUser(oAuth2UserRequest)).thenReturn(oAuth2User);
+        when(delegate.loadUser(oauth2UserRequest)).thenReturn(oauth2User);
         when(memberRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
 
         // 새로 저장될 Member 객체
@@ -116,7 +115,7 @@ public class CustomOauth2UserServiceTest {
         when(memberRepository.save(any(Member.class))).thenReturn(savedMember);
 
         // when
-        OAuth2User result = customOauth2UserService.loadUser(oAuth2UserRequest);
+        OAuth2User result = customOauth2UserService.loadUser(oauth2UserRequest);
 
         // then
         assertTrue(result instanceof Customoauth2User);
@@ -132,14 +131,14 @@ public class CustomOauth2UserServiceTest {
 
     @Test
     @DisplayName("OAuth2 속성에 이메일이 없을 때 예외 발생")
-    void loadUser_NoEmail_ThrowsException() {
+    void loadUserNoEmailThrowsException() {
         // Given
         attributes.remove("email");
-        when(delegate.loadUser(oAuth2UserRequest)).thenReturn(oAuth2User);
-        when(oAuth2User.getAttributes()).thenReturn(attributes);
+        when(delegate.loadUser(oauth2UserRequest)).thenReturn(oauth2User);
+        when(oauth2User.getAttributes()).thenReturn(attributes);
 
         // when & then
-        assertThatThrownBy(() -> customOauth2UserService.loadUser(oAuth2UserRequest))
+        assertThatThrownBy(() -> customOauth2UserService.loadUser(oauth2UserRequest))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.OAUTH_EMAIL_NOT_FOUND.getMessage())
                 .extracting("status")
@@ -148,14 +147,14 @@ public class CustomOauth2UserServiceTest {
 
     @Test
     @DisplayName("OAuth2 속성에 이메일이 빈 문자열일 때 예외 발생")
-    void loadUser_BlankEmail_ThrowsException() {
+    void loadUserBlankEmailThrowsException() {
         // given
         attributes.put("email", ""); // 빈 문자열
-        when(delegate.loadUser(oAuth2UserRequest)).thenReturn(oAuth2User);
-        when(oAuth2User.getAttributes()).thenReturn(attributes);
+        when(delegate.loadUser(oauth2UserRequest)).thenReturn(oauth2User);
+        when(oauth2User.getAttributes()).thenReturn(attributes);
 
         // when & then
-        assertThatThrownBy(() -> customOauth2UserService.loadUser(oAuth2UserRequest))
+        assertThatThrownBy(() -> customOauth2UserService.loadUser(oauth2UserRequest))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.OAUTH_EMAIL_NOT_FOUND.getMessage())
                 .extracting("status")
@@ -164,14 +163,14 @@ public class CustomOauth2UserServiceTest {
 
     @Test
     @DisplayName("OAuth2 속성에 이메일이 공백만 있을 때 예외 발생")
-    void loadUser_WhitespaceEmail_ThrowsException() {
+    void loadUserWhitespaceEmailThrowsException() {
         // given
         attributes.put("email", "   "); // 공백 문자열
-        when(delegate.loadUser(oAuth2UserRequest)).thenReturn(oAuth2User);
-        when(oAuth2User.getAttributes()).thenReturn(attributes);
+        when(delegate.loadUser(oauth2UserRequest)).thenReturn(oauth2User);
+        when(oauth2User.getAttributes()).thenReturn(attributes);
 
         // when & then
-        assertThatThrownBy(() -> customOauth2UserService.loadUser(oAuth2UserRequest))
+        assertThatThrownBy(() -> customOauth2UserService.loadUser(oauth2UserRequest))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.OAUTH_EMAIL_NOT_FOUND.getMessage())
                 .extracting("status")
