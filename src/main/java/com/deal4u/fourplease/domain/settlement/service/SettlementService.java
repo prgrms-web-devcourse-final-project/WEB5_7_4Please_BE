@@ -20,6 +20,11 @@ public class SettlementService {
         settlement.updateStatus(SettlementStatus.SUCCESS, LocalDateTime.now(), null);
     }
 
+    public void offerSecondBidder(Long auctionId) {
+
+    }
+
+
     private Settlement getSettlementOrThrow(Auction auction) {
         return settlementRepository.findByAuction(auction)
                 .orElseThrow(ErrorCode.SETTLEMENT_NOT_FOUND::toException);
