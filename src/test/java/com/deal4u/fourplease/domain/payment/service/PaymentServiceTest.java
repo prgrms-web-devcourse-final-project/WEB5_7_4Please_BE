@@ -97,9 +97,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("결제 승인 성공 - 정상적인 결제 처리")
-    void paymentConfirm_Success_Improved() {
-
-        String LOCK_PREFIX = "auction-lock:";
+    void paymentConfirmSuccessImproved() {
 
         // given
         when(paymentTransactionService.getOrderOrThrow(any(OrderId.class)))
@@ -115,6 +113,8 @@ class PaymentServiceTest {
         // when
         paymentService.paymentConfirm(confirmRequest);
 
+        String lockPrefix = "auction-lock:";
+
         // then
         verify(paymentTransactionService).getOrderOrThrow(any(OrderId.class));
         verify(namedLock).lock();
@@ -122,12 +122,12 @@ class PaymentServiceTest {
         verify(paymentTransactionService).savePayment(order, confirmRequest, successResponse,
                 order.getAuction());
         verify(namedLock).unlock();
-        verify(namedLockProvider).getBottleLock(LOCK_PREFIX + order.getAuction().getAuctionId());
+        verify(namedLockProvider).getBottleLock(lockPrefix + order.getAuction().getAuctionId());
     }
 
     @Test
     @DisplayName("결제 승인 실패 - 주문을 찾을 수 없음")
-    void paymentConfirm_OrderNotFound() {
+    void paymentConfirmOrderNotFound() {
         // given
         when(paymentTransactionService.getOrderOrThrow(any(OrderId.class)))
                 .thenThrow(ErrorCode.ORDER_NOT_FOUND.toException());
@@ -142,13 +142,13 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("결제 승인 실패 - 토스 API 응답 상태가 실패")
-    void paymentConfirm_PaymentStatusFailed() {
-        String LOCK_PREFIX = "auction-lock:";
+    void paymentConfirmPaymentStatusFailed() {
+        String lockPrefix = "auction-lock:";
 
         // given
         when(paymentTransactionService.getOrderOrThrow(any(OrderId.class)))
                 .thenReturn(order);
-        when(namedLockProvider.getBottleLock(LOCK_PREFIX + order.getAuction().getAuctionId()))
+        when(namedLockProvider.getBottleLock(lockPrefix + order.getAuction().getAuctionId()))
                 .thenReturn(namedLock);
         when(tossApiClient.confirmPayment(confirmRequest))
                 .thenReturn(failedResponse);
@@ -166,7 +166,7 @@ class PaymentServiceTest {
 
     @Test
     @DisplayName("결제 승인 실패 - 결제 금액이 주문 금액과 다름")
-    void paymentConfirm_InvalidAmount() {
+    void paymentConfirmInvalidAmount() {
         // given
         TossPaymentConfirmRequest invalidAmountRequest = new TossPaymentConfirmRequest(
                 "paymentKey123",
