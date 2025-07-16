@@ -19,28 +19,26 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     Optional<Bid> findTopByAuctionAndBidderOrderByPriceDesc(Auction auction, Bidder bidder);
 
-    @Query("select b.price from Bid b where b.deleted = false "
-            + "AND b.auction.auctionId = :auctionId order by b.price desc")
+    @Query("SELECT b.price "
+            + "FROM Bid b "
+            + "WHERE b.deleted = false "
+            + "AND b.auction.auctionId = :auctionId "
+            + "ORDER BY b.price DESC")
     List<Long> findPricesByAuctionIdOrderByPriceDesc(@Param("auctionId") Long auctionId);
 
-    @Query("SELECT b FROM Bid b "
+    @Query("SELECT b "
+            + "FROM Bid b "
             + "WHERE b.auction.auctionId = :auctionId "
             + "AND b.bidder.member = :member "
             + "AND b.isSuccessfulBidder = true")
     Optional<Bid> findSuccessFulBid(@Param("auctionId") Long auctionId,
                                     @Param("member") Member member);
 
-    @Query("SELECT MAX(b.price) FROM Bid b WHERE b.auction.auctionId = :auctionId AND b.deleted = false")
+    @Query("SELECT MAX(b.price) "
+            + "FROM Bid b "
+            + "WHERE b.auction.auctionId = :auctionId "
+            + "AND b.deleted = false")
     Optional<BigDecimal> findMaxBidPriceByAuctionId(Long auctionId);
-
-    @Query("SELECT b FROM Bid b " +
-            "JOIN FETCH b.auction " +
-            "WHERE b.auction.auctionId = :auctionId " +
-            "AND b.deleted = false " +
-            "AND b.isSuccessfulBidder = false " +
-            "ORDER BY b.price DESC, b.bidTime ASC")
-    Optional<Bid> findSecondHighestBidderByAuctionId(@Param("auctionId") Long auctionId);
-
 
     Optional<Bid> findByBidIdAndBidder(Long bidId, Bidder bidder);
 

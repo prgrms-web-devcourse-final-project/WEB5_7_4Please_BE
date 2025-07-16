@@ -132,9 +132,9 @@ public class OrderService {
 
     private Auction getAuctionForOrder(Long auctionId, OrderType orderTypeEnum) {
         if (OrderType.BUY_NOW.equals(orderTypeEnum)) {
-            return getOPENAuctionOrThrow(auctionId);
+            return getOpenAuctionOrThrow(auctionId);
         } else if (OrderType.AWARD.equals(orderTypeEnum)) {
-            return getCLOSEDAuctionOrThrow(auctionId);
+            return getClosedAuctionOrThrow(auctionId);
         }
         throw INVALID_ORDER_TYPE.toException();
     }
@@ -145,12 +145,12 @@ public class OrderService {
                 .orElseThrow(INVALID_AUCTION_BIDDER::toException);
     }
 
-    private Auction getOPENAuctionOrThrow(Long auctionId) {
+    private Auction getOpenAuctionOrThrow(Long auctionId) {
         return auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId)
                 .orElseThrow(AUCTION_NOT_FOUND::toException);
     }
 
-    private Auction getCLOSEDAuctionOrThrow(Long auctionId) {
+    private Auction getClosedAuctionOrThrow(Long auctionId) {
         return auctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(auctionId)
                 .orElseThrow(AUCTION_NOT_FOUND::toException);
     }

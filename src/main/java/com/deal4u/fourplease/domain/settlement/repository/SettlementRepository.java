@@ -12,15 +12,15 @@ import org.springframework.data.repository.query.Param;
 
 public interface SettlementRepository extends CrudRepository<Settlement, Long> {
 
-    @Query("SELECT s FROM Settlement s " +
-            "JOIN FETCH s.auction a " +
-            "WHERE a = :auction AND a.status = 'CLOSED'")
+    @Query("SELECT s FROM Settlement s "
+            + "JOIN FETCH s.auction a "
+            + "WHERE a = :auction AND a.status = 'CLOSED'")
     Optional<Settlement> findByAuctionWithJoin(Auction auction);
 
-    @Query("SELECT s FROM Settlement s " +
-            "JOIN FETCH s.auction " +
-            "WHERE s.status = :status " +
-            "AND s.paymentDeadline < :currentTime")
+    @Query("SELECT s FROM Settlement s "
+            + "JOIN FETCH s.auction "
+            + "WHERE s.status = :status "
+            + "AND s.paymentDeadline < :currentTime")
     List<Settlement> findExpiredSettlements(@Param("status") SettlementStatus status,
                                             @Param("currentTime") LocalDateTime currentTime);
 }
