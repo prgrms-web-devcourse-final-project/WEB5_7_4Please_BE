@@ -44,7 +44,9 @@ public enum ErrorCode {
 
     BIDPERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
 
-    BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다.");
+    BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
+
+    DOES_MODIFIED_URL(HttpStatus.INTERNAL_SERVER_ERROR,"알수없는 에러입니다.");
 
     private final HttpStatus status;
     private final String message;
