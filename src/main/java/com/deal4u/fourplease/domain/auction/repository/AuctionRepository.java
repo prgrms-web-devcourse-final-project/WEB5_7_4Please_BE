@@ -8,9 +8,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
-    @Query("select a from Auction a join fetch a.product where a.auctionId = :auctionId")
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "JOIN FETCH a.product "
+            + "WHERE a.auctionId = :auctionId")
     Optional<Auction> findByIdWithProduct(@Param("auctionId") Long auctionId);
-
 
     @Query("SELECT a "
             + "FROM Auction a "
@@ -18,4 +20,11 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "AND a.deleted = false "
             + "AND a.status = 'OPEN'")
     Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusOpen(Long auctionId);
+
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "WHERE a.auctionId = :auctionId "
+            + "AND a.deleted = false "
+            + "AND a.status = 'CLOSED'")
+    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(Long auctionId);
 }
