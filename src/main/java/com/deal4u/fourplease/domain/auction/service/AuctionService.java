@@ -64,10 +64,13 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public List<AuctionListResponse> findAll() {
-        List<Auction> auctionList = auctionRepository.findAll();
+    public PageResponse<AuctionListResponse> findAll(Pageable pageable) {
+        Page<Auction> auctionPage = auctionRepository.findAll(pageable);
 
-        return auctionSupportService.getAuctionListResponses(auctionList);
+        Page<AuctionListResponse> auctionListResponsePage = auctionSupportService
+                .getAuctionListResponses(auctionPage);
+
+        return PageResponse.fromPage(auctionListResponsePage);
     }
 
     @Transactional(readOnly = true)
@@ -83,7 +86,7 @@ public class AuctionService {
 
         Page<Auction> auctionPage = auctionRepository.findAllByProductIdIn(productIdList, pageable);
 
-        Page<SellerSaleListResponse> SellerSaleListResponsePage = auctionPage
+        Page<SellerSaleListResponse> sellerSaleListResponsePage = auctionPage
                 .map(auction -> {
                     BidSummaryDto bidSummaryDto = auctionSupportService
                             .getBidSummaryDto(auction.getAuctionId());
@@ -94,7 +97,7 @@ public class AuctionService {
                     );
                 });
 
-        return PageResponse.fromPage(SellerSaleListResponsePage);
+        return PageResponse.fromPage(sellerSaleListResponsePage);
     }
 
     private List<String> getProductImageUrlList(Product product) {

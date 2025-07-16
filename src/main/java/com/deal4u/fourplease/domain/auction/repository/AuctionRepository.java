@@ -28,4 +28,20 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "AND a.deleted = false "
             + "AND a.status = 'CLOSED'")
     Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(Long auctionId);
+    @Query("select a "
+            + "from Auction a "
+            + "join fetch a.product p "
+            + "where p.productId in :productIdList "
+            + "and a.deleted = false "
+            + "order by a.createdAt desc")
+    Page<Auction> findAllByProductIdIn(
+            @Param("productIdList") List<Long> productIdList,
+            Pageable pageable
+    );
+
+    @Query("select a "
+            + "from Auction a "
+            + "where a.deleted = false "
+            + "order by a.createdAt desc")
+    Page<Auction> findAll(Pageable pageable);
 }
