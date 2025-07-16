@@ -9,6 +9,7 @@ import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
+import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class AuctionService {
     private final ProductService productService;
     private final BidRepository bidRepository;
     private final ProductImageService productImageService;
+    private final AuctionScheduleService auctionScheduleService;
 
     @Transactional
     public void save(AuctionCreateRequest request, Member member) {
@@ -32,8 +34,11 @@ public class AuctionService {
         Product product = productService.save(productCreateDto);
 
         Auction auction = request.toEntity(product);
-        auctionRepository.save(auction);
+        Auction save = auctionRepository.save(auction);
 
+        // 경매 스케쥴 추가
+        auctionScheduleService.scheduleAuctionClose(save.getAuctionId(),
+                save.getDuration().getEndTime());
     }
 
     public AuctionDetailResponse getByAuctionId(@Positive Long auctionId) {
@@ -55,6 +60,9 @@ public class AuctionService {
     public void deleteByAuctionId(@Positive Long auctionId) {
         Auction targetAuction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
+
+        // 경매 스케쥴 취소
+        auctionScheduleService.cancelAuctionClose(targetAuction.getAuctionId());
 
         productService.deleteProduct(targetAuction.getProduct());
         targetAuction.delete();
