@@ -4,6 +4,7 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
+import com.deal4u.fourplease.domain.auction.dto.PageResponse;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
@@ -13,6 +14,8 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,16 +71,19 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public List<SellerSaleListResponse> findSalesBySellerId(Long sellerId) {
+    public PageResponse<SellerSaleListResponse> findSalesBySellerId(
+            Long sellerId,
+            Pageable pageable
+    ) {
         List<Product> productList = productService.getProductListBySellerId(sellerId);
 
         List<Long> productIdList = productList.stream()
                 .map(Product::getProductId)
                 .toList();
 
-        List<Auction> auctionList = auctionRepository.findAllByProductId(productIdList);
+        Page<Auction> auctionPage = auctionRepository.findAllByProductIdIn(productIdList, pageable);
 
-        return auctionList.stream()
+        Page<SellerSaleListResponse> SellerSaleListResponsePage = auctionPage
                 .map(auction -> {
                     BidSummaryDto bidSummaryDto = auctionSupportService
                             .getBidSummaryDto(auction.getAuctionId());
@@ -86,8 +92,9 @@ public class AuctionService {
                             bidSummaryDto,
                             auctionSupportService.getSaleAuctionStatus(auction)
                     );
-                })
-                .toList();
+                });
+
+        return PageResponse.fromPage(SellerSaleListResponsePage);
     }
 
     private List<String> getProductImageUrlList(Product product) {
