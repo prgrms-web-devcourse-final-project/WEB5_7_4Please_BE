@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class Shipment extends BaseDateEntity {
     private Long shipmentId;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auction_id")
     private Auction auction;
 
     @Column(nullable = false)

@@ -103,7 +103,16 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                                                   CASE
                                                       WHEN s.status IS NOT NULL THEN
                                                           CASE
-                                                              WHEN s.status = 'SUCCESS' THEN '결제 완료'
+                                                              WHEN s.status = 'SUCCESS' THEN
+                                                                  CASE
+                                                                      WHEN sh.status IS NOT NULL THEN
+                                                                          CASE
+                                                                              WHEN sh.status = 'DELIVERED' THEN '구매확정'
+                                                                              WHEN sh.status = 'INTRANSIT' THEN '배송중'
+                                                                              ELSE '결제 완료'
+                                                                          END
+                                                                      ELSE '결제 완료'
+                                                                  END
                                                               WHEN s.status = 'PENDING' THEN '낙찰'
                                                               WHEN s.status = 'REJECTED' THEN '결제 실패'
                                                               ELSE '낙찰'
@@ -141,6 +150,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                                                JOIN b.bidder bd
                                                JOIN bd.member m
                                                LEFT JOIN Settlement s ON s.auction = a AND s.bidder.member.memberId = :memberId
+                                               LEFT JOIN Shipment sh ON sh.auction = a
                                                WHERE m.memberId = :memberId AND b.deleted = false
                                                ORDER BY b.bidTime DESC
                     """,
