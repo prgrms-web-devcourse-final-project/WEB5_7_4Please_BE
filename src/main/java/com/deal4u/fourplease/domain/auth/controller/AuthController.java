@@ -3,7 +3,6 @@ package com.deal4u.fourplease.domain.auth.controller;
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
 import com.deal4u.fourplease.domain.auth.service.AuthService;
 import com.deal4u.fourplease.domain.member.entity.Member;
-import com.deal4u.fourplease.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;

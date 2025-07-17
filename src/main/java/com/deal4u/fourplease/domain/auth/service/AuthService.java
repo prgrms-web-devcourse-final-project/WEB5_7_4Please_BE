@@ -111,6 +111,4 @@ public class AuthService {
         Member member = savedToken.getMember();
         return createTokenPair(member);
     }
-
-
 }

@@ -2,6 +2,7 @@ package com.deal4u.fourplease.domain.member.controller;
 
 import com.deal4u.fourplease.domain.member.dto.SignupRequest;
 import com.deal4u.fourplease.domain.member.dto.SignupResponse;
+import com.deal4u.fourplease.domain.member.dto.UpdateMemberRequest;
 import com.deal4u.fourplease.domain.member.dto.UpdateMemberResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.service.MemberService;
@@ -51,10 +52,8 @@ public class MemberController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UpdateMemberResponse> updateMember(
             @AuthenticationPrincipal Member member,
-            @RequestBody Map<String, Object> body
+            @RequestBody UpdateMemberRequest request
     ) {
-        String nickName = body.get("nickName").toString();
-        return memberService.updateMember(member, nickName);
+        return memberService.updateMember(member, request.nickName());
     }
-
 }
