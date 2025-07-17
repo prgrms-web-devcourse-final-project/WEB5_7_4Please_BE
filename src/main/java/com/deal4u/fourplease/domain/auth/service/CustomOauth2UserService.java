@@ -30,14 +30,20 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
         Map<String, Object> attributes = oauth2User.getAttributes();
         String email = (String) attributes.get("email");
         String provider = request.getClientRegistration().getRegistrationId();
+
         if (email == null || email.isBlank()) {
             throw ErrorCode.OAUTH_EMAIL_NOT_FOUND.toException();
         }
+        // 소셜 refreshToken 발급
+        String refreshToken = (String) request.getAdditionalParameters().get("refresh_token");
+        // 매번 로그인 할 때마다 주는게 아니므로 null 처리 필요!
+        log.info("소셜 리프레시 토큰 발급{}", refreshToken);
 
         // 1. DB에 해당 이메일이 있는지 확인
         Optional<Member> optionalMember = memberRepository.findByEmailAndProvider(email, provider);
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
+            member.setRefreshToken(refreshToken); // 소셜 refreshToken 갱신
             return new Customoauth2User(member, attributes);
         }
 
@@ -46,6 +52,7 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
                 Member.builder()
                         .email(email)
                         .provider("google")
+                        .refreshToken(refreshToken)
                         .role(Role.USER)
                         .status(Status.PENDING)
                         .build());
