@@ -14,7 +14,7 @@ public class UrlMessageBody implements PushMessageBody {
     }
 
     @Override
-    public Map<String, String> body() {
+    public Map<String, Object> body() {
         return Map.of("url", url.toString(), "message", message);
     }
 }

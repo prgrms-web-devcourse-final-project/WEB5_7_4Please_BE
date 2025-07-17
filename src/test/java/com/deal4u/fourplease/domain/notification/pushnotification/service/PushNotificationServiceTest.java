@@ -6,6 +6,7 @@ import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotifi
 import com.deal4u.fourplease.domain.notification.pushnotification.mapper.PushNotificationMapper;
 import com.deal4u.fourplease.domain.notification.pushnotification.message.PushNotificationMessage;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,6 +37,6 @@ class PushNotificationServiceTest {
     }
 
     private PushNotifications toPushNotifications(List<Long> memberIds, String messagebody) {
-        return new PushNotifications(memberIds, messagebody);
+        return new PushNotifications(memberIds, Map.of("message", messagebody));
     }
 }

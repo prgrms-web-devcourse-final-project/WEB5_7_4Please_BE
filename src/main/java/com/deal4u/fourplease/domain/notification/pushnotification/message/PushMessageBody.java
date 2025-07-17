@@ -4,5 +4,5 @@ import java.util.Map;
 
 public interface PushMessageBody {
 
-    Map<String, String> body();
+    Map<String, Object> body();
 }

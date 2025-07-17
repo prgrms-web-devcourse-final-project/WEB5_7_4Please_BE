@@ -11,7 +11,7 @@ public class SimpleTextMessageBody implements PushMessageBody {
     }
 
     @Override
-    public Map<String, String> body() {
+    public Map<String, Object> body() {
         return Map.of("message", message);
     }
 }
