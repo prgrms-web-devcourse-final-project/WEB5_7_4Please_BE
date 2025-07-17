@@ -26,11 +26,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -53,7 +52,7 @@ class AuctionControllerTests {
 
     @Test
     @DisplayName("POST /api/v1/auctions가 성공하면 경매를 등록한 후 201을 반환한다")
-    void create_auction_should_return201() throws Exception {
+    void createAuctionShouldReturn201() throws Exception {
 
         AuctionCreateRequest req = genAuctionCreateRequest();
 
@@ -72,7 +71,7 @@ class AuctionControllerTests {
 
     @Test
     @DisplayName("GET /api/v1/auctions/{auctionId}/description이 성공하면 Id의 경매 정보와 200을 반환한다")
-    void read_auction_should_return200() throws Exception {
+    void readAuctionShouldReturn200() throws Exception {
 
         Long auctionId = 1L;
         AuctionDetailResponse resp = genAuctionDetailResponse();
@@ -90,7 +89,7 @@ class AuctionControllerTests {
 
     @Test
     @DisplayName("DELETE /api/v1/auctions/{auctionId}가 성공하면 soft delete 후 204를 반환한다")
-    void delete_auction_should_return204() throws Exception {
+    void deleteAuctionShouldReturn204() throws Exception {
 
         Long auctionId = 1L;
 

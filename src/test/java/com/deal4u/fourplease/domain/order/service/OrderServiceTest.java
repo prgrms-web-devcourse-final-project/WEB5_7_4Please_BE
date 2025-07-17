@@ -145,7 +145,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("즉시 구매(BUY_NOW) 주문이 정상적으로 생성되는 경우")
-        void testCreateOrder_BuyNowSuccessful() {
+        void testCreateOrderBuyNowSuccessful() {
             // Given
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
@@ -173,7 +173,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("즉시 구매(BUY_NOW) 주문에서 가격이 일치하지 않는 경우 예외 발생")
-        void testCreateOrder_BuyNowInvalidPrice() {
+        void testCreateOrderBuyNowInvalidPrice() {
             // Given
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
@@ -198,7 +198,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("낙찰자가 AWARD 타입의 주문을 정상적으로 생성하는 경우")
-        void testCreateOrder_AwardSuccessful() {
+        void testCreateOrderAwardSuccessful() {
             // Given
             Long auctionId = 2L;
             String orderType = "AWARD";
@@ -228,7 +228,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("AWARD 타입의 주문에서 가격이 일치하지 않는 경우 예외 발생")
-        void testCreateOrder_AwardInvalidPrice() {
+        void testCreateOrderAwardInvalidPrice() {
             // Given
             Long auctionId = 2L;
             String orderType = "AWARD";
@@ -297,7 +297,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("사용자를 찾을 수 없는 경우 예외 발생")
-        void testCreateOrder_UserNotFound() {
+        void testCreateOrderUserNotFound() {
             // Given
             Long auctionId = 1L;
             String orderType = "BUY_NOW";
@@ -316,7 +316,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("AWARD 타입의 주문에서 유효하지 않은 입찰자일 경우 예외 발생")
-        void testCreateOrder_InvalidBidderForAward() {
+        void testCreateOrderInvalidBidderForAward() {
             // Given
             Long auctionId = 2L;
             String orderType = "AWARD";
@@ -339,7 +339,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("유효하지 않은 주문 타입인 경우 예외 발생")
-        void testCreateOrder_InvalidOrderType() {
+        void testCreateOrderInvalidOrderType() {
             // Given
             Long auctionId = 1L;
             String orderType = "INVALID_TYPE";
@@ -359,7 +359,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("주문 조회가 정상적으로 수행되는 경우")
-        void testGetOrder_Successful() {
+        void testGetOrderSuccessful() {
             // Given
             Long orderId = 1L;
 
@@ -396,7 +396,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("존재하지 않는 주문을 조회하는 경우 예외 발생")
-        void testGetOrder_OrderNotFound() {
+        void testGetOrderOrderNotFound() {
             // Given
             Long orderId = 999L;
 
@@ -417,7 +417,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("주문 업데이트가 정상적으로 수행되는 경우")
-        void testUpdateOrder_Successful() {
+        void testUpdateOrderSuccessful() {
             // Given
             Long orderId = 1L;
 
@@ -458,7 +458,7 @@ class OrderServiceTest {
 
         @Test
         @DisplayName("존재하지 않는 주문을 업데이트하려는 경우 예외 발생")
-        void testUpdateOrder_OrderNotFound() {
+        void testUpdateOrderOrderNotFound() {
             // Given
             Long orderId = 999L;
 

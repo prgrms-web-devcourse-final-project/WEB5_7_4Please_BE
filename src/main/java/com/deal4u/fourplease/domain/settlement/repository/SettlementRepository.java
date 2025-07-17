@@ -12,15 +12,10 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface SettlementRepository extends CrudRepository<Settlement, Long> {
-    boolean existsByAuctionAndBidderAndStatus(Auction auction, Bidder bidder,
-                                              SettlementStatus status);
-
-
     @Query("select s.status "
             + "from Settlement s "
             + "where s.auction.auctionId = :auctionId")
     SettlementStatus getSettlementStatusByAuctionId(Long auctionId);
-
 
     @Query("SELECT s FROM Settlement s "
             + "JOIN FETCH s.auction a "

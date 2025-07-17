@@ -30,6 +30,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "AND a.deleted = false "
             + "AND a.status = 'CLOSED'")
     Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(Long auctionId);
+
     @Query("select a "
             + "from Auction a "
             + "join fetch a.product p "
@@ -46,4 +47,5 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "where a.deleted = false "
             + "order by a.createdAt desc")
     Page<Auction> findAll(Pageable pageable);
+
 }
