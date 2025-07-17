@@ -29,8 +29,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 222701460360-d7e9hvsqdo1evm0k7hnkvg1sgl02a6bk.apps.googleusercontent.com
-            client-secret: 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
+            client-id: dummy-google-client-id
+            client-secret: dummy-google-client-secret
             redirect-uri: "http://localhost:8080/api/v1/login/google"
             scope:
               - email
