@@ -2,15 +2,19 @@ package com.deal4u.fourplease.domain.auction.controller;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
+import com.deal4u.fourplease.domain.auction.dto.PageResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
-import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,6 +36,17 @@ public class AuctionController {
     private final AuctionService auctionService;
     private final MemberRepository memberRepository;
 
+    @Operation(summary = "전체 경매 조회")
+    @ApiResponse(responseCode = "200", description = "경매 목록 응답")
+    @ApiResponse(responseCode = "404", description = "경매를 찾을 수 없음")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public PageResponse<AuctionListResponse> readAllAuctions(
+            @PageableDefault Pageable pageable
+    ) {
+        return auctionService.findAll(pageable);
+    }
+
     @Operation(summary = "경매등록")
     @ApiResponse(responseCode = "201", description = "경매 등록 성공")
     @ApiResponse(responseCode = "400", description = "invalid value")
@@ -40,6 +55,7 @@ public class AuctionController {
     public void createAuction(
             @Valid @RequestBody AuctionCreateRequest request
     ) {
+        // TODO: member 추후 수정 필요
         auctionService.save(request, memberRepository.findAll().getFirst());
     }
 
