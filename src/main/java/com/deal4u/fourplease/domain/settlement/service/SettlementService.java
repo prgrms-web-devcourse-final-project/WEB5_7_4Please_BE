@@ -73,7 +73,7 @@ public class SettlementService {
     }
 
     private Settlement getSettlementOrThrow(Auction auction) {
-        return settlementRepository.findByAuction(auction)
+        return settlementRepository.findPendingSettlementByAuction(auction)
                 .orElseThrow(SETTLEMENT_NOT_FOUND::toException);
     }
 

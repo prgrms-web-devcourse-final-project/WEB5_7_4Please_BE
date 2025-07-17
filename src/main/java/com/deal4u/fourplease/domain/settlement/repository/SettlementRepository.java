@@ -33,7 +33,9 @@ public interface SettlementRepository extends CrudRepository<Settlement, Long> {
 
     boolean existsByAuctionAndBidder(Auction auction, Bidder bidder);
 
-    Optional<Settlement> findByAuction(Auction auction);
+    @Query("SELECT s FROM Settlement s WHERE s.auction = :auction " +
+            "AND s.status = com.deal4u.fourplease.domain.settlement.entity.SettlementStatus.PENDING")
+    Optional<Settlement> findPendingSettlementByAuction(@Param("auction") Auction auction);
 
     List<Settlement> findByStatus(SettlementStatus status);
 
