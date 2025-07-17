@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.member.entity;
 
-import com.deal4u.fourplease.domain.BaseDateEntity;
+import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

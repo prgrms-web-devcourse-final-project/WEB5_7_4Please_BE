@@ -2,34 +2,37 @@ package com.deal4u.fourplease.domain.auction.service;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
+import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
+import com.deal4u.fourplease.domain.auction.dto.PageResponse;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
+import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
-import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
-import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final ProductService productService;
-    private final BidRepository bidRepository;
     private final ProductImageService productImageService;
     private final AuctionScheduleService auctionScheduleService;
 
+    private final AuctionSupportService auctionSupportService;
+
     @Transactional
     public void save(AuctionCreateRequest request, Member member) {
-
         ProductCreateDto productCreateDto = request.toProductCreateDto(member);
         Product product = productService.save(productCreateDto);
 
@@ -41,23 +44,24 @@ public class AuctionService {
                 save.getDuration().getEndTime());
     }
 
-    public AuctionDetailResponse getByAuctionId(@Positive Long auctionId) {
-        // TODO: Long -> BigDecimal로 변경 예정
-        List<Long> bidList = bidRepository.findPricesByAuctionIdOrderByPriceDesc(auctionId);
+    @Transactional(readOnly = true)
+    public AuctionDetailResponse getByAuctionId(Long auctionId) {
+        BidSummaryDto bidSummaryDto = auctionSupportService.getBidSummaryDto(auctionId);
 
         Auction auction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
-        Product product = auction.getProduct();
+        List<String> productImageUrlList = getProductImageUrlList(auction.getProduct());
 
-        List<String> productImageUrls = productImageService.getByProduct(product)
-                .toProductImageUrlList();
-
-        return AuctionDetailResponse.toAuctionDetailResponse(bidList, auction, productImageUrls);
+        return AuctionDetailResponse.toAuctionDetailResponse(
+                auction,
+                productImageUrlList,
+                bidSummaryDto
+        );
     }
 
     @Transactional
-    public void deleteByAuctionId(@Positive Long auctionId) {
+    public void deleteByAuctionId(Long auctionId) {
         Auction targetAuction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
@@ -67,4 +71,47 @@ public class AuctionService {
         productService.deleteProduct(targetAuction.getProduct());
         targetAuction.delete();
     }
+
+    @Transactional(readOnly = true)
+    public PageResponse<AuctionListResponse> findAll(Pageable pageable) {
+        Page<Auction> auctionPage = auctionRepository.findAll(pageable);
+
+        Page<AuctionListResponse> auctionListResponsePage = auctionSupportService
+                .getAuctionListResponses(auctionPage);
+
+        return PageResponse.fromPage(auctionListResponsePage);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<SellerSaleListResponse> findSalesBySellerId(
+            Long sellerId,
+            Pageable pageable
+    ) {
+        List<Product> productList = productService.getProductListBySellerId(sellerId);
+
+        List<Long> productIdList = productList.stream()
+                .map(Product::getProductId)
+                .toList();
+
+        Page<Auction> auctionPage = auctionRepository.findAllByProductIdIn(productIdList, pageable);
+
+        Page<SellerSaleListResponse> sellerSaleListResponsePage = auctionPage
+                .map(auction -> {
+                    BidSummaryDto bidSummaryDto = auctionSupportService
+                            .getBidSummaryDto(auction.getAuctionId());
+                    return SellerSaleListResponse.toSellerSaleListResponse(
+                            auction,
+                            bidSummaryDto,
+                            auctionSupportService.getSaleAuctionStatus(auction)
+                    );
+                });
+
+        return PageResponse.fromPage(sellerSaleListResponsePage);
+    }
+
+    private List<String> getProductImageUrlList(Product product) {
+        return productImageService.getByProduct(product)
+                .toProductImageUrlList();
+    }
+
 }

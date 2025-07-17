@@ -18,9 +18,7 @@ public class SettlementScheduleService {
 
     // 정산 시작 시 해당 `Method`를 호출
     public void scheduleSettlementClose(Long settlementId) {
-        try {
-            JobDetail jobDetail = buildJobDetail(settlementId);
-        }
+
     }
 
     private JobDetail buildJobDetail(Long settlementId) {

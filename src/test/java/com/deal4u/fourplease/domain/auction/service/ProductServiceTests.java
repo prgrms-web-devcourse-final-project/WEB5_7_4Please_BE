@@ -43,7 +43,7 @@ class ProductServiceTests {
 
     @Test
     @DisplayName("상품을 등록하고 등록된 상품을 반환한다")
-    void product_can_be_saved_and_returned() throws Exception {
+    void productCanBeSavedAndReturned() throws Exception {
 
         ProductCreateDto req = genProductCreateDto();
         Member seller = genMember();
@@ -67,7 +67,7 @@ class ProductServiceTests {
 
     @Test
     @DisplayName("존재하지 않는 id로 카테고리 조회 시 예외가 발생한다")
-    void throws_if_category_not_found() throws Exception {
+    void throwsIfCategoryNotFound() throws Exception {
 
         ProductCreateDto wrongRequest = genProductCreateDto();
 
@@ -83,7 +83,7 @@ class ProductServiceTests {
 
     @Test
     @DisplayName("product를 인자로 받아 soft delete를 실행한다")
-    void delete_product_should_soft_delete_product_by_product() throws Exception {
+    void deleteProductShouldSoftDeleteProductByProduct() throws Exception {
 
         Product product = genProduct();
 

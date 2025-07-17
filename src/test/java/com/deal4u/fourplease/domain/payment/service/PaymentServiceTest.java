@@ -102,6 +102,7 @@ class PaymentServiceTest {
         );
     }
 
+
     @Nested
     class PaymentConfirmTest {
         @Test
@@ -200,7 +201,7 @@ class PaymentServiceTest {
     @DisplayName("결제 실패 시 상태가 FAILED로 변경된다")
     void paymentFailureStatus() {
         // given
-        TossPaymentConfirmResponse failedResponse = new TossPaymentConfirmResponse(
+        TossPaymentConfirmResponse paymentConfirmResponse = new TossPaymentConfirmResponse(
                 "order123",
                 "paymentKey123",
                 "FAILED",
@@ -210,7 +211,7 @@ class PaymentServiceTest {
         );
         given(paymentTransactionService.getOrderOrThrow(any())).willReturn(buyNowOrder);
         given(namedLockProvider.getBottleLock(anyString())).willReturn(namedLock);
-        given(tossApiClient.confirmPayment(confirmRequest)).willReturn(failedResponse);
+        given(tossApiClient.confirmPayment(confirmRequest)).willReturn(paymentConfirmResponse);
         given(paymentTransactionService.savePayment(any(), any(), any(), any())).willReturn(
                 payment);
         given(buyNowOrder.getAuction()).willReturn(auction);

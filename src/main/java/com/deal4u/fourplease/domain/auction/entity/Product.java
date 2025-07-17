@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.auction.entity;
 
-import com.deal4u.fourplease.domain.BaseDateEntity;
+import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import jakarta.persistence.AssociationOverride;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;

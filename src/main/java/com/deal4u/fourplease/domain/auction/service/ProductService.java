@@ -1,11 +1,16 @@
 package com.deal4u.fourplease.domain.auction.service;
 
+import static com.deal4u.fourplease.domain.auction.validator.Validator.validateListNotEmpty;
+
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
+import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.CategoryRepository;
 import com.deal4u.fourplease.domain.auction.repository.ProductRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,5 +39,11 @@ public class ProductService {
     public void deleteProduct(Product targetProduct) {
         productImageService.deleteProductImage(targetProduct);
         targetProduct.delete();
+    }
+
+    public List<Product> getProductListBySellerId(Long sellerId) {
+        List<Product> productList = productRepository.findBySellerId(sellerId);
+        validateListNotEmpty(productList);
+        return productList;
     }
 }
