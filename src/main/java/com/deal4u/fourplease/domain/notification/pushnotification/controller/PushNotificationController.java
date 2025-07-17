@@ -18,7 +18,7 @@ public class PushNotificationController {
     private final MemberRepository memberRepository;
     private final PushNotificationService pushNotificationService;
 
-    @PatchMapping("/{notificationId}/clicked")
+    @PatchMapping("/click/{notificationId}")
     void clickNotification(@PathVariable(name = "notificationId") Long id) {
         Member first = memberRepository.findAll().getFirst();
         pushNotificationService.click(Receiver.of(first.getMemberId()), id);
