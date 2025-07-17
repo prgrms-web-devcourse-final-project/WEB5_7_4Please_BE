@@ -4,18 +4,21 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
-import com.deal4u.fourplease.domain.auction.dto.PageResponse;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,11 +67,23 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<AuctionListResponse> findAll(Pageable pageable) {
-        Page<Auction> auctionPage = auctionRepository.findAll(pageable);
+    public PageResponse<AuctionListResponse> findAll(
+            int page,
+            int size,
+            String keyword,
+            @Nullable Long categoryId,
+            String order
+    ) {
+        Page<Auction> auctionPage = getAuctionPage(
+                page,
+                size,
+                keyword,
+                categoryId,
+                order
+        );
 
-        Page<AuctionListResponse> auctionListResponsePage = auctionSupportService
-                .getAuctionListResponses(auctionPage);
+        Page<AuctionListResponse> auctionListResponsePage =
+                auctionSupportService.getAuctionListResponses(auctionPage);
 
         return PageResponse.fromPage(auctionListResponsePage);
     }
@@ -100,9 +115,60 @@ public class AuctionService {
         return PageResponse.fromPage(sellerSaleListResponsePage);
     }
 
+    // TODO: auction 상태를 CLOSED로 변경하는 메서드로 대체 필요
+    @Transactional
+    public void close(Auction auction) {
+        auction.close();
+    }
+
     private List<String> getProductImageUrlList(Product product) {
         return productImageService.getByProduct(product)
                 .toProductImageUrlList();
+    }
+
+    private Page<Auction> getAuctionPage(
+            int page,
+            int size,
+            String keyword,
+            @Nullable Long categoryId,
+            String order
+    ) {
+        boolean hasKeyword = !keyword.trim().isEmpty();
+        boolean hasCategoryId = categoryId != null;
+        boolean isOrderByBidCount = order.equals("bids");
+
+        Pageable pageable = isOrderByBidCount ? PageRequest.of(page, size) :
+                PageRequest.of(page, size, createSort(order));
+
+        if (hasKeyword && hasCategoryId) {
+            return isOrderByBidCount ? auctionRepository.findByKeywordAndCategoryIdOrderByBidCount(
+                    keyword,
+                    categoryId,
+                    pageable
+            ) :
+                    auctionRepository.findByKeywordAndCategoryId(keyword, categoryId, pageable);
+        } else if (hasKeyword) {
+            return isOrderByBidCount ? auctionRepository.findByKeywordOrderByBidCount(
+                    keyword,
+                    pageable
+            ) :
+                    auctionRepository.findByKeyword(keyword, pageable);
+        } else if (hasCategoryId) {
+            return isOrderByBidCount ? auctionRepository.findByCategoryIdOrderByBidCount(
+                    categoryId,
+                    pageable
+            ) :
+                    auctionRepository.findByCategoryId(categoryId, pageable);
+        }
+        return isOrderByBidCount ? auctionRepository.findAll(pageable) :
+                auctionRepository.findAllOrderByBidCount(pageable);
+    }
+
+    private Sort createSort(String order) {
+        if (order.equals("timeout")) {
+            return Sort.by(Sort.Direction.ASC, "endTime");
+        }
+        return Sort.by(Sort.Direction.DESC, "createdAt");
     }
 
 }

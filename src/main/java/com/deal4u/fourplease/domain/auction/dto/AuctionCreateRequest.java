@@ -65,6 +65,7 @@ public record AuctionCreateRequest(
         BigDecimal buyNowPrice
 
 ) {
+
     public Auction toEntity(Product product) {
         return Auction.builder()
                 .product(product)
