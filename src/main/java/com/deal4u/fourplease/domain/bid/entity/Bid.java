@@ -55,9 +55,8 @@ public class Bid extends BaseDateEntity {
         return new Bid(auction, bidder, price);
     }
 
-    public void update(int price) {
-        this.price = BigDecimal.valueOf(price);
-        this.bidTime = LocalDateTime.now();
+    public void update(boolean isSuccessfulBidder) {
+        this.isSuccessfulBidder = isSuccessfulBidder;
     }
 
     public void delete() {

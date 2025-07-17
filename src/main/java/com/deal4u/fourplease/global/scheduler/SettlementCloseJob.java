@@ -1,25 +1,25 @@
 package com.deal4u.fourplease.global.scheduler;
 
-import com.deal4u.fourplease.domain.auction.entity.Auction;
-import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.settlement.service.SettlementService;
-import com.deal4u.fourplease.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AuctionCloseJob extends QuartzJobBean {
+public class SettlementCloseJob extends QuartzJobBean {
 
     private final SettlementService settlementService;
+    private final BidService bidService;
 
     @Override
-    protected void executeInternal(JobExecutionContext context) {
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-        Long auctionId = dataMap.getLong("auctionId");
-        settlementService.save(auctionId, 1);
+        Long settlementId = dataMap.getLong("settlementId");
+
     }
 }
