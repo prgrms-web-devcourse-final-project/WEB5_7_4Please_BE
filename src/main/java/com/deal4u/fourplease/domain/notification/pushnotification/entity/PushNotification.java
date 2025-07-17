@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.domain.notification.pushnotification.entity;
 
 import com.deal4u.fourplease.domain.BaseDateEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,6 +10,7 @@ import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.proxy.HibernateProxy;
 
 @Entity
@@ -20,7 +22,9 @@ public class PushNotification extends BaseDateEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long memberId;
+    @Column(nullable = false)
     private String message;
 
     public PushNotification(Long memberId, String message) {
