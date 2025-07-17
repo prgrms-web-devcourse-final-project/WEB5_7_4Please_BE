@@ -59,7 +59,8 @@ class AuthServiceTest {
         // given
         when(jwtProvider.generateTokenPair(member)).thenReturn(tokenPair);
         when(refreshTokenRepository.findByMember(member)).thenReturn(Optional.of(refreshToken));
-        when(jwtProvider.getExpirationFromToken("refresh")).thenReturn(LocalDateTime.now().plusDays(7));
+        when(jwtProvider.getExpirationFromToken("refresh"))
+                .thenReturn(LocalDateTime.now().plusDays(7));
 
         // when
         TokenPair result = authService.createTokenPair(member);
