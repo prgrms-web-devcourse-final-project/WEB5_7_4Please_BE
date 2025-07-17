@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.global.scheduler;
 
 import static com.deal4u.fourplease.global.exception.ErrorCode.SETTLEMENT_NOT_FOUND;
+import static com.deal4u.fourplease.global.exception.ErrorCode.FAILED_SETTLEMENT_SCHEDULE_NOT_FOUND;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -8,6 +9,7 @@ import java.util.Date;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
@@ -57,4 +59,13 @@ public class SettlementScheduleService {
                 .build();
     }
 
+    // `paymentDeadline`마감 시간이 지나거나, 결제를 취소하는 경우 해당 `Method`를 호출
+    public void cancelSettlement(Long settlementId) {
+        try {
+            scheduler.deleteJob(
+                    new JobKey("settlementCloseJob_" + settlementId, "settlement-jobs"));
+        } catch (Exception e) {
+            throw FAILED_SETTLEMENT_SCHEDULE_NOT_FOUND.toException();
+        }
+    }
 }

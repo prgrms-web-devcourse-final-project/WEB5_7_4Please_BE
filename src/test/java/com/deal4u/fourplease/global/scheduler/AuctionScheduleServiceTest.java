@@ -26,13 +26,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.quartz.Scheduler;
 
 @ExtendWith(MockitoExtension.class)
 class AuctionScheduleServiceTest {
-
-    @Mock
-    private Scheduler scheduler;
 
     @InjectMocks
     private AuctionService auctionService;

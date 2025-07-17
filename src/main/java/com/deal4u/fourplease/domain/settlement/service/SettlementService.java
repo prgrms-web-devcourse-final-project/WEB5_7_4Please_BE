@@ -11,7 +11,6 @@ import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
-import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
 import com.deal4u.fourplease.domain.settlement.mapper.SettlementMapper;
@@ -159,8 +158,14 @@ public class SettlementService {
         settlement.updateStatus(SettlementStatus.REJECTED, null, "결제 기간이 만료되어서 정산이 취소되었습니다.");
 
         // 3. 해당 입찰의 낙찰을 무효 처리
+        invalidateBid(settlement);
+    }
+
+    private void invalidateBid(Settlement settlement) {
         Bid bid = bidRepository.findByAuctionAndBidder(settlement.getAuction(),
                 settlement.getBidder()).orElseThrow(BID_NOT_FOUND::toException);
-        bid.update(true);
+
+        bid.update(false);
     }
+
 }
