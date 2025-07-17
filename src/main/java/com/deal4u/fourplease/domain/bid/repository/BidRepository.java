@@ -24,7 +24,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "WHERE b.deleted = false "
             + "AND b.auction.auctionId = :auctionId "
             + "ORDER BY b.price DESC")
-    List<Long> findPricesByAuctionIdOrderByPriceDesc(@Param("auctionId") Long auctionId);
+    List<BigDecimal> findPricesByAuctionIdOrderByPriceDesc(@Param("auctionId") Long auctionId);
 
     @Query("SELECT b "
             + "FROM Bid b "
