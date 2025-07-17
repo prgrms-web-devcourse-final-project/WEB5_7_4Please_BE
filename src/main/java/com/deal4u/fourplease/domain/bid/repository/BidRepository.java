@@ -45,4 +45,11 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     @SuppressWarnings("checkstyle:MethodName")
     Page<Bid> findByAuctionAndDeletedFalseOrderByPriceDescBidTimeAsc(Auction auction,
                                                                      Pageable pageable);
+
+
+    @Query("SELECT b FROM Bid b WHERE b.bidder.member.memberId = :memberId ORDER BY b.bidTime DESC")
+    Page<Bid> findByBidderMemberIdOrderByBidTimeDesc(@Param("memberId") Long memberId,
+                                                     Pageable pageable);
+
+    List<Bid> findByAuctionOrderByPriceDesc(@Param("auction") Auction auction);
 }
