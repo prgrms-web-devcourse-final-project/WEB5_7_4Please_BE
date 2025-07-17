@@ -51,7 +51,7 @@ public enum ErrorCode {
     // 500 - Internal Server Error
     WEBSOCKET_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "WebSocket 메시지 전송 중 오류가 발생하였습니다."),
     FAILED_SETTLEMENT_SCHEDULE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,
-            "실패한 정산 작업을 예약하는 중 오류가 발생했습니다."),
+            "실패한 정산 작업을 스케줄링하는 중 오류가 발생했습니다."),
     FAILED_SETTLEMENT_SCHEDULE_CANCEL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,
             "실패한 정산 작업을 취소하는 중 오류가 발생했습니다."),
     FAILED_SETTLEMENT_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "예약된 실패한 정산 작업이 존재하지 않습니다.");

@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
@@ -17,8 +18,8 @@ import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
 import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
+import com.deal4u.fourplease.global.sheduler.FailedSettlementScheduleService;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,9 @@ class SettlementServiceTest {
 
     @Mock
     private BidRepository bidRepository;
+
+    @Mock
+    private FailedSettlementScheduleService scheduleService;
 
     @InjectMocks
     private SettlementService settlementService;
@@ -57,10 +61,10 @@ class SettlementServiceTest {
 
         // then
         then(settlementRepository).should().findByAuction(auction);
+        then(scheduleService).should().cancelFailedSettlement(settlement.getSettlementId());
         assertThat(settlement.getStatus()).isEqualTo(SettlementStatus.SUCCESS);
         assertThat(settlement.getPaidAt()).isNotNull();
-        assertThat(settlement.getPaidAt()).isAfter(
-                paidAt.minusSeconds(1));
+        assertThat(settlement.getPaidAt()).isAfter(paidAt.minusSeconds(1));
     }
 
     @Test
@@ -80,7 +84,6 @@ class SettlementServiceTest {
                 .isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-
     @Test
     @DisplayName("차상위 입찰자에게 정산을 제안한다")
     void offerSecondBidder() {
@@ -89,11 +92,14 @@ class SettlementServiceTest {
         Auction auction = createAuction();
         Bidder bidder = createBidder();
         Bid secondHighestBid = createBid(auction, bidder);
+        Settlement savedSettlement = createSettlement(auction);
 
         given(bidRepository.findSecondHighestBidByAuctionId(auctionId))
                 .willReturn(Optional.of(secondHighestBid));
         given(settlementRepository.existsByAuctionAndBidder(auction, bidder))
                 .willReturn(false);
+        given(settlementRepository.save(any(Settlement.class)))
+                .willReturn(savedSettlement);
 
         // when
         settlementService.offerSecondBidder(auctionId);
@@ -102,7 +108,20 @@ class SettlementServiceTest {
         ArgumentCaptor<Settlement> settlementCaptor = ArgumentCaptor.forClass(Settlement.class);
         verify(settlementRepository).save(settlementCaptor.capture());
 
-        then(settlementRepository).should().save(any(Settlement.class));
+        Settlement capturedSettlement = settlementCaptor.getValue();
+        assertAll(
+                () -> assertThat(capturedSettlement.getAuction()).isEqualTo(auction),
+                () -> assertThat(capturedSettlement.getBidder()).isEqualTo(bidder),
+                () -> assertThat(capturedSettlement.getStatus()).isEqualTo(
+                        SettlementStatus.PENDING),
+                () -> assertThat(capturedSettlement.getPaymentDeadline()).isAfter(
+                        LocalDateTime.now().plusHours(47))
+        );
+
+        then(scheduleService).should().scheduleFailedSettlement(
+                eq(savedSettlement.getSettlementId()),
+                any(LocalDateTime.class)
+        );
     }
 
     @Test
@@ -121,7 +140,6 @@ class SettlementServiceTest {
                 .extracting("status")
                 .isEqualTo(HttpStatus.NOT_FOUND);
     }
-
 
     @Test
     @DisplayName("이미 정산이 존재하면 예외를 발생시킨다")
@@ -145,36 +163,46 @@ class SettlementServiceTest {
                 .isEqualTo(HttpStatus.CONFLICT);
     }
 
-
     @Test
     @DisplayName("실패한 정산을 처리한다")
-    void handleFailedSettlements() {
+    void handleFailedSettlement() {
         // given
+        Long settlementId = 1L;
         Auction auction = createAuction();
-        Settlement pendingSettlement1 = createSettlement(auction);
-        Settlement pendingSettlement2 = createSettlement(auction);
-        List<Settlement> pendingSettlements = List.of(pendingSettlement1, pendingSettlement2);
+        Settlement settlement = createSettlement(auction);
+        LocalDateTime beforeUpdate = LocalDateTime.now();
 
-        given(settlementRepository.findByStatus(SettlementStatus.PENDING))
-                .willReturn(pendingSettlements);
+        given(settlementRepository.findById(settlementId))
+                .willReturn(Optional.of(settlement));
 
         // when
-        settlementService.handleFailedSettlements();
+        settlementService.handleFailedSettlement(settlementId);
 
         // then
-        then(settlementRepository).should().findByStatus(SettlementStatus.PENDING);
+        then(settlementRepository).should().findById(settlementId);
 
-        // 상태가 변경되었는지 확인
         assertAll(
-                () -> assertThat(pendingSettlement1.getStatus()).isEqualTo(
-                        SettlementStatus.REJECTED),
-                () -> assertThat(pendingSettlement1.getRejectedReason()).isEqualTo(
-                        "차상위 입찰자가 결제를 하지 않았습니다."),
-                () -> assertThat(pendingSettlement2.getStatus()).isEqualTo(
-                        SettlementStatus.REJECTED),
-                () -> assertThat(pendingSettlement2.getRejectedReason()).isEqualTo(
-                        "차상위 입찰자가 결제를 하지 않았습니다.")
+                () -> assertThat(settlement.getStatus()).isEqualTo(SettlementStatus.REJECTED),
+                () -> assertThat(settlement.getRejectedReason()).isEqualTo(
+                        "차상위 입찰자가 결제 기한 내에 결제를 완료하지 않았습니다.")
         );
+    }
+
+    @Test
+    @DisplayName("실패한 정산 처리 시 정산을 찾을 수 없으면 예외를 발생시킨다")
+    void handleFailedSettlement_SettlementNotFound() {
+        // given
+        Long settlementId = 1L;
+
+        given(settlementRepository.findById(settlementId))
+                .willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> settlementService.handleFailedSettlement(settlementId))
+                .isInstanceOf(GlobalException.class)
+                .hasMessage("해당 정산을 찾을 수 없습니다.")
+                .extracting("status")
+                .isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     private Auction createAuction() {
