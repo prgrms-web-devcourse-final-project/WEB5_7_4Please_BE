@@ -2,10 +2,9 @@ package com.deal4u.fourplease.domain.bid.controller;
 
 import com.deal4u.fourplease.domain.bid.dto.BidRequest;
 import com.deal4u.fourplease.domain.bid.dto.BidResponse;
-import com.deal4u.fourplease.domain.bid.entity.PageResponse;
 import com.deal4u.fourplease.domain.bid.service.BidService;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -38,11 +37,10 @@ public class BidController {
      */
     @GetMapping("/auctions/{auctionId}/bids")
     @ResponseStatus(HttpStatus.OK)
-    public List<BidResponse> getBids(@PathVariable Long auctionId,
+    public PageResponse<BidResponse> getBids(@PathVariable Long auctionId,
             @PageableDefault Pageable pageable) {
         // 1. 일찰 내역 조회 호출
-        PageResponse<BidResponse> bidPage = bidService.getBidListForAuction(auctionId, pageable);
-        return bidPage.getContent();
+        return bidService.getBidListForAuction(auctionId, pageable);
     }
 
     @PostMapping("/bids")
