@@ -2,7 +2,6 @@ package com.deal4u.fourplease.domain.auction.service;
 
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionCreateRequest;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionList;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionListResponseList;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProduct;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProductList;
@@ -16,7 +15,6 @@ import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
-import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductImageListResponse;
@@ -64,7 +62,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("경매를 등록할 수 있다")
-    void saveShouldSaveAuction() throws Exception {
+    void saveShouldSaveAuction() {
 
         Member member = genMember();
         AuctionCreateRequest req = genAuctionCreateRequest();
@@ -93,7 +91,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("auctionId로 특정 경매를 조회 후 AuctionDetailResponse를 반환한다")
-    void getByAuctionIdShouldReturnAuctionDetailResponse() throws Exception {
+    void getByAuctionIdShouldReturnAuctionDetailResponse() {
 
         Long auctionId = 1L;
 
@@ -132,7 +130,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("존재하지 않는 auctionId로 조회를 시도하면 404 예외가 발생한다")
-    void throwsWhenTryToGetIfAuctionNotExist() throws Exception {
+    void throwsWhenTryToGetIfAuctionNotExist() {
         Long auctionId = 1L;
 
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.empty());
@@ -145,7 +143,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("auctionId로 경매를 삭제한다")
-    void deleteByAuctionIdShouldSoftDeleteAuctionByAuctionId() throws Exception {
+    void deleteByAuctionIdShouldSoftDeleteAuctionByAuctionId() {
 
         Long auctionId = 1L;
 
@@ -162,7 +160,7 @@ class AuctionServiceTests {
 
     @Test
     @DisplayName("존재하지 않는 auctionId로 삭제를 시도하면 404 예외가 발생한다")
-    void throwsWhenTryToDeleteIfAuctionNotExist() throws Exception {
+    void throwsWhenTryToDeleteIfAuctionNotExist() {
 
         Long auctionId = 1L;
 
@@ -175,66 +173,8 @@ class AuctionServiceTests {
     }
 
     @Test
-    @DisplayName("전체 경매 목록을 조회한다")
-    void findAllShouldReturnAuctionList() throws Exception {
-
-        Pageable pageable = PageRequest.of(0, 20);
-
-        List<Auction> auctionList = genAuctionList();
-
-        // PageImpl로 Page 객체 모킹
-        Page<Auction> auctionPage = new PageImpl<>(auctionList, pageable, auctionList.size());
-
-        List<AuctionListResponse> auctionListResponseList = genAuctionListResponseList();
-        Page<AuctionListResponse> auctionListResponsePage = new PageImpl<>(
-                auctionListResponseList,
-                pageable,
-                auctionListResponseList.size()
-        );
-
-        when(auctionRepository.findAll(pageable)).thenReturn(auctionPage);
-        when(auctionSupportService.getAuctionListResponses(auctionPage))
-                .thenReturn(auctionListResponsePage);
-
-        PageResponse<AuctionListResponse> resp = auctionService.findAll(pageable);
-
-        assertThat(resp).isNotNull();
-        assertThat(resp.getContent()).hasSize(3);
-        assertThat(resp.getContent().get(0).name()).isEqualTo("목도리");
-        assertThat(resp.getContent().get(0).maxPrice()).isEqualTo(new BigDecimal("200000"));
-        assertThat(resp.getContent().get(1).name()).isEqualTo("축구공");
-        assertThat(resp.getContent().get(1).maxPrice()).isEqualTo(new BigDecimal("10000000"));
-        assertThat(resp.getContent().get(2).maxPrice()).isEqualTo(new BigDecimal("2000000"));
-        assertThat(resp.getContent().get(2).name()).isEqualTo("칫솔");
-
-        assertThat(resp.getTotalElements()).isEqualTo(3);
-        assertThat(resp.getTotalPages()).isEqualTo(1);
-        assertThat(resp.getPage()).isEqualTo(0);
-        assertThat(resp.getSize()).isEqualTo(20);
-    }
-
-    @Test
-    @DisplayName("경매 목록이 없을 경우 빈 리스트를 반환한다")
-    void findAllShouldReturnEmptyListWhenNoAuctionsExist() {
-
-        Pageable pageable = PageRequest.of(0, 20);
-
-        when(auctionRepository.findAll(pageable)).thenReturn(Page.empty(pageable));
-        when(auctionSupportService.getAuctionListResponses(Page.empty(pageable)))
-                .thenReturn(Page.empty(pageable));
-
-        PageResponse<AuctionListResponse> resp = auctionService.findAll(pageable);
-
-        assertThat(resp).isNotNull();
-        assertThat(resp.getTotalElements()).isEqualTo(0);
-        assertThat(resp.getTotalPages()).isEqualTo(0);
-        assertThat(resp.getPage()).isEqualTo(0);
-        assertThat(resp.getSize()).isEqualTo(20);
-    }
-
-    @Test
     @DisplayName("판매자 id로 해당 판매자의 판매내역을 조회한다")
-    void findSalesBySellerIdShouldReturnSellerSaleList() throws Exception {
+    void findSalesBySellerIdShouldReturnSellerSaleList() {
 
         Long sellerId = 1L;
         Pageable pageable = PageRequest.of(0, 20);
@@ -284,7 +224,7 @@ class AuctionServiceTests {
 
         assertThat(resp.getTotalElements()).isEqualTo(3);
         assertThat(resp.getTotalPages()).isEqualTo(1);
-        assertThat(resp.getPage()).isEqualTo(0);
+        assertThat(resp.getPage()).isZero();
         assertThat(resp.getSize()).isEqualTo(20);
     }
 

@@ -27,8 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -103,15 +101,23 @@ class AuctionControllerTests {
     @DisplayName("GET /api/v1/auctions가 성공하면 전체 경매 목록과 200을 반환한다")
     void readAllAuctionsShouldReturn200() throws Exception {
 
-        Pageable pageable = PageRequest.of(0, 20);
+        int page = 0;
+        int size = 20;
+        String keyword = "";
+        Long categoryId = 4L;
+        String order = "latest";
+
         PageResponse<AuctionListResponse> resp = genAuctionListResponsePageResponse();
 
-        when(auctionService.findAll(pageable)).thenReturn(resp);
+        when(auctionService.findAll(page, size, keyword, categoryId, order)).thenReturn(resp);
 
         mockMvc.perform(
                         get("/api/v1/auctions")
                                 .param("page", "0")
                                 .param("size", "20")
+                                .param("keyword", keyword)
+                                .param("categoryId", String.valueOf(categoryId))
+                                .param("order", order)
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name")
                         .value(resp.getContent().get(0).name()))
