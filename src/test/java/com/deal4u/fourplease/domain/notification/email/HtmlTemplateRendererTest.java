@@ -20,7 +20,7 @@ class HtmlTemplateRendererTest {
     @Test
     @DisplayName("랜더링 성공")
     void successfulRendering() {
-        String rend = htmlTemplateRenderer.rend("test", Map.of("date", "test"));
+        String rend = htmlTemplateRenderer.render("test", Map.of("date", "test"));
 
         String html = """
                 <!DOCTYPE html>
@@ -41,7 +41,7 @@ class HtmlTemplateRendererTest {
     @Test
     @DisplayName("랜더링 실패")
     void failedRendering() {
-        ThrowableAssert.ThrowingCallable callable = () -> htmlTemplateRenderer.rend(
+        ThrowableAssert.ThrowingCallable callable = () -> htmlTemplateRenderer.render(
                 "discontainFile", Map.of("date", "test"));
 
         assertThatThrownBy(callable)

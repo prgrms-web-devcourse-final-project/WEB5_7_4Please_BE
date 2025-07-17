@@ -14,7 +14,7 @@ public class HtmlTemplateRenderer {
 
     private final TemplateEngine templateEngine;
 
-    public String rend(String htmlName, Map<String, Object> data) {
+    public String render(String htmlName, Map<String, Object> data) {
         IContext content = toContent(data);
         return templateEngine.process(htmlName, content);
     }

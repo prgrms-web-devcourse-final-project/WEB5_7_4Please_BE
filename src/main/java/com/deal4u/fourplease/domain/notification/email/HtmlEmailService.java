@@ -12,7 +12,7 @@ public class HtmlEmailService {
     private final EmailSender mailSender;
 
     public void send(HtmlEmailMessage htmlEmailMessage) throws MailSendException {
-        String bodyHtml = htmlTemplateRenderer.rend(htmlEmailMessage.getHtmlFileName(),
+        String bodyHtml = htmlTemplateRenderer.render(htmlEmailMessage.getHtmlFileName(),
                 htmlEmailMessage.getData());
         mailSender.sendHtml(htmlEmailMessage.getSubject(), htmlEmailMessage.getEmails(), bodyHtml);
     }
