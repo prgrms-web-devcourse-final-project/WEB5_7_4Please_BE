@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.domain.auth.entity;
 
-import com.deal4u.fourplease.domain.BaseDateEntity;
+
+import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
