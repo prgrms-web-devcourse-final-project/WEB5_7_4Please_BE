@@ -1,7 +1,6 @@
 package com.deal4u.fourplease.domain.settlement.repository;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
-import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
 import java.time.LocalDateTime;
