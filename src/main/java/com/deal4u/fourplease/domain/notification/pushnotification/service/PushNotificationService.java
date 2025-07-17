@@ -1,8 +1,11 @@
 package com.deal4u.fourplease.domain.notification.pushnotification.service;
 
-import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotifications;
+import com.deal4u.fourplease.domain.notification.pushnotification.entity.Receiver;
+import com.deal4u.fourplease.domain.notification.pushnotification.entity.PushNotification;
 import com.deal4u.fourplease.domain.notification.pushnotification.mapper.PushNotificationMapper;
 import com.deal4u.fourplease.domain.notification.pushnotification.message.PushNotificationMessage;
+import com.deal4u.fourplease.domain.notification.pushnotification.repository.PushNotificationRepository;
+import com.deal4u.fourplease.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,12 +13,20 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PushNotificationService {
 
-    private final PushNotificationMapper pushNotificationMapper;
     private final PushNotificationSaver saver;
+    private final PushNotificationRepository pushNotificationRepository;
 
     public void send(PushNotificationMessage pushMessage) {
-        PushNotifications pushNotifications = pushNotificationMapper.toPushNotifications(
-                pushMessage);
-        saver.save(pushNotifications.toCreateCommand());
+        saver.save(PushNotificationMapper.toCreateCommands(pushMessage));
+    }
+
+    public void click(Receiver receiver, Long notificationId) {
+        PushNotification pushNotification = pushNotificationRepository.findById(notificationId)
+                .orElseThrow(ErrorCode.ENTITY_NOT_FOUND::toException);
+        if (!pushNotification.isSameReceiver(receiver)) {
+            throw ErrorCode.UNAUTHORIZED_RECEIVER.toException();
+        }
+
+        pushNotification.click();
     }
 }

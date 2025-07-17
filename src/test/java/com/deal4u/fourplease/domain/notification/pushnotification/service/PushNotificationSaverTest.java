@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationCreateCommand;
+import com.deal4u.fourplease.domain.notification.pushnotification.entity.Receiver;
 import com.deal4u.fourplease.domain.notification.pushnotification.entity.PushNotification;
 import com.deal4u.fourplease.domain.notification.pushnotification.repository.PushNotificationRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,10 +43,10 @@ class PushNotificationSaverTest {
         List<PushNotification> savedPushNotifications = getPushNotifications();
         assertThat(savedPushNotifications).hasSize(notifications.size());
         assertThat(savedPushNotifications)
-                .extracting(PushNotification::getMemberId, PushNotification::getMessage)
+                .extracting(PushNotification::getReceiver,PushNotification::getMessage)
                 .containsExactlyInAnyOrder(
-                        tuple(1L, Map.of("message", "test")),
-                        tuple(2L, Map.of("message", "test"))
+                        tuple(Receiver.of(1L), Map.of("message", "test")),
+                        tuple(Receiver.of(2L), Map.of("message", "test"))
                 );
     }
 

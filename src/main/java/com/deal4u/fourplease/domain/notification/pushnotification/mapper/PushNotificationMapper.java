@@ -1,14 +1,22 @@
 package com.deal4u.fourplease.domain.notification.pushnotification.mapper;
 
-import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotifications;
+import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationCreateCommand;
+import com.deal4u.fourplease.domain.notification.pushnotification.message.PushMessageBody;
 import com.deal4u.fourplease.domain.notification.pushnotification.message.PushNotificationMessage;
-import org.springframework.stereotype.Component;
+import java.util.List;
+import lombok.experimental.UtilityClass;
 
-@Component
+@UtilityClass
 public class PushNotificationMapper {
 
-    public PushNotifications toPushNotifications(PushNotificationMessage pushNotificationMessage) {
-        return new PushNotifications(pushNotificationMessage.getMemberIds(),
-                pushNotificationMessage.getPushMessageBody().body());
+    public static List<PushNotificationCreateCommand> toCreateCommands(
+            PushNotificationMessage pushNotificationMessage) {
+        PushMessageBody pushMessageBody = pushNotificationMessage.getPushMessageBody();
+
+        return pushNotificationMessage.getMemberIds().stream().map(
+                id -> new PushNotificationCreateCommand(
+                        id, pushMessageBody.body()
+                )).toList();
+
     }
 }

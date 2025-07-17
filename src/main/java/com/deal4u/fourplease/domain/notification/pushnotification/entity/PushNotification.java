@@ -2,7 +2,10 @@ package com.deal4u.fourplease.domain.notification.pushnotification.entity;
 
 import com.deal4u.fourplease.domain.BaseDateEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,6 +13,7 @@ import jakarta.persistence.Id;
 import java.util.Map;
 import java.util.Objects;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
@@ -24,16 +28,37 @@ public class PushNotification extends BaseDateEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long memberId;
+    @AttributeOverrides(
+            value = {
+                    @AttributeOverride(name = "memberId", column = @Column(nullable = false))
+            }
+    )
+    @Embedded
+    private Receiver receiver;
 
     @Column(nullable = false, columnDefinition = "json")
     @Type(JsonType.class)
     private Map<String, Object> message;
 
-    public PushNotification(Long memberId, Map<String, Object> message) {
-        this.memberId = memberId;
+    private Boolean clicked;
+
+    @Builder
+    private PushNotification(Long memberId, Map<String, Object> message) {
+        this.receiver = Receiver.of(memberId);
         this.message = message;
+        this.clicked = false;
+    }
+
+    public boolean isSameReceiver(Receiver receiver) {
+        return this.receiver.equals(receiver);
+    }
+
+    public void click() {
+        clicked = true;
+    }
+
+    public boolean isClicked() {
+        return clicked;
     }
 
     @Override
