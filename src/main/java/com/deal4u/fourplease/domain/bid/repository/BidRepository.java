@@ -95,69 +95,88 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     // h2 방식!! 중요!!,
     @Query(
             value = """
-                        SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyPageBidHistory(
-                                                   a.auctionId,
-                                                   b.bidId,
-                                                   COALESCE(p.thumbnailUrl, ''),
-                                                   COALESCE(p.name, ''),
-                                                  CASE
-                                                      WHEN s.status IS NOT NULL THEN
-                                                          CASE
-                                                              WHEN s.status = 'SUCCESS' THEN
-                                                                  CASE
-                                                                      WHEN sh.status IS NOT NULL THEN
-                                                                          CASE
-                                                                              WHEN sh.status = 'DELIVERED' THEN '구매확정'
-                                                                              WHEN sh.status = 'INTRANSIT' THEN '배송중'
-                                                                              ELSE '결제 완료'
-                                                                          END
-                                                                      ELSE '결제 완료'
-                                                                  END
-                                                              WHEN s.status = 'PENDING' THEN '낙찰'
-                                                              WHEN s.status = 'REJECTED' THEN '결제 실패'
-                                                              ELSE '낙찰'
-                                                          END
-                                                      WHEN a.status = 'FAIL' AND s.status IS NULL THEN '패찰'
-                                                      WHEN a.status = 'CLOSED' THEN
-                                                          CASE
-                                                              WHEN b.isSuccessfulBidder = true THEN '낙찰'
-                                                              ELSE '경매 종료'
-                                                          END
-                                                      ELSE '진행중'
-                                                   END AS status,
+                            SELECT new com.deal4u.fourplease.domain.
+                                                member.mypage.dto.MyPageBidHistory(
+                                a.auctionId,
+                                b.bidId,
+                                COALESCE(p.thumbnailUrl, ''),
+                                COALESCE(p.name, ''),
+                                CASE
+                                    WHEN s.status IS NOT NULL THEN
+                                        CASE
+                                            WHEN s.status = 'SUCCESS' THEN
+                                                CASE
+                                                    WHEN sh.status IS NOT NULL THEN
+                                                        CASE
+                                                            WHEN sh.status = 'DELIVERED' THEN '구매확정'
+                                                            WHEN sh.status = 'INTRANSIT' THEN '배송중'
+                                                            ELSE '결제 완료'
+                                                        END
+                                                    ELSE '결제 완료'
+                                                END
+                                            WHEN s.status = 'PENDING' THEN '낙찰'
+                                            WHEN s.status = 'REJECTED' THEN '결제 실패'
+                                            ELSE '낙찰'
+                                        END
+                                    WHEN a.status = 'FAIL' AND s.status IS NULL THEN '패찰'
+                                    WHEN a.status = 'CLOSED' THEN
+                                        CASE
+                                            WHEN b.isSuccessfulBidder = true THEN '낙찰'
+                                            ELSE '경매 종료'
+                                        END
+                                    ELSE '진행중'
+                                END AS status,
                     
-                                                   COALESCE(a.startingPrice, 0.0),
-                                                   COALESCE((SELECT MAX(b2.price) FROM Bid b2 WHERE b2.auction = a AND b2.deleted = false), 0.0),
-                                                   COALESCE(a.instantBidPrice, 0.0),
-                                                   COALESCE(b.price, 0.0),
+                                COALESCE(a.startingPrice, 0.0),
+                                COALESCE(
+                                    (SELECT MAX(b2.price)
+                                     FROM Bid b2
+                                     WHERE b2.auction = a AND b2.deleted = false), 0.0),
+                                COALESCE(a.instantBidPrice, 0.0),
+                                COALESCE(b.price, 0.0),
                     
-                                                   COALESCE((SELECT b3.bidder.member.nickName FROM Bid b3
-                                                       WHERE b3.auction = a AND b3.isSuccessfulBidder = true AND b3.deleted = false), ''),
-                                                   COALESCE((SELECT b3.price FROM Bid b3
-                                                       WHERE b3.auction = a AND b3.isSuccessfulBidder = true AND b3.deleted = false), 0.0),
+                                COALESCE(
+                                    (SELECT b3.bidder.member.nickName
+                                     FROM Bid b3
+                                     WHERE b3.auction = a
+                                     AND b3.isSuccessfulBidder = true
+                                     AND b3.deleted = false), ''),
+                                COALESCE(
+                                    (SELECT b3.price
+                                     FROM Bid b3
+                                     WHERE b3.auction = a
+                                     AND b3.isSuccessfulBidder = true
+                                     AND b3.deleted = false), 0.0),
                     
-                                                   b.bidTime,
-                                                   b.createdAt,
+                                b.bidTime,
+                                b.createdAt,
                     
-                                                   COALESCE(CAST(FORMATDATETIME((SELECT s2.paymentDeadline FROM Settlement s2
-                                                       WHERE s2.auction = a AND s2.bidder.member.memberId = :memberId), 'yyyy-MM-dd HH:mm') AS string), ''),
-                    
-                                                   COALESCE(p.seller.member.nickName, '')
-                                               )
-                                               FROM Bid b
-                                               JOIN b.auction a
-                                               JOIN a.product p
-                                               JOIN b.bidder bd
-                                               JOIN bd.member m
-                                               LEFT JOIN Settlement s ON s.auction = a AND s.bidder.member.memberId = :memberId
-                                               LEFT JOIN Shipment sh ON sh.auction = a
-                                               WHERE m.memberId = :memberId AND b.deleted = false
-                                               ORDER BY b.bidTime DESC
+                                COALESCE(CAST(
+                                    FORMATDATETIME(
+                                        (SELECT s2.paymentDeadline
+                                         FROM Settlement s2
+                                         WHERE s2.auction = a
+                                         AND s2.bidder.member.memberId = :memberId),
+                                                             'yyyy-MM-dd HH:mm')
+                                    AS string), ''),
+                                COALESCE(p.seller.member.nickName, '')
+                            )
+                            FROM Bid b
+                            JOIN b.auction a
+                            JOIN a.product p
+                            JOIN b.bidder bd
+                            JOIN bd.member m
+                            LEFT JOIN Settlement s
+                                ON s.auction = a AND s.bidder.member.memberId = :memberId
+                            LEFT JOIN Shipment sh
+                                ON sh.auction = a
+                            WHERE m.memberId = :memberId AND b.deleted = false
+                            ORDER BY b.bidTime DESC
                     """,
             countQuery = """
-                        SELECT COUNT(b)
-                        FROM Bid b
-                        WHERE b.bidder.member.memberId = :memberId AND b.deleted = false
+                            SELECT COUNT(b)
+                            FROM Bid b
+                            WHERE b.bidder.member.memberId = :memberId AND b.deleted = false
                     """
     )
     Page<MyPageBidHistory> findMyBidHistoryH2(
@@ -168,58 +187,77 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     // mysql 용
     @Query(
             value = """
-                        SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyPageBidHistory(
-                            a.auctionId,
-                            b.bidId,
-                            COALESCE(p.thumbnailUrl, ''),
-                            COALESCE(p.name, ''),
+                            SELECT new com.deal4u.fourplease.domain.
+                                                member.mypage.dto.MyPageBidHistory(
+                                a.auctionId,
+                                b.bidId,
+                                COALESCE(p.thumbnailUrl, ''),
+                                COALESCE(p.name, ''),
                     
-                            CASE
-                                WHEN s.status IS NOT NULL THEN
-                                    CASE
-                                        WHEN s.status = 'SUCCESS' THEN '결제 완료'
-                                        WHEN s.status = 'PENDING' THEN '결제 대기'
-                                        WHEN s.status = 'REJECTED' THEN '결제 실패'
-                                        ELSE '낙찰'
-                                    END
-                                ELSE
-                                    CASE
-                                        WHEN a.status = 'FAIL' THEN '패찰'
-                                        ELSE '몰라'
-                                    END
-                            END,
+                                CASE
+                                    WHEN s.status IS NOT NULL THEN
+                                        CASE
+                                            WHEN s.status = 'SUCCESS' THEN '결제 완료'
+                                            WHEN s.status = 'PENDING' THEN '결제 대기'
+                                            WHEN s.status = 'REJECTED' THEN '결제 실패'
+                                            ELSE '낙찰'
+                                        END
+                                    ELSE
+                                        CASE
+                                            WHEN a.status = 'FAIL' THEN '패찰'
+                                            ELSE '몰라'
+                                        END
+                                END,
                     
-                            COALESCE(a.startingPrice, 0.0),
-                            COALESCE((SELECT MAX(b2.price) FROM Bid b2 WHERE b2.auction = a AND b2.deleted = false), 0.0),
-                            COALESCE(a.instantBidPrice, 0.0),
-                            COALESCE(b.price, 0.0),
+                                COALESCE(a.startingPrice, 0.0),
+                                COALESCE(
+                                    (SELECT MAX(b2.price)
+                                     FROM Bid b2
+                                     WHERE b2.auction = a AND b2.deleted = false), 0.0),
+                                COALESCE(a.instantBidPrice, 0.0),
+                                COALESCE(b.price, 0.0),
                     
-                            COALESCE((SELECT b3.bidder.member.nickName FROM Bid b3
-                                WHERE b3.auction = a AND b3.isSuccessfulBidder = true AND b3.deleted = false), ''),
-                            COALESCE((SELECT b3.price FROM Bid b3
-                                WHERE b3.auction = a AND b3.isSuccessfulBidder = true AND b3.deleted = false), 0.0),
+                                COALESCE(
+                                    (SELECT b3.bidder.member.nickName
+                                     FROM Bid b3
+                                     WHERE b3.auction = a
+                                     AND b3.isSuccessfulBidder = true
+                                     AND b3.deleted = false), ''),
+                                COALESCE(
+                                    (SELECT b3.price
+                                     FROM Bid b3
+                                     WHERE b3.auction = a
+                                     AND b3.isSuccessfulBidder = true
+                                     AND b3.deleted = false), 0.0),
                     
-                            b.bidTime,
-                            b.createdAt,
+                                b.bidTime,
+                                b.createdAt,
                     
-                            COALESCE(CAST(DATE_FORMAT((SELECT s2.paymentDeadline FROM Settlement s2
-                                WHERE s2.auction = a AND s2.bidder.member.memberId = :memberId), '%Y-%m-%d %H:%i') AS string), ''),
+                                COALESCE(CAST(
+                                    DATE_FORMAT(
+                                        (SELECT s2.paymentDeadline
+                                         FROM Settlement s2
+                                         WHERE s2.auction = a
+                                         AND s2.bidder.member.memberId = :memberId),
+                                                             '%Y-%m-%d %H:%i')
+                                    AS string), ''),
                     
-                            COALESCE(p.seller.member.nickName, '')
-                        )
-                        FROM Bid b
-                        JOIN b.auction a
-                        JOIN a.product p
-                        JOIN b.bidder bd
-                        JOIN bd.member m
-                        LEFT JOIN Settlement s ON s.auction = a AND s.bidder.member.memberId = :memberId
-                        WHERE m.memberId = :memberId AND b.deleted = false
-                        ORDER BY b.bidTime DESC
+                                COALESCE(p.seller.member.nickName, '')
+                            )
+                            FROM Bid b
+                            JOIN b.auction a
+                            JOIN a.product p
+                            JOIN b.bidder bd
+                            JOIN bd.member m
+                            LEFT JOIN Settlement s
+                                ON s.auction = a AND s.bidder.member.memberId = :memberId
+                            WHERE m.memberId = :memberId AND b.deleted = false
+                            ORDER BY b.bidTime DESC
                     """,
             countQuery = """
-                        SELECT COUNT(b)
-                        FROM Bid b
-                        WHERE b.bidder.member.memberId = :memberId AND b.deleted = false
+                            SELECT COUNT(b)
+                            FROM Bid b
+                            WHERE b.bidder.member.memberId = :memberId AND b.deleted = false
                     """
     )
     Page<MyPageBidHistory> findMyBidHistory(
