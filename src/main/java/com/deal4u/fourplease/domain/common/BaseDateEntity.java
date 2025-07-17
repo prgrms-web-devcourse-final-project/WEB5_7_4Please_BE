@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.domain;
+package com.deal4u.fourplease.domain.common;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
