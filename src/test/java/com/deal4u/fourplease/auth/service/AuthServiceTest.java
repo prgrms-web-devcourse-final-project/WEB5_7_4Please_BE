@@ -4,15 +4,18 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
 import com.deal4u.fourplease.domain.auth.entity.RefreshToken;
+import com.deal4u.fourplease.domain.auth.repository.BlacklistedTokenRepository;
 import com.deal4u.fourplease.domain.auth.repository.RefreshTokenRepository;
 import com.deal4u.fourplease.domain.auth.service.AuthService;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.time.LocalDateTime;
@@ -25,24 +28,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceTest {
+class AuthServiceTest {
+    private final String validToken = "mocked.jwt.token";
+    private final String email = "test@example.com";
     @InjectMocks
     private AuthService authService;
-
     @Mock
     private Member member;
-
     @Mock
     private JwtProvider jwtProvider;
-
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
-
     @Mock
     private RefreshToken refreshToken;
-
+    @Mock
+    private BlacklistedTokenRepository blacklistedTokenRepository;
     private TokenPair tokenPair;
 
     @BeforeEach
@@ -149,5 +152,43 @@ public class AuthServiceTest {
                 .isEqualTo(HttpStatus.UNAUTHORIZED);
 
         verify(refreshTokenRepository).delete(refreshToken);
+    }
+
+    @Test
+    @DisplayName("로그 아웃 성공 시 블랙리스트 등록 및 리프레시 토큰 삭제 처리")
+    void logout_success() {
+        String authHeader = "Bearer " + validToken;
+        Member newMember = Member.builder()
+                .email(email)
+                .status(Status.ACTIVE)
+                .build();
+
+        when(jwtProvider.getExpirationFromToken(validToken)).thenReturn(
+                LocalDateTime.now().plusMinutes(15));
+        when(blacklistedTokenRepository.existsByToken(validToken)).thenReturn(false);
+        doNothing().when(jwtProvider).validateOrThrow(validToken);
+
+        ResponseEntity<Void> response = authService.logout(authHeader, newMember);
+
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        verify(blacklistedTokenRepository).save(org.mockito.ArgumentMatchers.any());
+        verify(refreshTokenRepository).deleteByMember(newMember);
+    }
+
+    @Test
+    @DisplayName("이미 블랙리스트에 등록된 토큰으로 로그아웃 시 예외 발생")
+    void logout_shouldFailIfTokenAlreadyBlacklisted() {
+        String authHeader = "Bearer " + validToken;
+        Member newMember = Member.builder()
+                .email(email)
+                .status(Status.ACTIVE)
+                .build();
+
+        when(blacklistedTokenRepository.existsByToken(validToken)).thenReturn(true);
+        doNothing().when(jwtProvider).validateOrThrow(validToken);
+
+        assertThatThrownBy(() -> authService.logout(authHeader, newMember))
+                .isInstanceOf(GlobalException.class)
+                .hasMessage(ErrorCode.TOKEN_ALREADY_BLACKLISTED.getMessage());
     }
 }
