@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.domain.bid.entity;
+package com.deal4u.fourplease.domain.common;
 
 import java.util.List;
 import lombok.AccessLevel;
@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 public class PageResponse<T> {
 
     private List<T> content;
-    private int bidCount;
     private int page;
     private int size;
     private int totalPages;
