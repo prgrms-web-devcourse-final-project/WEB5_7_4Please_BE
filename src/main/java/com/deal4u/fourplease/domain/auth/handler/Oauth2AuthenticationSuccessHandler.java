@@ -40,8 +40,8 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         Member member = oauth2User.getMember();
 
         memberService.validateMember(member);
-        log.info("멤버의 이메일: " + member.getEmail());
-        log.info("멤버의 상태: " + member.getStatus());
+        log.info("멤버 이메일: " + member.getEmail());
+        log.info("멤버 상태: " + member.getStatus());
 
 
         // 응답 설정
