@@ -11,12 +11,13 @@ import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
+import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
 import com.deal4u.fourplease.domain.settlement.mapper.SettlementMapper;
 import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
+import com.deal4u.fourplease.global.scheduler.FailedSettlementScheduleService;
 import com.deal4u.fourplease.global.scheduler.SettlementScheduleService;
-import com.deal4u.fourplease.global.sheduler.FailedSettlementScheduleService;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,8 @@ public class SettlementService {
         Settlement save = settlementRepository.save(settlement);
 
         // 2. 정산 스케쥴러 생성
-
+        settlementScheduleService.scheduleSettlementClose(save.getSettlementId(),
+                save.getPaymentDeadline());
     }
 
     private Auction closeAuction(Long auctionId) {
@@ -141,5 +143,24 @@ public class SettlementService {
         if (settlementExists) {
             throw SETTLEMENT_ALREADY_EXISTS.toException();
         }
+    }
+
+    /**
+     * 결제 기간 만료로 인한 정산 실패 처리를 수행합니다.
+     *
+     * @param settlementId 정산 ID.
+     */
+    @Transactional
+    public void expireSettlement(Long settlementId) {
+        // 1. 정산 정보 조회
+        Settlement settlement = getSettlementOrThrow(settlementId);
+
+        // 2. 정산 상태를 `REJECTED`로 변경
+        settlement.updateStatus(SettlementStatus.REJECTED, null, "결제 기간이 만료되어서 정산이 취소되었습니다.");
+
+        // 3. 해당 입찰의 낙찰을 무효 처리
+        Bid bid = bidRepository.findByAuctionAndBidder(settlement.getAuction(),
+                settlement.getBidder()).orElseThrow(BID_NOT_FOUND::toException);
+        bid.update(true);
     }
 }

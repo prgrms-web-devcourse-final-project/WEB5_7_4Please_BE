@@ -54,6 +54,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     Optional<Bid> findByBidIdAndBidder(Long bidId, Bidder bidder);
 
+    Optional<Bid> findByAuctionAndBidder(Auction auction, Bidder bidder);
+
     @SuppressWarnings("checkstyle:MethodName")
     Page<Bid> findByAuctionAndDeletedFalseOrderByPriceDescBidTimeAsc(Auction auction,
             Pageable pageable);

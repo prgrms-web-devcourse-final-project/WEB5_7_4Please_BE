@@ -1,9 +1,6 @@
 package com.deal4u.fourplease.global.scheduler;
 
-import com.deal4u.fourplease.domain.auction.entity.Auction;
-import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.settlement.service.SettlementService;
-import com.deal4u.fourplease.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;

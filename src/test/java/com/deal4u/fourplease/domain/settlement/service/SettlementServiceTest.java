@@ -18,7 +18,7 @@ import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
 import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
-import com.deal4u.fourplease.global.sheduler.FailedSettlementScheduleService;
+import com.deal4u.fourplease.global.scheduler.FailedSettlementScheduleService;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.global.sheduler;
+package com.deal4u.fourplease.global.scheduler;
 
 import com.deal4u.fourplease.domain.settlement.service.SettlementService;
 import lombok.RequiredArgsConstructor;
