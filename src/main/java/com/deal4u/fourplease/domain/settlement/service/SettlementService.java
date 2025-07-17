@@ -55,6 +55,12 @@ public class SettlementService {
         scheduleService.cancelFailedSettlement(settlement.getSettlementId());
     }
 
+    private Settlement getSettlementOrThrow(Auction auction) {
+        return settlementRepository.findPendingSettlementByAuction(auction,
+                        SettlementStatus.PENDING)
+                .orElseThrow(SETTLEMENT_NOT_FOUND::toException);
+    }
+
     private Settlement getSettlementOrThrow(Long settlementId) {
         return settlementRepository.findById(settlementId)
                 .orElseThrow(SETTLEMENT_NOT_FOUND::toException);
@@ -70,11 +76,6 @@ public class SettlementService {
                 .build();
 
         return settlementRepository.save(settlement);
-    }
-
-    private Settlement getSettlementOrThrow(Auction auction) {
-        return settlementRepository.findPendingSettlementByAuction(auction)
-                .orElseThrow(SETTLEMENT_NOT_FOUND::toException);
     }
 
     private Bid getSecondHighestBidOrThrow(Long auctionId) {

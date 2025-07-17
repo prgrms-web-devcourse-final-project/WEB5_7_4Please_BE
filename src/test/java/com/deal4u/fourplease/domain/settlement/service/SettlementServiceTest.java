@@ -53,14 +53,16 @@ class SettlementServiceTest {
         Settlement settlement = createSettlement(auction);
         final LocalDateTime paidAt = LocalDateTime.now();
 
-        given(settlementRepository.findPendingSettlementByAuction(auction))
+        given(settlementRepository.findPendingSettlementByAuction(auction,
+                SettlementStatus.PENDING))
                 .willReturn(Optional.of(settlement));
 
         // when
         settlementService.changeSettlementSuccess(auction);
 
         // then
-        then(settlementRepository).should().findPendingSettlementByAuction(auction);
+        then(settlementRepository).should()
+                .findPendingSettlementByAuction(auction, SettlementStatus.PENDING);
         then(scheduleService).should().cancelFailedSettlement(settlement.getSettlementId());
         assertThat(settlement.getStatus()).isEqualTo(SettlementStatus.SUCCESS);
         assertThat(settlement.getPaidAt()).isNotNull();
@@ -73,7 +75,8 @@ class SettlementServiceTest {
         // given
         Auction auction = createAuction();
 
-        given(settlementRepository.findPendingSettlementByAuction(auction))
+        given(settlementRepository.findPendingSettlementByAuction(auction,
+                SettlementStatus.PENDING))
                 .willReturn(Optional.empty());
 
         // when & then

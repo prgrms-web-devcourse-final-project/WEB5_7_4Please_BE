@@ -39,9 +39,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "WHERE b.auction.auctionId = :auctionId "
             + "AND b.deleted = false "
             + "AND b.isSuccessfulBidder = true "
-            +
-            "AND b.price < (SELECT MAX(b2.price) FROM Bid b2 " +
-            "WHERE b2.auction.auctionId = :auctionId AND b2.deleted = false) "
+            + "AND b.price < (SELECT MAX(b2.price) FROM Bid b2 "
+            + "WHERE b2.auction.auctionId = :auctionId AND b2.deleted = false) "
             + "ORDER BY b.price DESC")
     Optional<Bid> findSecondHighestBidByAuctionId(@Param("auctionId") Long auctionId);
 

@@ -4,8 +4,6 @@ import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -13,31 +11,28 @@ import org.springframework.data.repository.query.Param;
 
 public interface SettlementRepository extends CrudRepository<Settlement, Long> {
 
-    @Query("select s.status "
-            + "from Settlement s "
-            + "where s.auction.auctionId = :auctionId")
+    @Query("SELECT s.status "
+            + "FROM Settlement s "
+            + "WHERE s.auction.auctionId = :auctionId")
     SettlementStatus getSettlementStatusByAuctionId(Long auctionId);
-
-
-    @Query("SELECT s FROM Settlement s "
-            + "JOIN FETCH s.auction a "
-            + "WHERE a = :auction AND a.status = 'CLOSED'")
-    Optional<Settlement> findByAuctionWithJoin(Auction auction);
-
-    @Query("SELECT s FROM Settlement s "
-            + "JOIN FETCH s.auction "
-            + "WHERE s.status = :status "
-            + "AND s.paymentDeadline < :currentTime")
-    List<Settlement> findExpiredSettlements(@Param("status") SettlementStatus status,
-                                            @Param("currentTime") LocalDateTime currentTime);
 
     boolean existsByAuctionAndBidder(Auction auction, Bidder bidder);
 
-    @Query("SELECT s FROM Settlement s WHERE s.auction = :auction " +
-            "AND s.status = com.deal4u.fourplease.domain.settlement.entity.SettlementStatus.PENDING")
-    Optional<Settlement> findPendingSettlementByAuction(@Param("auction") Auction auction);
+    @Query("SELECT s "
+            + "FROM Settlement s "
+            + "WHERE s.auction = :auction "
+            + "AND s.status = :status")
+    Optional<Settlement> findPendingSettlementByAuction(
+            @Param("auction") Auction auction,
+            @Param("status") SettlementStatus status
+    );
 
-    List<Settlement> findByStatus(SettlementStatus status);
-
-
+    @Query("SELECT s "
+            + "FROM Settlement s "
+            + "WHERE s.settlementId = :settlementId "
+            + "AND s.status = :status")
+    Optional<Settlement> findPendingSettlementById(
+            @Param("settlementId") Long settlementId,
+            @Param("status") SettlementStatus status
+    );
 }
