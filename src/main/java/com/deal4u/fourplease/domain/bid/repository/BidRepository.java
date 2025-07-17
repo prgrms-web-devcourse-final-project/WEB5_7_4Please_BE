@@ -202,7 +202,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                             b.bidTime,
                             b.createdAt,
                     
-                            COALESCE(CAST(FUNCTION('DATE_FORMAT', (SELECT s2.paymentDeadline FROM Settlement s2
+                            COALESCE(CAST(DATE_FORMAT((SELECT s2.paymentDeadline FROM Settlement s2
                                 WHERE s2.auction = a AND s2.bidder.member.memberId = :memberId), '%Y-%m-%d %H:%i') AS string), ''),
                     
                             COALESCE(p.seller.member.nickName, '')
