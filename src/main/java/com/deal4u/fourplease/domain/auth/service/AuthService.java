@@ -10,6 +10,7 @@ import com.deal4u.fourplease.domain.auth.repository.RefreshTokenRepository;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
+import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class AuthService {
     private final BlacklistedTokenRepository blacklistedTokenRepository;
     private final GoogleOauthProperties googleOauthProperties;
     private final RestTemplate restTemplate;
+    private final MemberRepository memberRepository;
 
     // 로그인 시 토큰 생성 및 저장
     public TokenPair createTokenPair(Member member) {
@@ -129,13 +131,17 @@ public class AuthService {
         // 서버 토큰 블랙리스트 처리
         // logout(authHeader, member);
 
-        // 소셜 accessToken
+        // 소셜 accessToken 발급
         String accessToken = refreshGoogleAccessToken(member.getRefreshToken());
 
         // 소셜 연동 해제
         unlinkSocialAccount(member, accessToken);
 
+        // 2. 내부 DB의 refresh token 폐기
+        member.setRefreshToken(null);
         member.setStatus(Status.DELETED);
+        memberRepository.save(member);
+
         refreshTokenRepository.deleteByMember(member);
 
         log.info("회원 탈퇴 완료: {}", member.getEmail());
@@ -173,6 +179,7 @@ public class AuthService {
 
         } catch (RestClientException e) {
             // errorcode 던져주면 이걸로 refresh 토큰 재발급 api 호출
+            // 반드시 재발급이 가능한 에러 코드로 이어져야함
             throw ErrorCode.SOCIAL_UNLINK_FAILED.toException();
         }
 
@@ -195,6 +202,26 @@ public class AuthService {
     }
 
     private void unlinkGoogle(Member member, String accessToken) {
-        // accessToken을 통해 구글 연동 해제
+        try {
+            String url = "https://oauth2.googleapis.com/revoke";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("token", accessToken);
+
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("구글 연동 해제 성공: {}", member.getEmail());
+            } else {
+                log.warn("구글 연동 해제 실패: {}, 응답: {}", member.getEmail(), response);
+            }
+
+        } catch (Exception e) {
+            log.warn("구글 연동 해제 요청 실패: {}", member.getEmail(), e);
+        }
     }
 }
