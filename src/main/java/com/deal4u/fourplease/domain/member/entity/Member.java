@@ -45,6 +45,10 @@ public class Member extends BaseDateEntity {
     @Column(nullable = false)
     private String provider;
 
+    @Setter
+    @Column(nullable = false)
+    private String refreshToken; // 소셜 리프레시 토큰
+
     @Builder
     public Member(String email, String nickName, Role role, Status status,
                   String provider) {
