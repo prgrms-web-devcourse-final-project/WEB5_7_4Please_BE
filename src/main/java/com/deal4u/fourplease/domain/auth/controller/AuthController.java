@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,5 +43,13 @@ public class AuthController {
             @AuthenticationPrincipal Member member
     ) {
         return authService.logout(authHeader, member);
+    }
+
+    @DeleteMapping("/members")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> disconnectPlatforms(
+            @RequestHeader("Authorization") String authHeader,
+            @AuthenticationPrincipal Member member) {
+        return authService.deactivateMember(authHeader, member);
     }
 }
