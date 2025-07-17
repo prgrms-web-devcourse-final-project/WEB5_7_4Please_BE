@@ -31,6 +31,7 @@ public enum ErrorCode {
     NICKNAME_LENGTH_INVALID(HttpStatus.BAD_REQUEST, "닉네임은 2~20자 사이여야 합니다."),
     INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "닉네임은 공백일 수 없습니다."),
     INVALID_NICKNAME_FORMAT(HttpStatus.BAD_REQUEST, "닉네임 형식이 잘못되었습니다."),
+    SOCIAL_UNLINK_FAILED(HttpStatus.BAD_REQUEST, "소셜 연동 해제에 실패했습니다."),
 
     // 401 - Unauthorized,
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰이 유효하지 않습니다."),
