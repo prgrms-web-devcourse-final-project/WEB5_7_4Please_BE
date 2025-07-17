@@ -72,7 +72,7 @@ class FailedSettlementScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 등록 중 예외가 발생하면 GlobalException을 던진다")
-    void scheduleFailedSettlement_SchedulerException() throws SchedulerException {
+    void scheduleFailedSettlementSchedulerException() throws SchedulerException {
         // given
         Long settlementId = 1L;
         LocalDateTime executionTime = LocalDateTime.now().plusHours(48);
@@ -111,7 +111,7 @@ class FailedSettlementScheduleServiceTest {
 
     @Test
     @DisplayName("스케줄 취소 중 예외가 발생하면 GlobalException을 던진다")
-    void cancelFailedSettlement_SchedulerException() throws SchedulerException {
+    void cancelFailedSettlementSchedulerException() throws SchedulerException {
         // given
         Long settlementId = 1L;
 

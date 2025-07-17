@@ -51,7 +51,7 @@ class SettlementServiceTest {
         // given
         Auction auction = createAuction();
         Settlement settlement = createSettlement(auction);
-        LocalDateTime paidAt = LocalDateTime.now();
+        final LocalDateTime paidAt = LocalDateTime.now();
 
         given(settlementRepository.findPendingSettlementByAuction(auction))
                 .willReturn(Optional.of(settlement));
@@ -69,7 +69,7 @@ class SettlementServiceTest {
 
     @Test
     @DisplayName("정산을 찾을 수 없으면 예외를 발생시킨다")
-    void changeSettlementSuccess_SettlementNotFound() {
+    void changeSettlementSuccessSettlementNotFound() {
         // given
         Auction auction = createAuction();
 
@@ -126,7 +126,7 @@ class SettlementServiceTest {
 
     @Test
     @DisplayName("차상위 입찰자를 찾을 수 없으면 예외를 발생시킨다")
-    void offerSecondBidder_SecondHighestBidderNotFound() {
+    void offerSecondBidderSecondHighestBidderNotFound() {
         // given
         Long auctionId = 1L;
 
@@ -143,7 +143,7 @@ class SettlementServiceTest {
 
     @Test
     @DisplayName("이미 정산이 존재하면 예외를 발생시킨다")
-    void offerSecondBidder_SettlementAlreadyExists() {
+    void offerSecondBidderSettlementAlreadyExists() {
         // given
         Long auctionId = 1L;
         Auction auction = createAuction();
@@ -190,7 +190,7 @@ class SettlementServiceTest {
 
     @Test
     @DisplayName("실패한 정산 처리 시 정산을 찾을 수 없으면 예외를 발생시킨다")
-    void handleFailedSettlement_SettlementNotFound() {
+    void handleFailedSettlementSettlementNotFound() {
         // given
         Long settlementId = 1L;
 
