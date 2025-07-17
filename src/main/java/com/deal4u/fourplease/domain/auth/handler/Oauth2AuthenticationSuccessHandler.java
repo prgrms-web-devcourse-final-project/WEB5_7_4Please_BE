@@ -7,7 +7,6 @@ import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.service.MemberService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,11 +24,8 @@ import org.springframework.stereotype.Component;
 public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private static final String SIGNUP_REDIRECT_URL = "/signup";
     private static final String MAIN_REDIRECT_URL = "/";
-    private static final String CONTENT_TYPE = "application/json";
-    private static final String CHARSET = "UTF-8";
     private final JwtProvider jwtProvider;
     private final AuthService authService;
-    private final ObjectMapper objectMapper;
     private final MemberService memberService;
 
     @Override
@@ -43,37 +39,26 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         log.info("멤버 이메일: " + member.getEmail());
         log.info("멤버 상태: " + member.getStatus());
 
-
-        // 응답 설정
-        setupResponse(response);
-
-        Map<String, Object> responseBody = new HashMap<>();
+        response.setStatus(HttpServletResponse.SC_OK);
 
         if (member.getStatus() == Status.PENDING) {
             // 아직 닉네임 설정 안했으므로, 프론트 닉네임 설정 페이지로 redirect
             String tempToken = jwtProvider.generateTokenPair(member).accessToken(); // 임시 토큰 발급
             log.info("token: " + tempToken);
-            responseBody.put("message", "닉네임 설정이 필요합니다.");
-            responseBody.put("tempToken", tempToken);
-            responseBody.put("redirectUrl", MAIN_REDIRECT_URL); // 회원가입 페이지 (닉네임 설정 페이지)
+            response.setHeader("X-Temp-Token", tempToken);
+            response.setHeader("X-Redirect-Url", MAIN_REDIRECT_URL);
+            response.setHeader("X-Message", "닉네임 설정이 필요합니다.");
         } else {
             // 새로운 JWT 발급
             TokenPair tokenPair = authService.createTokenPair(member);
-
-            responseBody.put("message", "로그인 성공");
-            responseBody.put("accessToken", tokenPair.accessToken());
-            responseBody.put("refreshToken", tokenPair.refreshToken());
-            responseBody.put("redirectUrl", SIGNUP_REDIRECT_URL); // 메인 페이지로
+            response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
+            response.setHeader("X-Refresh-Token", tokenPair.refreshToken());
+            response.setHeader("X-Redirect-Url", SIGNUP_REDIRECT_URL);
+            response.setHeader("X-Message", "로그인 성공");
         }
 
-        response.getWriter().write(objectMapper.writeValueAsString(responseBody));
+        response.getWriter().write("{\"status\":\"ok\"}");
         response.getWriter().flush();
 
-    }
-
-    private void setupResponse(HttpServletResponse response) {
-        response.setContentType(CONTENT_TYPE);
-        response.setCharacterEncoding(CHARSET);
-        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

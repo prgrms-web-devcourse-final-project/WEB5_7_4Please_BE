@@ -1,7 +1,6 @@
 package com.deal4u.fourplease.auth.handler;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
@@ -28,7 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 
 @ExtendWith(MockitoExtension.class)
-public class Oauth2AuthenticationSuccessHandlerTest {
+class Oauth2AuthenticationSuccessHandlerTest {
     private final String tempToken = "temp.jwt.token";
     private final String accessToken = "access.jwt.token";
     private final String refreshToken = "refresh.jwt.token";
@@ -59,10 +58,6 @@ public class Oauth2AuthenticationSuccessHandlerTest {
         when(authentication.getPrincipal()).thenReturn(customOauth2User);
         when(customOauth2User.getMember()).thenReturn(member);
         when(response.getWriter()).thenReturn(new PrintWriter(outputStream, true));
-        when(objectMapper.writeValueAsString(any())).thenAnswer(invocation -> {
-            Object obj = invocation.getArgument(0);
-            return obj.toString(); // 또는 간단한 JSON 흉내
-        });
     }
 
     @Test
@@ -79,10 +74,11 @@ public class Oauth2AuthenticationSuccessHandlerTest {
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
         // then
-        String responseJson = outputStream.toString();
-        assertThat(responseJson).contains("닉네임 설정이 필요합니다.");
-        assertThat(responseJson).contains(tempToken);
-        assertThat(responseJson).contains("/");
+        // then - 헤더 값 설정 확인
+        verify(response).setHeader("X-Temp-Token", tempToken);
+        verify(response).setHeader("X-Redirect-Url", "/");
+        verify(response).setHeader("X-Message", "닉네임 설정이 필요합니다.");
+        verify(response).setStatus(HttpServletResponse.SC_OK);
     }
 
     @Test
@@ -98,10 +94,10 @@ public class Oauth2AuthenticationSuccessHandlerTest {
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
         // then
-        String responseJson = outputStream.toString();
-        assertThat(responseJson).contains("로그인 성공");
-        assertThat(responseJson).contains(accessToken);
-        assertThat(responseJson).contains(refreshToken);
-        assertThat(responseJson).contains("/signup"); // SIGNUP_REDIRECT_URL
+        verify(response).setHeader("Authorization", "Bearer " + accessToken);
+        verify(response).setHeader("X-Refresh-Token", refreshToken);
+        verify(response).setHeader("X-Redirect-Url", "/signup");
+        verify(response).setHeader("X-Message", "로그인 성공");
+        verify(response).setStatus(HttpServletResponse.SC_OK);
     }
 }
