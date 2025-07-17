@@ -137,11 +137,11 @@ public class AuthService {
         // 소셜 연동 해제
         unlinkSocialAccount(member, accessToken);
 
-        // 2. 내부 DB의 refresh token 폐기
         member.setRefreshToken(null);
         member.setStatus(Status.DELETED);
         memberRepository.save(member);
 
+        // 서버의 refresh token 폐기
         refreshTokenRepository.deleteByMember(member);
 
         log.info("회원 탈퇴 완료: {}", member.getEmail());
@@ -149,9 +149,9 @@ public class AuthService {
     }
 
     // refresh 토큰을 통해 AccessToken 재발급
-    // 이때 재발급에 실패하면 refreshToken도 재발급 해야함
+    // 이때 accessToken 재발급에 실패하면 refreshToken도 재발급 해야함
     // -> 컨트롤러를 통해 프론트에게 access_type=offline + prompt=consent 붙여서 요청
-    private String refreshGoogleAccessToken(String refreshToken) {
+    public String refreshGoogleAccessToken(String refreshToken) {
         String url = "https://oauth2.googleapis.com/token";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -174,12 +174,12 @@ public class AuthService {
             } else {
                 log.error("구글 accesstoken 재발급 실패. Status: {}, Body: {}",
                         response.getStatusCode(), response.getBody());
-                throw ErrorCode.SOCIAL_UNLINK_FAILED.toException();
+                // accesstoken에 재발급에 실패했으므로 refreshtoken이 만료
+                // errorcode 던져주면 이걸로 refresh 토큰 재발급 controller 호출
+                // 반드시 재발급이 가능한 에러 코드로 이어져야함
+                throw ErrorCode.SOCIAL_REFRESH_TOKEN_EXPIRED.toException();
             }
-
         } catch (RestClientException e) {
-            // errorcode 던져주면 이걸로 refresh 토큰 재발급 api 호출
-            // 반드시 재발급이 가능한 에러 코드로 이어져야함
             throw ErrorCode.SOCIAL_UNLINK_FAILED.toException();
         }
 
@@ -191,7 +191,7 @@ public class AuthService {
         try {
             switch (provider) {
                 case "google" -> unlinkGoogle(member, accessToken);
-                case "kakao" -> unlinkGoogle(member, accessToken); //
+                case "kakao" -> unlinkGoogle(member, accessToken);
                 default -> log.warn("알 수 없는 provider: {}", provider);
             }
         } catch (Exception e) {

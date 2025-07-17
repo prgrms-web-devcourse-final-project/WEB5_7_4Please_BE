@@ -37,6 +37,7 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰이 유효하지 않습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
+    SOCIAL_REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "소셜 리프레시 토큰이 만료되었습니다. 재동의가 필요합니다."),
 
     // 403 - Forbidden,
     BID_FORBIDDEN_PRICE(HttpStatus.FORBIDDEN, "기존 입찰 금액보다 높은 금액을 입력해주세요."),

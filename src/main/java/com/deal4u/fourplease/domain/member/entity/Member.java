@@ -46,7 +46,6 @@ public class Member extends BaseDateEntity {
     private String provider;
 
     @Setter
-    @Column(nullable = false)
     private String refreshToken; // 소셜 리프레시 토큰
 
     @Builder

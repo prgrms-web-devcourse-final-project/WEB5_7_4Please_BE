@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final MemberRepository memberRepository;
+    private final AuthService authService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) {
@@ -35,19 +36,37 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
             throw ErrorCode.OAUTH_EMAIL_NOT_FOUND.toException();
         }
         // 소셜 refreshToken 발급
+        // 최초 로그인이거나 재동의 후 로그인이면 값이 존재
         String refreshToken = (String) request.getAdditionalParameters().get("refresh_token");
-        // 매번 로그인 할 때마다 주는게 아니므로 null 처리 필요!
         log.info("소셜 리프레시 토큰 발급{}", refreshToken);
 
         // 1. DB에 해당 이메일이 있는지 확인
         Optional<Member> optionalMember = memberRepository.findByEmailAndProvider(email, provider);
+
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
-            member.setRefreshToken(refreshToken); // 소셜 refreshToken 갱신
+            // member deleted면 로그인 불가
+            if (member.getStatus() == Status.DELETED) {
+                throw ErrorCode.MEMBER_WITHDRAWN.toException();
+            }
+
+            if (refreshToken != null && !refreshToken.isBlank()
+                    && !refreshToken.equals(member.getRefreshToken())) {
+                member.setRefreshToken(refreshToken);
+                memberRepository.save(member);
+                log.info("재동의 후 새 refresh token 갱신 완료");
+            }
+
+            // 소셜 accesstoken 재발급 성공 시 → 새 소셜 refreshToken 필요 없음
+            String accessToken =
+                    authService.refreshGoogleAccessToken(member.getRefreshToken());
+            log.info("기존 소셜 refresh token 유효함: access token = {}", accessToken);
+
+
             return new Customoauth2User(member, attributes);
         }
 
-        // 2. 없다면 생성
+        // 2. 없다면 생성 (최초 로그인)
         Member newMember = memberRepository.save(
                 Member.builder()
                         .email(email)

@@ -69,8 +69,7 @@ public class AuthController {
                 .queryParam("prompt", "consent")
                 .build()
                 .toUriString();
-
-        response.sendRedirect(url);
+        response.sendRedirect(url); // 재동의 화면
     }
 
 }
