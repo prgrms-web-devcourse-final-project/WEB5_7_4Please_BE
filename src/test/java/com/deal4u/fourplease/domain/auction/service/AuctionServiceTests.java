@@ -15,7 +15,9 @@ import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
+import com.deal4u.fourplease.domain.auction.dto.CategoryDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductImageListResponse;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
@@ -28,6 +30,7 @@ import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +44,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @ExtendWith(MockitoExtension.class)
 class AuctionServiceTests {
@@ -226,6 +230,125 @@ class AuctionServiceTests {
         assertThat(resp.getTotalPages()).isEqualTo(1);
         assertThat(resp.getPage()).isZero();
         assertThat(resp.getSize()).isEqualTo(20);
+    }
+
+    @Test
+    @DisplayName("Auction의 상태를 OPEN에서 CLOSE로 변환한다")
+    void closeShouldChangeAuctionStatusOpenIntoClose() {
+
+        Auction auction = genAuctionCreateRequest().toEntity(genProduct());
+
+        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.OPEN);
+
+        auctionService.close(auction);
+        
+        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.CLOSED);
+
+    }
+
+    @Test
+    @DisplayName("전체 경매 목록에서 검색어로 필터랑하고 최신순으로 정렬한다")
+    void findAllShouldFillerByKeywordAndOrderByLatest() {
+
+        int page = 0;
+        int size = 20;
+        String keyword = "축구공";
+        Long categoryId = null;
+        String orderBy = "latest";
+
+        Pageable pageable =
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<Auction> auctionList = genAuctionList();
+
+        // PageImpl로 Page 객체 모킹
+        Page<Auction> auctionPage = new PageImpl<>(auctionList, pageable, auctionList.size());
+
+        List<AuctionListResponse> auctionListResponseList = List.of(
+                new AuctionListResponse(
+                        2L,
+                        "http://example.com/thumbnail2.jpg",
+                        new CategoryDto(2L, "스포츠"),
+                        "축구공",
+                        BigDecimal.valueOf(10000000),
+                        null,
+                        150,
+                        LocalDateTime.now().plusDays(7),
+                        true
+                )
+        );
+        Page<AuctionListResponse> auctionListResponsePage = new PageImpl<>(
+                auctionListResponseList,
+                pageable,
+                auctionListResponseList.size()
+        );
+
+        when(auctionRepository.findByKeyword(keyword, pageable)).thenReturn(auctionPage);
+        when(auctionSupportService.getAuctionListResponses(auctionPage))
+                .thenReturn(auctionListResponsePage);
+
+        PageResponse<AuctionListResponse> resp =
+                auctionService.findAll(page, size, keyword, categoryId, orderBy);
+
+        assertThat(resp.getContent().getFirst().name()).isEqualTo("축구공");
+        assertThat(resp.getTotalElements()).isEqualTo(auctionListResponseList.size());
+
+    }
+
+    @Test
+    @DisplayName("전체 경매 목록에서 카테고리로 필터링하고 입찰순으로 필터링한다")
+    void findAllShouldFilterByCategoryAndOrderByBidCount() {
+
+        int page = 0;
+        int size = 20;
+        String keyword = "";
+        Long categoryId = 4L; // 생활용품
+        String orderBy = "bids";
+
+        Pageable pageable = PageRequest.of(page, size);
+        List<Auction> auctionList = genAuctionList();
+
+        Page<Auction> auctionPage = new PageImpl<>(auctionList, pageable, auctionList.size());
+
+        List<AuctionListResponse> auctionListResponseList = List.of(
+                new AuctionListResponse(
+                        4L,
+                        "http://example.com/thumbnail3.jpg",
+                        new CategoryDto(4L, "생활용품"),
+                        "치약",
+                        BigDecimal.valueOf(2000000),
+                        null,
+                        40,
+                        LocalDateTime.now(),
+                        false
+                ),
+                new AuctionListResponse(
+                        3L,
+                        "http://example.com/thumbnail3.jpg",
+                        new CategoryDto(4L, "생활용품"),
+                        "칫솔",
+                        BigDecimal.valueOf(2000000),
+                        null,
+                        20,
+                        LocalDateTime.now(),
+                        false
+                )
+        );
+
+        Page<AuctionListResponse> auctionListResponsePage =
+                new PageImpl<>(auctionListResponseList, pageable, auctionListResponseList.size());
+
+        when(auctionRepository.findByCategoryIdOrderByBidCount(categoryId, pageable))
+                .thenReturn(auctionPage);
+        when(auctionSupportService.getAuctionListResponses(auctionPage))
+                .thenReturn(auctionListResponsePage);
+
+        PageResponse<AuctionListResponse> resp = auctionService.findAll(page, size, keyword,
+                categoryId, orderBy);
+
+        assertThat(resp.getContent().getFirst().bidCount()).isEqualTo(40);
+        assertThat(resp.getContent().getLast().bidCount()).isEqualTo(20);
+        assertThat(resp.getTotalElements()).isEqualTo(auctionListResponseList.size());
+
     }
 
 }
