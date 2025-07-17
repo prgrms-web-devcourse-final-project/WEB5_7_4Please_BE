@@ -157,8 +157,6 @@ public class AuthService {
         params.add("grant_type", "refresh_token");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-
-
         try {
             ResponseEntity<GoogleTokenResponse> response = restTemplate.postForEntity(
                     url,
@@ -174,6 +172,7 @@ public class AuthService {
             }
 
         } catch (RestClientException e) {
+            // errorcode 던져주면 이걸로 refresh 토큰 재발급 api 호출
             throw ErrorCode.SOCIAL_UNLINK_FAILED.toException();
         }
 
@@ -185,6 +184,7 @@ public class AuthService {
         try {
             switch (provider) {
                 case "google" -> unlinkGoogle(member, accessToken);
+                case "kakao" -> unlinkGoogle(member, accessToken); //
                 default -> log.warn("알 수 없는 provider: {}", provider);
             }
         } catch (Exception e) {
