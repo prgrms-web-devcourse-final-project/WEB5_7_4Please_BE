@@ -33,7 +33,8 @@ public class SecurityConfig {
                         oauth2.authorizationEndpoint(
                                         authorization -> authorization.baseUri("/api/v1/login/page")
                                 )
-                                .redirectionEndpoint(redir -> redir.baseUri("/api/v1/login/google"))
+                                .redirectionEndpoint(
+                                        redir -> redir.baseUri("/api/v1/login/{registrationId}"))
                                 .userInfoEndpoint(userInfo -> userInfo
                                         .userService(customOauth2UserService)
                                 )

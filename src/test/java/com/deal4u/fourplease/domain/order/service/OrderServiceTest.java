@@ -89,7 +89,6 @@ class OrderServiceTest {
                 .build();
 
         member = Member.builder()
-                .memberId(1L)
                 .email("pbk2312@inu.ac.kr")
                 .nickName("당근을 흔들어라")
                 .role(Role.USER)

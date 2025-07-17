@@ -1,35 +1,36 @@
 jwt:
-  secret: your-very-long-secret-key-which-is-512-bit-or-more
+  secret: gQq2wbSH1ohB9ZC+mfZLVkffzIqZX4MsOMhMRDFtO3Rb+dGjtrfhY02SHWmU5OYfZaPivLLch1O2tAGsVDJCVg==
   access-token-expiration: 900000   # 15분 (ms 단위)
   refresh-token-expiration: 604800000 # 7일
 
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:mysql://localhost:3306/deal4u
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: test1234
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
         format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
     defer-datasource-initialization: true
 
   sql:
     init:
-      mode: always
-      data-locations: classpath:data-ci.sql
+      mode: never
+      # data-locations: classpath:data-ci.sql
 
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: dummy-google-client-id
-            client-secret: dummy-google-client-secret
+            client-id: 222701460360-d7e9hvsqdo1evm0k7hnkvg1sgl02a6bk.apps.googleusercontent.com
+            client-secret: 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
             redirect-uri: "http://localhost:8080/api/v1/login/google"
             scope:
               - email
@@ -71,4 +72,4 @@ spring:
             user-info-authentication-method: header
             user-name-attribute: id # Kakao 응답 값 id, connected_at, properties, kakao_account 중 id 지정
 toss:
-  secret-key: ${TOSS_SECRET_KEY}
+  secret-key: test_sk_DpexMgkW36wJdWA1DM74VGbR5ozO

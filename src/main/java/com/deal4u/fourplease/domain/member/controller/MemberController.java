@@ -1,6 +1,8 @@
 package com.deal4u.fourplease.domain.member.controller;
 
 import com.deal4u.fourplease.domain.member.dto.SignupRequest;
+import com.deal4u.fourplease.domain.member.dto.SignupResponse;
+import com.deal4u.fourplease.domain.member.dto.UpdateMemberResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,8 +35,8 @@ public class MemberController {
             @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰")
     })
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> signUp(@PathVariable String token,
-                                    @RequestBody SignupRequest request) {
+    public ResponseEntity<SignupResponse> signUp(@PathVariable String token,
+                                                 @RequestBody SignupRequest request) {
         return memberService.signup(token, request);
     }
 
@@ -48,7 +49,7 @@ public class MemberController {
             @ApiResponse(responseCode = "422", description = "사용할 수 없는 닉네임")
     })
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> updateMember(
+    public ResponseEntity<UpdateMemberResponse> updateMember(
             @AuthenticationPrincipal Member member,
             @RequestBody Map<String, Object> body
     ) {
@@ -56,18 +57,4 @@ public class MemberController {
         return memberService.updateMember(member, nickName);
     }
 
-
-    @PostMapping("/logout")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "로그아웃 성공"),
-            @ApiResponse(responseCode = "401", description = "인증 실패 – 토큰 누락 또는 유효하지 않음"),
-            @ApiResponse(responseCode = "403", description = "이미 무효화된 토큰")
-    })
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<?> logout(
-            @RequestHeader("Authorization") String authHeader,
-            @AuthenticationPrincipal Member member
-    ) {
-        return memberService.logout(authHeader, member);
-    }
 }

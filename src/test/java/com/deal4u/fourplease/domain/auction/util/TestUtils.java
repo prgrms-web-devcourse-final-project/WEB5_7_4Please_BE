@@ -35,7 +35,6 @@ public class TestUtils {
     public static Member genMember() {
         // TODO: Member 추후 확인 필요
         return Member.builder()
-                .memberId(1L)
                 .email("user1@user.com")
                 .nickName("유저1")
                 .role(Role.USER)

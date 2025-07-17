@@ -42,9 +42,8 @@ public class Member extends BaseDateEntity {
     private String provider;
 
     @Builder
-    public Member(Long memberId, String email, String nickName, Role role, Status status,
+    public Member(String email, String nickName, Role role, Status status,
                   String provider) {
-        this.memberId = memberId;
         this.email = email;
         this.nickName = nickName;
         this.role = role != null ? role : Role.USER;

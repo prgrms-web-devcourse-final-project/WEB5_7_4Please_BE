@@ -32,7 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-public class MemberServiceTest {
+class MemberServiceTest {
 
     private final String validToken = "mocked.jwt.token";
     private final String email = "test@example.com";
@@ -159,7 +159,7 @@ public class MemberServiceTest {
         when(blacklistedTokenRepository.existsByToken(validToken)).thenReturn(false);
         doNothing().when(jwtProvider).validateOrThrow(validToken);
 
-        ResponseEntity<Void> response = memberService.logout(authHeader, member);
+        ResponseEntity<Void> response = authService.logout(authHeader, member);
 
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         verify(blacklistedTokenRepository).save(org.mockito.ArgumentMatchers.any());
@@ -178,7 +178,7 @@ public class MemberServiceTest {
         when(blacklistedTokenRepository.existsByToken(validToken)).thenReturn(true);
         doNothing().when(jwtProvider).validateOrThrow(validToken);
 
-        assertThatThrownBy(() -> memberService.logout(authHeader, member))
+        assertThatThrownBy(() -> authService.logout(authHeader, member))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.TOKEN_ALREADY_BLACKLISTED.getMessage());
     }
