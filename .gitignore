@@ -40,4 +40,5 @@ out/
 .vscode/
 
 application.yml
+src/main/resources/application.yml
 README.md
