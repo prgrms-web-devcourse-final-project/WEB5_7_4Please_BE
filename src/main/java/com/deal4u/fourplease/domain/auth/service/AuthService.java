@@ -25,11 +25,9 @@ public class AuthService {
 
     // 로그인 시 토큰 생성 및 저장
     public TokenPair createTokenPair(Member member) {
-
-
         TokenPair tokenPair = jwtProvider.generateTokenPair(member);
 
-        LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(30);
+        LocalDateTime expiryDate = jwtProvider.getExpirationFromToken(tokenPair.refreshToken());
         refreshTokenRepository.findByMember(member)
                 .ifPresentOrElse(
                         existing -> existing.updateToken(tokenPair.refreshToken(), expiryDate),
