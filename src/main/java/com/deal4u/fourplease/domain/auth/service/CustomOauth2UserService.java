@@ -29,12 +29,13 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2User oauth2User = delegate.loadUser(request); // Spring이 가져온 사용자 정보
         Map<String, Object> attributes = oauth2User.getAttributes();
         String email = (String) attributes.get("email");
+        String provider = request.getClientRegistration().getRegistrationId();
         if (email == null || email.isBlank()) {
             throw ErrorCode.OAUTH_EMAIL_NOT_FOUND.toException();
         }
 
         // 1. DB에 해당 이메일이 있는지 확인
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
+        Optional<Member> optionalMember = memberRepository.findByEmailAndProvider(email, provider);
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
             return new Customoauth2User(member, attributes);
