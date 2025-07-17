@@ -12,6 +12,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -32,6 +33,7 @@ public class Settlement extends BaseDateEntity {
     private Long settlementId;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auction_id")
     private Auction auction;
 
     @Embedded
@@ -45,7 +47,7 @@ public class Settlement extends BaseDateEntity {
     private String rejectedReason;
 
     private LocalDateTime paidAt;
-    
+
     public void updateStatus(SettlementStatus status, LocalDateTime paidAt, String rejectedReason) {
         this.status = status;
         if (status == SettlementStatus.SUCCESS) {

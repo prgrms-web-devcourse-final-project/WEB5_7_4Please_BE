@@ -51,5 +51,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     Page<Bid> findByBidderMemberIdOrderByBidTimeDesc(@Param("memberId") Long memberId,
                                                      Pageable pageable);
 
-    List<Bid> findByAuctionOrderByPriceDesc(@Param("auction") Auction auction);
+    @Query("SELECT b FROM Bid b WHERE b.auction = :auction AND b.isSuccessfulBidder = true")
+    Optional<Bid> findSuccessfulBidByAuction(@Param("auction") Auction auction);
 }

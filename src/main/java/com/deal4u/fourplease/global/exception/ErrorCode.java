@@ -40,6 +40,9 @@ public enum ErrorCode {
     BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다."),
     STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "일치하는 상태를 찾을 수 없습니다."),
+    MAX_PRICE_NOT_FOUND(HttpStatus.NOT_FOUND, "최고가를 조회할 수 없습니다."),
+    WINNIGBID_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 경매의 낙찰이 없습니다."),
+
     // 409 - Conflict
     PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
     // 500 - Internal Server Error
