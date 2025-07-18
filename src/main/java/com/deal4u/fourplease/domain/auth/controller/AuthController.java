@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.domain.auth.controller;
 
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
+import com.deal4u.fourplease.domain.auth.property.GoogleOauthProperties;
 import com.deal4u.fourplease.domain.auth.service.AuthService;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class AuthController {
 
     private final AuthService authService;
+    private final GoogleOauthProperties googleOauthProperties;
 
     @PostMapping
     public ResponseEntity<TokenPair> refreshAccessToken(
@@ -61,8 +63,8 @@ public class AuthController {
     public void forceGoogleReConsent(HttpServletResponse response) throws IOException {
         String url = UriComponentsBuilder
                 .fromUriString("https://accounts.google.com/o/oauth2/v2/auth")
-                .queryParam("client_id", "{YOUR_CLIENT_ID}")
-                .queryParam("redirect_uri", "{YOUR_REDIRECT_URI}")
+                .queryParam("client_id", googleOauthProperties.getClientId())
+                .queryParam("redirect_uri", googleOauthProperties.getClientSecret())
                 .queryParam("response_type", "code")
                 .queryParam("scope", "openid email profile")
                 .queryParam("access_type", "offline")

@@ -38,7 +38,7 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
         // 소셜 refreshToken 발급
         // 최초 로그인이거나 재동의 후 로그인이면 값이 존재
         String refreshToken = (String) request.getAdditionalParameters().get("refresh_token");
-        log.info("소셜 리프레시 토큰 발급{}", refreshToken);
+        log.info("소셜 리프레시 토큰 발급 = {}", refreshToken);
 
         // 1. DB에 해당 이메일이 있는지 확인
         Optional<Member> optionalMember = memberRepository.findByEmailAndProvider(email, provider);
@@ -61,7 +61,6 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
             String accessToken =
                     authService.refreshGoogleAccessToken(member.getRefreshToken());
             log.info("기존 소셜 refresh token 유효함: access token = {}", accessToken);
-
 
             return new Customoauth2User(member, attributes);
         }

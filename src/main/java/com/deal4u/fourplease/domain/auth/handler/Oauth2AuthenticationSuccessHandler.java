@@ -47,14 +47,12 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             log.info("token: " + tempToken);
             response.setHeader("X-Temp-Token", tempToken);
             response.setHeader("X-Redirect-Url", MAIN_REDIRECT_URL);
-            response.setHeader("X-Message", "닉네임 설정이 필요합니다.");
         } else {
             // 새로운 JWT 발급
             TokenPair tokenPair = authService.createTokenPair(member);
             response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
             response.setHeader("X-Refresh-Token", tokenPair.refreshToken());
             response.setHeader("X-Redirect-Url", SIGNUP_REDIRECT_URL);
-            response.setHeader("X-Message", "로그인 성공");
         }
 
         response.getWriter().write("{\"status\":\"ok\"}");

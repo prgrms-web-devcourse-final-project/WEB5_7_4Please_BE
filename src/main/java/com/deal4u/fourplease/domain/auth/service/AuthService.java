@@ -152,6 +152,7 @@ public class AuthService {
     // 이때 accessToken 재발급에 실패하면 refreshToken도 재발급 해야함
     // -> 컨트롤러를 통해 프론트에게 access_type=offline + prompt=consent 붙여서 요청
     public String refreshGoogleAccessToken(String refreshToken) {
+        log.info("소셜 리프레시 토큰을 통해 액세스 토큰을 재발급 메서드 진입");
         String url = "https://oauth2.googleapis.com/token";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -161,6 +162,7 @@ public class AuthService {
         params.add("client_secret", googleOauthProperties.getClientSecret());
         params.add("refresh_token", refreshToken);
         params.add("grant_type", "refresh_token");
+        log.info("Google 토큰 갱신 요청 파라미터: {}", params);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         try {
@@ -169,7 +171,9 @@ public class AuthService {
                     request,
                     GoogleTokenResponse.class
             );
+            log.info("GoogleTokenResponse 확인: {}", response);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                log.info("is2xxSuccessful 진입 확인");
                 return response.getBody().accessToken();
             } else {
                 log.error("구글 accesstoken 재발급 실패. Status: {}, Body: {}",
@@ -191,7 +195,7 @@ public class AuthService {
         try {
             switch (provider) {
                 case "google" -> unlinkGoogle(member, accessToken);
-                case "kakao" -> unlinkGoogle(member, accessToken);
+                case "kakao" -> log.info("아직 미구현");
                 default -> log.warn("알 수 없는 provider: {}", provider);
             }
         } catch (Exception e) {
@@ -212,7 +216,8 @@ public class AuthService {
             params.add("token", accessToken);
 
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+            ResponseEntity<String> response =
+                    restTemplate.postForEntity(url, request, String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("구글 연동 해제 성공: {}", member.getEmail());
