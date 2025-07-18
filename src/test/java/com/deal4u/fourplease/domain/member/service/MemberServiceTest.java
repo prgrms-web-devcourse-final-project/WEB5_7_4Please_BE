@@ -72,23 +72,6 @@ class MemberServiceTest {
 
     // 나중에 닉네임 체크 개선되면 예외 추가
     @Test
-    @DisplayName("회원가입 중 중복 닉네임은 예외 발생")
-    void signup_shouldFailIfNicknameExists() {
-        SignupRequest request = new SignupRequest(nickname);
-        Member member = Member.builder()
-                .email(email)
-                .build();
-        when(jwtProvider.getEmailFromToken(validToken)).thenReturn(email);
-        doNothing().when(jwtProvider).validateOrThrow(validToken);
-        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
-        when(memberRepository.existsByNickName(nickname)).thenReturn(true);
-
-        assertThatThrownBy(() -> memberService.signup(validToken, request))
-                .isInstanceOf(GlobalException.class)
-                .hasMessage(ErrorCode.NICKNAME_ALREADY_EXISTS.getMessage());
-    }
-
-    @Test
     @DisplayName("회원가입 중 회원이 존재하지 않으면 예외 발생")
     void signup_shouldFailIfMemberNotFound() {
         SignupRequest request = new SignupRequest(nickname);
@@ -122,20 +105,58 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원 정보 업데이트 중 중복 닉네임은 예외 발생")
-    void updateMember_shouldFailIfNicknameExists() {
-        String newNickName = "DuplicatedNick";
-        Member member = Member.builder()
-                .email(email)
-                .status(Status.ACTIVE)
-                .build();
+    @DisplayName("정상 닉네임은 예외 없이 통과")
+    void validateNickname_valid() {
+        String nickName = "정상닉네임123";
+        when(memberRepository.existsByNickName(nickName)).thenReturn(false);
 
-        when(memberRepository.existsByNickName(newNickName)).thenReturn(true);
+        memberService.validateNickName(nickName); // 예외 발생 안 하면 통과
+    }
 
-        assertThatThrownBy(() -> memberService.updateMember(member, newNickName))
+    @Test
+    @DisplayName("null 닉네임은 예외 발생")
+    void validateNickname_null() {
+        assertThatThrownBy(() -> memberService.validateNickName(null))
+                .isInstanceOf(GlobalException.class)
+                .hasMessage(ErrorCode.INVALID_NICKNAME.getMessage());
+    }
+
+    @Test
+    @DisplayName("공백 닉네임은 예외 발생")
+    void validateNickname_blank() {
+        assertThatThrownBy(() -> memberService.validateNickName("   "))
+                .isInstanceOf(GlobalException.class)
+                .hasMessage(ErrorCode.INVALID_NICKNAME.getMessage());
+    }
+
+    @Test
+    @DisplayName("2자 미만 또는 20자 초과 닉네임은 예외 발생")
+    void validateNickname_lengthOutOfBounds() {
+        assertThatThrownBy(() -> memberService.validateNickName("a"))
+                .isInstanceOf(GlobalException.class)
+                .hasMessage(ErrorCode.NICKNAME_LENGTH_INVALID.getMessage());
+
+        assertThatThrownBy(() -> memberService.validateNickName("a".repeat(21)))
+                .isInstanceOf(GlobalException.class)
+                .hasMessage(ErrorCode.NICKNAME_LENGTH_INVALID.getMessage());
+    }
+
+    @Test
+    @DisplayName("허용되지 않은 특수문자가 포함되면 예외 발생")
+    void validateNickname_invalidCharacters() {
+        assertThatThrownBy(() -> memberService.validateNickName("닉네임!@#"))
+                .isInstanceOf(GlobalException.class)
+                .hasMessage(ErrorCode.INVALID_NICKNAME_FORMAT.getMessage());
+    }
+
+    @Test
+    @DisplayName("중복된 닉네임이면 예외 발생")
+    void validateNickname_duplicate() {
+        String nickName = "중복닉";
+        when(memberRepository.existsByNickName(nickName)).thenReturn(true);
+
+        assertThatThrownBy(() -> memberService.validateNickName(nickName))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.NICKNAME_ALREADY_EXISTS.getMessage());
     }
-
-
 }

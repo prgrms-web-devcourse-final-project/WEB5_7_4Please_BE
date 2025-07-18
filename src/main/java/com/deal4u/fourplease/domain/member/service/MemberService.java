@@ -61,14 +61,10 @@ public class MemberService {
         }
     }
 
-
     @Transactional
     public ResponseEntity<SignupResponse> signup(String token, SignupRequest request) {
         // 토큰 유효성 검사
         jwtProvider.validateOrThrow(token);
-
-        // 닉네임 유효성 검사
-        validateNickName(request.nickName());
 
         String email = jwtProvider.getEmailFromToken(token);
         log.info("토큰에서 추출된 이메일: {}", email);
@@ -95,9 +91,6 @@ public class MemberService {
     }
 
     public ResponseEntity<UpdateMemberResponse> updateMember(Member member, String nickName) {
-        // 닉네임 유효성 검사 (중복 제거)
-        validateNickName(nickName);
-
         member.setNickName(nickName);
         memberRepository.save(member);
         UpdateMemberResponse response = UpdateMemberResponse.builder()

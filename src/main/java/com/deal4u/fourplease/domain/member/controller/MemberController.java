@@ -13,11 +13,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,5 +56,18 @@ public class MemberController {
             @RequestBody UpdateMemberRequest request
     ) {
         return memberService.updateMember(member, request.nickName());
+    }
+
+    @GetMapping("/member/check")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용 가능한 닉네임"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "422", description = "사용할 수 없는 닉네임")
+    })
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Void> checkNickname(@RequestParam("nickname") String nickname) {
+        memberService.validateNickName(nickname);
+        return ResponseEntity.ok().build(); // 닉네임 사용 가능
     }
 }
