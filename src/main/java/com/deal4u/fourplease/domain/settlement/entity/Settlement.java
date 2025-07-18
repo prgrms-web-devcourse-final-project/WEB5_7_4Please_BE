@@ -1,8 +1,8 @@
 package com.deal4u.fourplease.domain.settlement.entity;
 
-import com.deal4u.fourplease.domain.BaseDateEntity;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
+import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -45,4 +45,14 @@ public class Settlement extends BaseDateEntity {
     private String rejectedReason;
 
     private LocalDateTime paidAt;
+    
+    public void updateStatus(SettlementStatus status, LocalDateTime paidAt, String rejectedReason) {
+        this.status = status;
+        if (status == SettlementStatus.SUCCESS) {
+            this.paidAt = paidAt;
+        }
+        if (status == SettlementStatus.REJECTED) {
+            this.rejectedReason = rejectedReason;
+        }
+    }
 }

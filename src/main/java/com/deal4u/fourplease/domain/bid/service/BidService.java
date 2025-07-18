@@ -9,9 +9,9 @@ import com.deal4u.fourplease.domain.bid.dto.BidResponse;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.BidMessageStatus;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
-import com.deal4u.fourplease.domain.bid.entity.PageResponse;
 import com.deal4u.fourplease.domain.bid.mapper.BidMapper;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
@@ -141,10 +141,10 @@ public class BidService {
         return PageResponse.fromPage(bidResponsePage);
     }
 
+
     private Bidder getBidder(long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
         return Bidder.createBidder(member);
     }
-
 }

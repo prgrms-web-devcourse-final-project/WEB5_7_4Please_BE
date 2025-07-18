@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.payment.entity;
 
-import com.deal4u.fourplease.domain.BaseDateEntity;
+import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -40,4 +40,12 @@ public class Payment extends BaseDateEntity {
 
     @Embedded
     private OrderId orderId;
+
+    public void statusFailed() {
+        this.status = PaymentStatus.FAILED;
+    }
+
+    public void statusSuccess() {
+        this.status = PaymentStatus.SUCCESS;
+    }
 }
