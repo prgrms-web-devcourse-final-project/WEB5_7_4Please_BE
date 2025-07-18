@@ -7,15 +7,15 @@ public record MyPageBidHistory(
         Long auctionId,
         Long bidId,
         String thumbnailUrl,
-        String productName,
-        String statusDescription,
-        BigDecimal startingPrice,
+        String product,
+        String status,
+        BigDecimal startBidPrice,
         BigDecimal highestBidPrice,
         BigDecimal instantBidPrice,
-        BigDecimal bidPrice,
+        BigDecimal myBidPrice,
         LocalDateTime bidTime,
         LocalDateTime createdAt,
-        String paymentDeadlineFormatted,
+        String paymentDeadline,
         String sellerNickName
 ) {
 }
