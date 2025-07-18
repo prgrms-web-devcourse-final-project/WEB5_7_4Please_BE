@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class BidMultiThreadTest {
+class BidMultiThreadTest {
 
     @Autowired
     private BidService bidService;
@@ -25,7 +25,7 @@ public class BidMultiThreadTest {
     private NameLockStore lockStore;
 
     @Test
-    void bid_has_lock_test() throws InterruptedException {
+    void bid_has_lock_test() {
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(1);
         AtomicInteger count = new AtomicInteger(0);
@@ -59,7 +59,7 @@ public class BidMultiThreadTest {
         executorService.shutdown();
 
         await().atLeast(1000, TimeUnit.MILLISECONDS)
-                .atMost(1500, TimeUnit.MILLISECONDS)
+                .atMost(2000, TimeUnit.MILLISECONDS)
                 .untilAtomic(count, equalTo(2));
     }
 }

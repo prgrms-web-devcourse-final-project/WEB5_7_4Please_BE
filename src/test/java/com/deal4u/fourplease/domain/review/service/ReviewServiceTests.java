@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
@@ -131,11 +131,8 @@ class ReviewServiceTests {
     @Test
     @DisplayName("리뷰 작성 성공")
     void create_review_success() throws Exception {
+
         // Given
-        ReviewRequest request = new ReviewRequest(
-                auction.getAuctionId(),
-                5,
-                "사장님이 맛있고, 음식이 친절해요.");
         Long buyerId = buyer.getMemberId();
 
         // Mocking repository
@@ -148,6 +145,10 @@ class ReviewServiceTests {
         when(reviewRepository.findByAuctionAndReviewer(any(Auction.class),
                 any(Reviewer.class))).thenReturn(Optional.empty());
 
+        ReviewRequest request = new ReviewRequest(
+                auction.getAuctionId(),
+                5,
+                "사장님이 맛있고, 음식이 친절해요.");
         // When
         reviewService.createReview(request, buyerId);
 
