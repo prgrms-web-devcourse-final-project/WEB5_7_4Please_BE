@@ -167,13 +167,21 @@ public class SettlementService {
 
         // 3. 해당 입찰의 낙찰을 무효 처리
         invalidateBid(settlement);
+
+        // 4. 차상위 입찰을 낙찰 처리
+        awardSecondHighestBid(settlement.getAuction());
     }
 
     private void invalidateBid(Settlement settlement) {
         Bid bid = bidRepository.findByAuctionAndBidder(settlement.getAuction(),
                 settlement.getBidder()).orElseThrow(BID_NOT_FOUND::toException);
-
         bid.update(false);
+    }
+
+    private void awardSecondHighestBid(Auction auction) {
+        Bid bid = bidRepository.findSecondHighestBidByAuctionIdForSchedule(auction.getAuctionId())
+                .orElseThrow(BID_NOT_FOUND::toException);
+        bid.update(true);
     }
 
 }
