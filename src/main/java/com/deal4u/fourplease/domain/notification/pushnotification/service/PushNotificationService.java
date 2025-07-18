@@ -33,7 +33,7 @@ public class PushNotificationService {
         PushNotification pushNotification = pushNotificationRepository.findById(notificationId)
                 .orElseThrow(ErrorCode.ENTITY_NOT_FOUND::toException);
         if (!pushNotification.isSameReceiver(receiver)) {
-            throw ErrorCode.UNAUTHORIZED_RECEIVER.toException();
+            throw ErrorCode.FORBIDDEN_RECEIVER.toException();
         }
 
         pushNotification.click();

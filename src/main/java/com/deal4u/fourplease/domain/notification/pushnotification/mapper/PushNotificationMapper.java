@@ -40,6 +40,7 @@ public class PushNotificationMapper {
 
     private static List<PushNotificationResponse> toPushNotificationResponses(
             List<PushNotification> pushNotifications) {
-        return pushNotifications.stream().map(PushNotificationMapper::toPushNotificationResponse).toList();
+        return pushNotifications.stream().map(PushNotificationMapper::toPushNotificationResponse)
+                .toList();
     }
 }
