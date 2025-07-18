@@ -65,7 +65,8 @@ public class PushNotificationController {
                 pageRequest.toPageable());
     }
 
-    //이건 테스트용입니다
+    // 이건 테스트용입니다
+    @SuppressWarnings("checkstyle:OverloadMethodsDeclarationOrder")
     @PostMapping("/push/{message}")
     @Transactional
     void listPushNotification(@PathVariable String message) {

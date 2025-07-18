@@ -37,8 +37,16 @@ class PushNotificationServiceTest {
         pushNotificationService.send(testMessage);
 
         Mockito.verify(saver, Mockito.times(1)).save(List.of(
-                new PushNotificationCreateCommand(1L, Map.of("message", message)),
-                new PushNotificationCreateCommand(2L, Map.of("message", message))
+                new PushNotificationCreateCommand(
+                        1L,
+                        "아무 타입",
+                        Map.of("message", message)
+                ),
+                new PushNotificationCreateCommand(
+                        2L,
+                        "아무 타입2",
+                        Map.of("message", message)
+                )
         ));
     }
 
@@ -63,7 +71,7 @@ class PushNotificationServiceTest {
         assertThatThrownBy(
                 throwingCallable
         ).isInstanceOf(GlobalException.class)
-                .hasMessage(ErrorCode.UNAUTHORIZED_RECEIVER.getMessage());
+                .hasMessage(ErrorCode.FORBIDDEN_RECEIVER.getMessage());
     }
 
     @Test

@@ -26,7 +26,9 @@ public class PushNotificationSaver {
 
     public void save(List<PushNotificationCreateCommand> pushNotifications) {
         jdbcTemplate.batchUpdate(
-                "insert into push_notification(message,type,member_id,clicked,created_at,updated_at) values (?,?,?,?,now(),now())",
+                "insert into "
+                        + "push_notification(message,type,member_id,clicked,created_at,updated_at) "
+                        + "values (?,?,?,?,now(),now())",
                 new BatchPreparedStatementSetter() {
                     @SneakyThrows
                     @Override

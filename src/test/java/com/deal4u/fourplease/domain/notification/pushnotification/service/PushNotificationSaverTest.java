@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationCreateCommand;
-import com.deal4u.fourplease.domain.notification.pushnotification.entity.Receiver;
 import com.deal4u.fourplease.domain.notification.pushnotification.entity.PushNotification;
+import com.deal4u.fourplease.domain.notification.pushnotification.entity.Receiver;
 import com.deal4u.fourplease.domain.notification.pushnotification.repository.PushNotificationRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -35,15 +35,24 @@ class PushNotificationSaverTest {
     @Test
     void saver() {
         List<PushNotificationCreateCommand> notifications = List.of(
-                new PushNotificationCreateCommand(1L, Map.of("message", "test")),
-                new PushNotificationCreateCommand(2L, Map.of("message", "test")));
+                new PushNotificationCreateCommand(
+                        1L,
+                        "아무 타입",
+                        Map.of("message", "test")
+                ),
+                new PushNotificationCreateCommand(
+                        2L,
+                        "아무 타입",
+                        Map.of("message", "test")
+                )
+        );
 
         pushNotificationSaver.save(notifications);
 
         List<PushNotification> savedPushNotifications = getPushNotifications();
         assertThat(savedPushNotifications).hasSize(notifications.size());
         assertThat(savedPushNotifications)
-                .extracting(PushNotification::getReceiver,PushNotification::getMessage)
+                .extracting(PushNotification::getReceiver, PushNotification::getMessage)
                 .containsExactlyInAnyOrder(
                         tuple(Receiver.of(1L), Map.of("message", "test")),
                         tuple(Receiver.of(2L), Map.of("message", "test"))
