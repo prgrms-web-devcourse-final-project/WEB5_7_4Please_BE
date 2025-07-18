@@ -38,6 +38,7 @@ public class JwtProvider {
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
 
+
     public TokenPair generateTokenPair(Member member) {
         return new TokenPair(
                 generateAccessToken(member),

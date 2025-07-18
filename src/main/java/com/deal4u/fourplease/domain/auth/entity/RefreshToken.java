@@ -47,5 +47,4 @@ public class RefreshToken extends BaseDateEntity {
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(this.expiryDate);
     }
-
 }

@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.member.service;
+package com.deal4u.fourplease.domain.member.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -15,7 +15,6 @@ import com.deal4u.fourplease.domain.member.dto.UpdateMemberResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
-import com.deal4u.fourplease.domain.member.service.MemberService;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.util.Optional;

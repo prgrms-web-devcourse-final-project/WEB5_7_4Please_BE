@@ -1,10 +1,9 @@
-package com.deal4u.fourplease.auth.token;
+package com.deal4u.fourplease.domain.auth.token;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
-import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.global.exception.ErrorCode;

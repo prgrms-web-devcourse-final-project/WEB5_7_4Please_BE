@@ -39,6 +39,10 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
         Optional<Member> optionalMember = memberRepository.findByEmailAndProvider(email, provider);
         if (optionalMember.isPresent()) {
             Member member = optionalMember.get();
+            // 탈퇴했던 회원이면 닉네임 재발급
+            if (member.getStatus() == Status.DELETED) {
+                member.setStatus(Status.PENDING);
+            }
             return new Customoauth2User(member, attributes);
         }
 

@@ -13,8 +13,6 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +25,6 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final JwtProvider jwtProvider;
     private final AuthService authService;
     private final MemberService memberService;
-    private final OAuth2AuthorizedClientService authorizedClientService;
 
 
     @Override
@@ -42,14 +39,6 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         log.info("멤버 이메일: " + member.getEmail());
         log.info("멤버 상태: " + member.getStatus());
 
-        // access_token, refresh_token 가져오기
-        OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
-                member.getProvider(), authentication.getName());
-
-        String refreshToken = client.getRefreshToken() != null ?
-                client.getRefreshToken().getTokenValue() : null;
-
-        log.info("refreshToken: " + refreshToken);
         response.setStatus(HttpServletResponse.SC_OK);
 
         if (member.getStatus() == Status.PENDING) {
@@ -57,13 +46,13 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             String tempToken = jwtProvider.generateTokenPair(member).accessToken(); // 임시 토큰 발급
             log.info("token: " + tempToken);
             response.setHeader("X-Temp-Token", tempToken);
-            response.setHeader("X-Redirect-Url", MAIN_REDIRECT_URL);
+            response.setHeader("X-Redirect-Url", SIGNUP_REDIRECT_URL);
         } else {
             // 새로운 JWT 발급
             TokenPair tokenPair = authService.createTokenPair(member);
             response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
             response.setHeader("X-Refresh-Token", tokenPair.refreshToken());
-            response.setHeader("X-Redirect-Url", SIGNUP_REDIRECT_URL);
+            response.setHeader("X-Redirect-Url", MAIN_REDIRECT_URL);
         }
 
         response.getWriter().write("{\"status\":\"ok\"}");

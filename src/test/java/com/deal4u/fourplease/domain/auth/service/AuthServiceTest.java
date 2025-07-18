@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.auth.service;
+package com.deal4u.fourplease.domain.auth.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -12,7 +12,6 @@ import com.deal4u.fourplease.domain.auth.dto.TokenPair;
 import com.deal4u.fourplease.domain.auth.entity.RefreshToken;
 import com.deal4u.fourplease.domain.auth.repository.BlacklistedTokenRepository;
 import com.deal4u.fourplease.domain.auth.repository.RefreshTokenRepository;
-import com.deal4u.fourplease.domain.auth.service.AuthService;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
@@ -36,6 +35,10 @@ class AuthServiceTest {
     private final String email = "test@example.com";
     @InjectMocks
     private AuthService authService;
+
+    @InjectMocks
+    private LogoutService logoutService;
+
     @Mock
     private Member member;
     @Mock
@@ -170,7 +173,7 @@ class AuthServiceTest {
         when(blacklistedTokenRepository.existsByToken(validToken)).thenReturn(false);
         doNothing().when(jwtProvider).validateOrThrow(validToken);
 
-        ResponseEntity<Void> response = authService.logout(authHeader, newMember);
+        ResponseEntity<Void> response = logoutService.logout(authHeader, newMember);
 
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         verify(blacklistedTokenRepository).save(org.mockito.ArgumentMatchers.any());
@@ -189,7 +192,7 @@ class AuthServiceTest {
         when(blacklistedTokenRepository.existsByToken(validToken)).thenReturn(true);
         doNothing().when(jwtProvider).validateOrThrow(validToken);
 
-        assertThatThrownBy(() -> authService.logout(authHeader, newMember))
+        assertThatThrownBy(() -> logoutService.logout(authHeader, newMember))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.TOKEN_ALREADY_BLACKLISTED.getMessage());
     }

@@ -1,10 +1,9 @@
-package com.deal4u.fourplease.auth.handler;
+package com.deal4u.fourplease.domain.auth.handler;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
-import com.deal4u.fourplease.domain.auth.handler.Oauth2AuthenticationSuccessHandler;
 import com.deal4u.fourplease.domain.auth.model.Customoauth2User;
 import com.deal4u.fourplease.domain.auth.service.AuthService;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
@@ -76,8 +75,7 @@ class Oauth2AuthenticationSuccessHandlerTest {
         // then
         // then - 헤더 값 설정 확인
         verify(response).setHeader("X-Temp-Token", tempToken);
-        verify(response).setHeader("X-Redirect-Url", "/");
-        verify(response).setHeader("X-Message", "닉네임 설정이 필요합니다.");
+        verify(response).setHeader("X-Redirect-Url", "/signup");
         verify(response).setStatus(HttpServletResponse.SC_OK);
     }
 
@@ -96,8 +94,7 @@ class Oauth2AuthenticationSuccessHandlerTest {
         // then
         verify(response).setHeader("Authorization", "Bearer " + accessToken);
         verify(response).setHeader("X-Refresh-Token", refreshToken);
-        verify(response).setHeader("X-Redirect-Url", "/signup");
-        verify(response).setHeader("X-Message", "로그인 성공");
+        verify(response).setHeader("X-Redirect-Url", "/");
         verify(response).setStatus(HttpServletResponse.SC_OK);
     }
 }
