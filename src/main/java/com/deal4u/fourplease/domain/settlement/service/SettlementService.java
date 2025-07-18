@@ -109,7 +109,8 @@ public class SettlementService {
 
     public void changeSettlementFailure(Auction auction) {
         Settlement settlement = getSettlementOrThrow(auction);
-        settlement.updateStatus(SettlementStatus.REJECTED, LocalDateTime.now(), "결제 기간이 만료되어서 정산이 취소되었습니다.");
+        settlement.updateStatus(SettlementStatus.REJECTED, LocalDateTime.now(),
+                "결제 기간이 만료되어서 정산이 취소되었습니다.");
 
         scheduleService.cancelFailedSettlement(settlement.getSettlementId());
     }
