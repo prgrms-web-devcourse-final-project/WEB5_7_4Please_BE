@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.auth.service;
 
-import com.deal4u.fourplease.domain.auth.dto.GoogleTokenResponse;
+import com.deal4u.fourplease.domain.auth.dto.GoogleAccessTokenResponse;
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
 import com.deal4u.fourplease.domain.auth.entity.BlacklistedToken;
 import com.deal4u.fourplease.domain.auth.entity.RefreshToken;
@@ -129,7 +129,7 @@ public class AuthService {
         extractTokenFromHeader(authHeader);
 
         // 서버 토큰 블랙리스트 처리
-        // logout(authHeader, member);
+        // zlogout(authHeader, member);
 
         // 소셜 accessToken 발급
         String accessToken = refreshGoogleAccessToken(member.getRefreshToken());
@@ -166,10 +166,10 @@ public class AuthService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         try {
-            ResponseEntity<GoogleTokenResponse> response = restTemplate.postForEntity(
+            ResponseEntity<GoogleAccessTokenResponse> response = restTemplate.postForEntity(
                     url,
                     request,
-                    GoogleTokenResponse.class
+                    GoogleAccessTokenResponse.class
             );
             log.info("GoogleTokenResponse 확인: {}", response);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {

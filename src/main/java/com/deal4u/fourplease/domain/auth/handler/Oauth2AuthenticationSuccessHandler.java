@@ -10,11 +10,11 @@ import com.deal4u.fourplease.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -27,10 +27,13 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
     private final JwtProvider jwtProvider;
     private final AuthService authService;
     private final MemberService memberService;
+    private final OAuth2AuthorizedClientService authorizedClientService;
+
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
+
         log.info("SuccessHandler 실행됨");
         Customoauth2User oauth2User = (Customoauth2User) authentication.getPrincipal();
         Member member = oauth2User.getMember();
@@ -39,6 +42,14 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         log.info("멤버 이메일: " + member.getEmail());
         log.info("멤버 상태: " + member.getStatus());
 
+        // access_token, refresh_token 가져오기
+        OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
+                member.getProvider(), authentication.getName());
+
+        String refreshToken = client.getRefreshToken() != null ?
+                client.getRefreshToken().getTokenValue() : null;
+
+        log.info("refreshToken: " + refreshToken);
         response.setStatus(HttpServletResponse.SC_OK);
 
         if (member.getStatus() == Status.PENDING) {
