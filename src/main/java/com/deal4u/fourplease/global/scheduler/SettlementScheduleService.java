@@ -1,7 +1,7 @@
 package com.deal4u.fourplease.global.scheduler;
 
-import static com.deal4u.fourplease.global.exception.ErrorCode.SETTLEMENT_NOT_FOUND;
 import static com.deal4u.fourplease.global.exception.ErrorCode.FAILED_SETTLEMENT_SCHEDULE_NOT_FOUND;
+import static com.deal4u.fourplease.global.exception.ErrorCode.SETTLEMENT_NOT_FOUND;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

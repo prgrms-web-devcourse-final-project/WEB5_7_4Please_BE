@@ -1,13 +1,13 @@
 package com.deal4u.fourplease.global.scheduler;
 
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProduct;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProduct;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionDuration;
@@ -21,6 +21,7 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.domain.settlement.service.SettlementService;
+import com.deal4u.fourplease.global.exception.GlobalException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -65,11 +66,10 @@ class SettlementScheduleServiceTest {
         LocalDateTime auctionStartTime = LocalDateTime.now();
         LocalDateTime auctionEndTime = LocalDateTime.now().plusDays(auctionDays);
 
-        Long settlementId = 10L;
-
         // Auction 생성
         Auction auction = Auction.builder()
                 .auctionId(auctionId)
+                .product(product)
                 .duration(new AuctionDuration(auctionStartTime, auctionEndTime))
                 .status(AuctionStatus.CLOSED)
                 .build();
@@ -124,5 +124,59 @@ class SettlementScheduleServiceTest {
 
         assertThat(idCaptor.getValue()).isEqualTo(expectedSettlementId);
         assertThat(timeCaptor.getValue()).isEqualTo(paymentDeadLine);
+    }
+
+    @Test
+    @DisplayName("정산 생성 실패 (AuctionId가 존재하지 않는 경우)")
+    void save_settlement_not_found_auction() {
+        // Given
+        Long notExistsAuctionId = 99L;
+        int days = 1;
+
+        // when
+        when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(notExistsAuctionId))
+                .thenReturn(Optional.empty());
+
+        // then
+        assertThatThrownBy(() -> settlementService.save(notExistsAuctionId, days))
+                .isInstanceOf(GlobalException.class)
+                .hasMessageContaining("해당 경매를 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("정산 생성 실패 (AuctionId에 해당하는 Bid 정보가 존재하지 않는 경우)")
+    void save_settlement_not_found_bid() {
+
+        // Given
+        Member member = genMember();
+        Product product = genProduct();
+
+        Long auctionId = 1L;
+        int auctionDays = 3;
+        Long bidId = 2L;
+        int paymentDeadLineDays = 1;
+
+        LocalDateTime auctionStartTime = LocalDateTime.now();
+        LocalDateTime auctionEndTime = LocalDateTime.now().plusDays(auctionDays);
+
+        // Auction 생성
+        Auction auction = Auction.builder()
+                .auctionId(auctionId)
+                .product(product)
+                .duration(new AuctionDuration(auctionStartTime, auctionEndTime))
+                .status(AuctionStatus.CLOSED)
+                .build();
+
+        when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
+                .thenReturn(Optional.of(auction));
+
+        when(bidRepository.findTopByAuctionOrderByPriceDescBidTimeAsc(auction))
+                .thenReturn(Optional.empty());
+
+        // when
+        assertThatThrownBy(() -> settlementService.save(auctionId, paymentDeadLineDays))
+                .isInstanceOf(GlobalException.class)
+                .hasMessageContaining("해당 입찰 내역을 찾을 수 없습니다.");
+
     }
 }
