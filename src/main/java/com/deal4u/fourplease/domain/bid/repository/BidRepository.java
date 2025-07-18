@@ -47,51 +47,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     Page<Bid> findByAuctionAndDeletedFalseOrderByPriceDescBidTimeAsc(Auction auction,
                                                                      Pageable pageable);
 
-
-    @Query("SELECT b FROM Bid b WHERE b.bidder.member.memberId = :memberId ORDER BY b.bidTime DESC")
-    Page<Bid> findByBidderMemberIdOrderByBidTimeDesc(@Param("memberId") Long memberId,
-                                                     Pageable pageable);
-
-    @Query("SELECT b FROM Bid b WHERE b.auction = :auction AND b.isSuccessfulBidder = true")
-    Optional<Bid> findSuccessfulBidByAuction(@Param("auction") Auction auction);
-
-    @Query("""
-             SELECT b FROM Bid b
-             JOIN FETCH b.auction a
-             JOIN FETCH a.product p
-             JOIN FETCH p.seller ps
-             JOIN FETCH ps.member
-             JOIN FETCH b.bidder bd
-             JOIN FETCH bd.member
-             WHERE b.bidder.member.memberId = :memberId
-             AND b.deleted = false
-             ORDER BY b.bidTime DESC
-            """)
-    Page<Bid> findByBidderMemberIdWithFetchJoin(@Param("memberId") Long memberId,
-                                                Pageable pageable);
-
-    // 여러 경매의 최고 입찰가를 한 번에 조회
-    @Query("""
-            SELECT b.auction.auctionId, MAX(b.price) 
-            FROM Bid b 
-            WHERE b.auction.auctionId IN :auctionIds 
-            AND b.deleted = false 
-            GROUP BY b.auction.auctionId
-            """)
-    List<Object[]> findMaxBidPricesByAuctionIds(@Param("auctionIds") List<Long> auctionIds);
-
-    // 여러 경매의 낙찰자를 한 번에 조회
-    @Query("""
-            SELECT b FROM Bid b 
-            JOIN FETCH b.bidder bd 
-            JOIN FETCH bd.member 
-            WHERE b.auction.auctionId IN :auctionIds 
-            AND b.isSuccessfulBidder = true 
-            AND b.deleted = false
-            """)
-    List<Bid> findSuccessfulBidsByAuctionIds(@Param("auctionIds") List<Long> auctionIds);
-
-
     // h2 방식!! 중요!!,
     @Query(
             value = """
