@@ -58,14 +58,14 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                             CASE
                                 WHEN s.status IS NOT NULL THEN
                                     CASE
-                                        WHEN s.status = 'SUCCESS' THEN
+                                        WHEN s.status = 'SUCCESS' THEN 
                                             COALESCE(sh.status, '결제 완료')
                                         WHEN s.status = 'PENDING' THEN '낙찰'
                                         WHEN s.status = 'REJECTED' THEN '결제 실패'
                                         ELSE '낙찰'
                                     END
                                 WHEN a.status = 'FAIL' AND s.status IS NULL THEN '패찰'
-                                WHEN a.status = 'CLOSED' THEN
+                                WHEN a.status = 'CLOSED' THEN 
                                     CASE WHEN b.isSuccessfulBidder THEN '낙찰' ELSE '경매 종료' END
                                 ELSE '진행중'
                             END AS status,
@@ -92,7 +92,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                         JOIN bd.member m
                         LEFT JOIN Settlement s ON s.auction = a AND s.bidder.member.memberId = :memberId
                         LEFT JOIN Shipment sh ON sh.auction = a
-                        LEFT JOIN Bid b2 ON b2.auction = a AND b2.deleted = false
                         LEFT JOIN Bid b3 ON b3.auction = a AND b3.isSuccessfulBidder = true AND b3.deleted = false
                         WHERE m.memberId = :memberId AND b.deleted = false
                         GROUP BY a.auctionId, b.bidId, p.thumbnailUrl, p.name, b.price, b.bidTime, b.createdAt, p.seller.member.nickName
@@ -105,7 +104,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                     """
     )
     Page<MyPageBidHistory> findMyBidHistoryH2(@Param("memberId") Long memberId, Pageable pageable);
-
 
     // mysql 용
     @Query(
