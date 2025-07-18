@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.global.sheduler;
+package com.deal4u.fourplease.global.scheduler;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -9,8 +9,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 
 import com.deal4u.fourplease.global.exception.GlobalException;
-import com.deal4u.fourplease.global.scheduler.FailedSettlementJob;
-import com.deal4u.fourplease.global.scheduler.FailedSettlementScheduleService;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
