@@ -35,7 +35,7 @@ class ProductImageServiceTests {
 
     @Test
     @DisplayName("상품 이미지 url 리스트를 받아 등록할 있다")
-    void product_image_can_be_saved() throws Exception {
+    void productImageCanBeSaved() throws Exception {
 
         Product product = mock(Product.class);
         List<String> imageUrls = List.of(
@@ -60,7 +60,7 @@ class ProductImageServiceTests {
 
     @Test
     @DisplayName("product를 인자로 받아 productId로 이미지 리스트를 찾아 반환한다")
-    void return_product_image_list_by_product_id() throws Exception {
+    void returnProductImageListByProductId() throws Exception {
 
         Product product = genProduct();
         List<ProductImage> productImageList = genProductImageList(product);
@@ -83,7 +83,7 @@ class ProductImageServiceTests {
 
     @Test
     @DisplayName("productId로 조회한 이미지 리스트가 빈 값이면 400 예외가 발생한다")
-    void throw_if_image_list_empty() throws Exception {
+    void throwIfImageListEmpty() throws Exception {
 
         Product product = genProduct();
         List<ProductImage> productImageList = List.of();
@@ -102,7 +102,7 @@ class ProductImageServiceTests {
 
     @Test
     @DisplayName("product를 인자로 받아 productImage 리스트를 삭제한다")
-    void productImage_list_can_be_deleted_by_product() throws Exception {
+    void productImageListCanBeDeletedByProduct() throws Exception {
 
         Product product = genProduct();
         List<ProductImage> productImageList = genProductImageList(product);
@@ -117,7 +117,7 @@ class ProductImageServiceTests {
 
     @Test
     @DisplayName("product에 해당하는 이미지 url 리스트가 없을 경우 400 예외가 발생한다")
-    void throws_if_image_urls_not_exist() throws Exception {
+    void throwsIfImageUrlsNotExist() throws Exception {
 
         Product product = genProduct();
 

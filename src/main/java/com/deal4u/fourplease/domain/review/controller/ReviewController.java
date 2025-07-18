@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.review.controller;
 
-import com.deal4u.fourplease.domain.bid.entity.PageResponse;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.review.dto.ReviewRequest;
 import com.deal4u.fourplease.domain.review.dto.ReviewResponse;
 import com.deal4u.fourplease.domain.review.service.ReviewService;

@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.domain.bid.entity;
+package com.deal4u.fourplease.domain.common;
 
 import java.util.List;
 import lombok.AccessLevel;

@@ -8,7 +8,7 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.USER_NOT_FOUND;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Seller;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
-import com.deal4u.fourplease.domain.bid.entity.PageResponse;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
