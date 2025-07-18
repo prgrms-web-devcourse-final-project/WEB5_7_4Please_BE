@@ -28,6 +28,7 @@ class PushNotificationServiceTest {
         PushNotificationMessage testMessage = PushNotificationMessage.simpleMessageBuilder()
                 .addReceiver(1L)
                 .addReceiver(2L)
+                .type("아무 타입")
                 .message(message)
                 .build();
 
@@ -44,7 +45,7 @@ class PushNotificationServiceTest {
                 ),
                 new PushNotificationCreateCommand(
                         2L,
-                        "아무 타입2",
+                        "아무 타입",
                         Map.of("message", message)
                 )
         ));
