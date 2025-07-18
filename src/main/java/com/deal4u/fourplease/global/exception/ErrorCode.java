@@ -28,6 +28,7 @@ public enum ErrorCode {
     BID_FORBIDDEN_PRICE(HttpStatus.FORBIDDEN, "기존 입찰 금액보다 높은 금액을 입력해주세요."),
     AUCTION_NOT_OPEN(HttpStatus.FORBIDDEN, "해당 경매는 종료되었습니다."),
     AUCTION_NOT_CLOSED(HttpStatus.FORBIDDEN, "해당 경매는 종료되지 않았습니다."),
+    FORBIDDEN_RECEIVER(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // 404 - Not Found
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "엔티티를 찾을 수 없습니다."),
@@ -47,10 +48,6 @@ public enum ErrorCode {
     PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
     REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 리뷰가 작성되었습니다."),
 
-    BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
-
-    FORBIDDEN_RECEIVER(HttpStatus.FORBIDDEN, "권한이 없습니다.");
-  
     // 500 - Internal Server Error
     WEBSOCKET_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "WebSocket 메시지 전송 중 오류가 발생하였습니다.");
 

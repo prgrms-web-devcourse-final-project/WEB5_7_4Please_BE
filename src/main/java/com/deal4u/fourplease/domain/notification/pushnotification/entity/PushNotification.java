@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.notification.pushnotification.entity;
 
-import com.deal4u.fourplease.domain.BaseDateEntity;
+import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
