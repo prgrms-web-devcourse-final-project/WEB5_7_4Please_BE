@@ -28,6 +28,8 @@ public class PushNotification extends BaseDateEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String type;
+
     @AttributeOverrides(
             value = {
                     @AttributeOverride(name = "memberId", column = @Column(nullable = false))
@@ -43,8 +45,9 @@ public class PushNotification extends BaseDateEntity {
     private Boolean clicked;
 
     @Builder
-    private PushNotification(Long memberId, Map<String, Object> message) {
+    private PushNotification(Long memberId, String type, Map<String, Object> message) {
         this.receiver = Receiver.of(memberId);
+        this.type = type;
         this.message = message;
         this.clicked = false;
     }

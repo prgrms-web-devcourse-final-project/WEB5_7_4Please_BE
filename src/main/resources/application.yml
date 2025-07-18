@@ -30,5 +30,8 @@ spring:
           auth: true            # 사용자 인증 시도 여부
           starttls:
             enable: true        # starttls 활성화 여부
+  h2:
+    console:
+      enabled: true
 toss:
   secret-key: ${TOSS_SECRET_KEY}

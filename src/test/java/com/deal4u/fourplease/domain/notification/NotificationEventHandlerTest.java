@@ -50,7 +50,7 @@ class NotificationEventHandlerTest {
     @DisplayName("이벤트를 발행하면 푸쉬 알림이 전송된다.")
     void whenEventIsPublishedThenPushNotificationIsSent() {
         PushNotificationMessage message = PushNotificationMessage.simpleMessageBuilder()
-                .addTo(1L)
+                .addReceiver(1L)
                 .message("test")
                 .build();
 
@@ -84,7 +84,7 @@ class NotificationEventHandlerTest {
     @DisplayName("롤백되면 이벤트를 발행하면 푸쉬 알림이 전송되지 않는다")
     void whenEventIsPublishedButTransactionRollsBackThenPushNotificationIsNotSent() {
         PushNotificationMessage message = PushNotificationMessage.simpleMessageBuilder()
-                .addTo(1L)
+                .addReceiver(1L)
                 .message("test")
                 .build();
 

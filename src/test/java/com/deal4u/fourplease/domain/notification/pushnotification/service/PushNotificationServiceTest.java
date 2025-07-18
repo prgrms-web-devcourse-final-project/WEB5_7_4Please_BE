@@ -26,8 +26,8 @@ class PushNotificationServiceTest {
     void pushNotificationSendFlowRunsSuccessfully() {
         String message = "test message";
         PushNotificationMessage testMessage = PushNotificationMessage.simpleMessageBuilder()
-                .addTo(1L)
-                .addTo(2L)
+                .addReceiver(1L)
+                .addReceiver(2L)
                 .message(message)
                 .build();
 

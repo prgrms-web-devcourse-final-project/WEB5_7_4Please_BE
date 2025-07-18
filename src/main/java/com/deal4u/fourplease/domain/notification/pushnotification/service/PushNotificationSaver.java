@@ -25,7 +25,8 @@ public class PushNotificationSaver {
 
 
     public void save(List<PushNotificationCreateCommand> pushNotifications) {
-        jdbcTemplate.batchUpdate("insert into push_notification(message,member_id) values (?,?)",
+        jdbcTemplate.batchUpdate(
+                "insert into push_notification(message,type,member_id,clicked,created_at,updated_at) values (?,?,?,?,now(),now())",
                 new BatchPreparedStatementSetter() {
                     @SneakyThrows
                     @Override
@@ -34,7 +35,9 @@ public class PushNotificationSaver {
                         PushNotificationCreateCommand notifications = pushNotifications.get(i);
                         Map<String, Object> message = notifications.message();
                         ps.setObject(1, objectMapper.writeValueAsString(message), Types.BINARY);
-                        ps.setLong(2, notifications.memberId());
+                        ps.setString(2, notifications.type());
+                        ps.setLong(3, notifications.memberId());
+                        ps.setBoolean(4, false);
                     }
 
                     @Override
