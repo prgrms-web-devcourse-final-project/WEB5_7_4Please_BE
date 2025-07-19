@@ -5,6 +5,7 @@ import com.deal4u.fourplease.domain.shipment.service.ShipmentService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +30,7 @@ public class ShipmentController {
     })
     @PostMapping("/auctions/{auctionId}/shipment")
     public void registerTrackingNumber(
-            @PathVariable Long auctionId,
+            @PathVariable @Positive Long auctionId,
             @RequestBody @Valid TrackingNumberRequest trackingNumberRequest) {
         shipmentService.saveShipment(auctionId, trackingNumberRequest);
     }
