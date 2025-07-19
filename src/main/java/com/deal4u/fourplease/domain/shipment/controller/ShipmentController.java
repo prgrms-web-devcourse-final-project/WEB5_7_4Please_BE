@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -33,5 +34,16 @@ public class ShipmentController {
             @PathVariable @Positive Long auctionId,
             @RequestBody @Valid TrackingNumberRequest trackingNumberRequest) {
         shipmentService.saveShipment(auctionId, trackingNumberRequest);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "구매 확정 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 경매 또는 배송 정보를 찾을 수 없습니다"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    })
+    @PutMapping("/auctions/{auctionId}/shipment/confirm")
+    public void confirmPurchase(@PathVariable @Positive Long auctionId) {
+        shipmentService.confirmPurchase(auctionId);
     }
 }

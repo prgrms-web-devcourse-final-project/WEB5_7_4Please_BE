@@ -126,4 +126,73 @@ class ShipmentServiceTest {
             verify(auctionRepository, times(1)).findById(auctionId);
         }
     }
+
+    @Nested
+    class ConfirmPurchaseTests {
+
+        @Test
+        @DisplayName("구매 확정이 정상적으로 수행되는 경우")
+        void testConfirmPurchaseSuccessful() {
+            // Given
+            Long auctionId = 1L;
+
+            Shipment shipment = Shipment.builder()
+                    .shipmentId(1L)
+                    .auction(auction)
+                    .shippingCode("1234567890")
+                    .status(ShipmentStatus.INTRANSIT)
+                    .build();
+
+            when(auctionRepository.findById(auctionId))
+                    .thenReturn(Optional.of(auction));
+            when(shipmentRepository.findByAuction(auction))
+                    .thenReturn(Optional.of(shipment));
+
+            // When
+            shipmentService.confirmPurchase(auctionId);
+
+            // Then
+            assertThat(shipment.getStatus()).isEqualTo(ShipmentStatus.DELIVERED);
+            verify(auctionRepository, times(1)).findById(auctionId);
+            verify(shipmentRepository, times(1)).findByAuction(auction);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 경매 ID로 구매 확정 시 예외 발생")
+        void testConfirmPurchaseAuctionNotFound() {
+            // Given
+            Long nonExistentAuctionId = 999L;
+
+            when(auctionRepository.findById(nonExistentAuctionId))
+                    .thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> shipmentService.confirmPurchase(nonExistentAuctionId))
+                    .isInstanceOf(GlobalException.class)
+                    .hasMessage("해당 경매를 찾을 수 없습니다.");
+
+            verify(auctionRepository, times(1)).findById(nonExistentAuctionId);
+            verify(shipmentRepository, times(0)).findByAuction(any());
+        }
+
+        @Test
+        @DisplayName("배송 정보가 없는 경매에 대해 구매 확정 시 예외 발생")
+        void testConfirmPurchaseShipmentNotFound() {
+            // Given
+            Long auctionId = 1L;
+
+            when(auctionRepository.findById(auctionId))
+                    .thenReturn(Optional.of(auction));
+            when(shipmentRepository.findByAuction(auction))
+                    .thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> shipmentService.confirmPurchase(auctionId))
+                    .isInstanceOf(GlobalException.class)
+                    .hasMessage("해당 배송 정보를 찾을 수 없습니다.");
+
+            verify(auctionRepository, times(1)).findById(auctionId);
+            verify(shipmentRepository, times(1)).findByAuction(auction);
+        }
+    }
 }
