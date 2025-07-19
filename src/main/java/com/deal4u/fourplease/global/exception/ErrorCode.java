@@ -45,6 +45,7 @@ public enum ErrorCode {
     AUCTION_NOT_CLOSED(HttpStatus.FORBIDDEN, "해당 경매는 종료되지 않았습니다."),
     MEMBER_WITHDRAWN(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다."),
     TOKEN_ALREADY_BLACKLISTED(HttpStatus.FORBIDDEN, "이미 블랙리스트 처리된 토큰입니다."),
+    FORBIDDEN_RECEIVER(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // 404 - Not Found,
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "엔티티를 찾을 수 없습니다."),

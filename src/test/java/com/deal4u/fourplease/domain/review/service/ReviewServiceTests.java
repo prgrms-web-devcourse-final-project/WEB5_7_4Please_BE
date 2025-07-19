@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
@@ -130,12 +130,9 @@ class ReviewServiceTests {
 
     @Test
     @DisplayName("리뷰 작성 성공")
-    void create_review_success() throws Exception {
+    void create_review_success() {
+
         // Given
-        ReviewRequest request = new ReviewRequest(
-                auction.getAuctionId(),
-                5,
-                "사장님이 맛있고, 음식이 친절해요.");
         Long buyerId = buyer.getMemberId();
 
         // Mocking repository
@@ -148,6 +145,10 @@ class ReviewServiceTests {
         when(reviewRepository.findByAuctionAndReviewer(any(Auction.class),
                 any(Reviewer.class))).thenReturn(Optional.empty());
 
+        ReviewRequest request = new ReviewRequest(
+                auction.getAuctionId(),
+                5,
+                "사장님이 맛있고, 음식이 친절해요.");
         // When
         reviewService.createReview(request, buyerId);
 
@@ -167,7 +168,7 @@ class ReviewServiceTests {
 
     @Test
     @DisplayName("리뷰 작성 실패 (존재하지 않는 경매)")
-    void create_review_not_found_auction() throws Exception {
+    void create_review_not_found_auction() {
         // Given
         Long nonExistingAuctionId = 99L;
         ReviewRequest request = new ReviewRequest(nonExistingAuctionId, 5, "...");
@@ -186,7 +187,7 @@ class ReviewServiceTests {
 
     @Test
     @DisplayName("리뷰 작성 실패 (존재하지 않는 주문 내역)")
-    void create_review_not_found_order() throws Exception {
+    void create_review_not_found_order() {
         // Given
         ReviewRequest request = new ReviewRequest(auction.getAuctionId(), 5, "...");
         Long buyerId = buyer.getMemberId();
@@ -205,7 +206,7 @@ class ReviewServiceTests {
 
     @Test
     @DisplayName("리뷰 작성 실패 (존재하지 않는 결제 내역)")
-    void create_review_not_found_payment() throws Exception {
+    void create_review_not_found_payment() {
         // Given
         ReviewRequest request = new ReviewRequest(auction.getAuctionId(), 5, "...");
         Long buyerId = buyer.getMemberId();
@@ -225,7 +226,7 @@ class ReviewServiceTests {
 
     @Test
     @DisplayName("리뷰 작성 실패 (이미 작성된 리뷰가 존재하는 경우)")
-    void create_review_already_exists_review() throws Exception {
+    void create_review_already_exists_review() {
         // Given
         ReviewRequest request = new ReviewRequest(auction.getAuctionId(), 5, "...");
         Long buyerId = buyer.getMemberId();
