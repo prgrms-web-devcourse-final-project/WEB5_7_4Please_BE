@@ -34,7 +34,7 @@ public class ShipmentService {
 
         Shipment shipment = getShipmentOrThrow(auction);
 
-        shipment.updateStatusToDELIVERED();
+        shipment.updateStatusToDelivered();
     }
 
     private Shipment getShipmentOrThrow(Auction auction) {

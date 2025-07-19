@@ -38,7 +38,7 @@ public class Shipment extends BaseDateEntity {
     @Column(nullable = false)
     private ShipmentStatus status;
 
-    public void updateStatusToDELIVERED() {
+    public void updateStatusToDelivered() {
         this.status = ShipmentStatus.DELIVERED;
     }
 }
