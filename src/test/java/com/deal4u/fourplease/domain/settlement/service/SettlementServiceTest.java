@@ -42,6 +42,9 @@ class SettlementServiceTest {
     @Mock
     private FailedSettlementScheduleService scheduleService;
 
+    @Mock
+    private SecondBidderNotifier secondBidderNotifier;
+
     @InjectMocks
     private SettlementService settlementService;
 
@@ -110,6 +113,11 @@ class SettlementServiceTest {
         // then
         ArgumentCaptor<Settlement> settlementCaptor = ArgumentCaptor.forClass(Settlement.class);
         verify(settlementRepository).save(settlementCaptor.capture());
+        then(secondBidderNotifier).should().send(
+                eq(secondHighestBid),
+                eq(auction),
+                any(LocalDateTime.class)
+        );
 
         Settlement capturedSettlement = settlementCaptor.getValue();
         assertAll(

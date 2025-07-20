@@ -34,13 +34,14 @@ public class SecondBidderNotifier {
             String bidderEmail = secondHighestBid.getBidder().getMember().getEmail();
 
             HtmlEmailMessage emailMessage = HtmlEmailMessage.builder()
-                    .templateName("second-bidder-notification")
+                    .templateName("offerSecondBidder")
                     .subject("[Deal4U] 차상위 입찰자 결제 안내")
                     .addEmail(bidderEmail)
                     .addData("bidderName", secondHighestBid.getBidder().getMember().getNickName())
-                    .addData("auctionTitle", auction.getProduct())
+                    .addData("auctionTitle", auction.getProduct().getName())
                     .addData("bidAmount", secondHighestBid.getPrice())
                     .addData("paymentDeadline", paymentDeadline)
+                    .addData("paymentUrl", "/") // todo: 실제 url로 변경
                     .build();
 
             htmlEmailService.send(emailMessage);

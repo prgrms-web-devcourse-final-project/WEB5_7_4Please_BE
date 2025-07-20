@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2순위 입찰자 결제 안내</title>
+    <title>차상위 입찰자 결제 안내</title>
     <style>
         body {
             font-family: 'Malgun Gothic', sans-serif;
@@ -40,14 +40,16 @@
             font-weight: bold;
         }
 
+
         .btn {
             display: inline-block;
             background-color: #4CAF50;
-            color: white;
+            color: white !important; /* 글씨색 고정 */
             padding: 12px 24px;
-            text-decoration: none;
+            text-decoration: none !important; /* 밑줄 제거 */
             border-radius: 5px;
             margin: 20px 0;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -58,20 +60,19 @@
 </div>
 
 <div class="content">
-    <p th:text="${bidderName} + '님 안녕하세요!">고객님 안녕하세요!</p>
+    <p th:text="|${bidderName}님 안녕하세요!|">고객님 안녕하세요!</p>
 
-    <p>최상위 입찰자의 결제가 완료되지 않아, <strong th:text="${bidderName}">고객님</strong>께서 차상위 입찰자로 낙찰 기회를 얻으셨습니다.</p>
+    <p>최상위 입찰자의 결제가 완료되지 않아, <strong th:text="${bidderName}"></strong>고객님께서 차상위 입찰자로 낙찰 기회를 얻으셨습니다.</p>
 
     <div class="highlight">
         <h3>📋 낙찰 정보</h3>
         <ul>
             <li><strong>경매 상품:</strong> <span th:text="${auctionTitle}">상품명</span></li>
-            <li><strong>낙찰 금액:</strong> <span th:text="${#numbers.formatInteger(bidAmount, 0, 'COMMA')} + '원'">0원</span>
+            <li><strong>낙찰 금액:</strong> <span th:text="|${#numbers.formatInteger(bidAmount, 0, 'COMMA')}원|">0원</span>
             </li>
             <li><strong>결제 마감:</strong> <span class="deadline"
                                               th:text="${#temporals.format(paymentDeadline, 'yyyy년 MM월 dd일 HH시 mm분')}">마감시간</span>
             </li>
-            <li><strong>정산 ID:</strong> <span th:text="${settlementId}">정산ID</span></li>
         </ul>
     </div>
 
@@ -83,14 +84,13 @@
     </ul>
 
     <div style="text-align: center; margin: 30px 0;">
-        <a href="#" class="btn">지금 결제하기</a>
+        <a th:href="${paymentUrl}" class="btn">지금 결제하기</a>
     </div>
 
     <hr>
 
     <p><small>
         본 메일은 자동으로 발송된 메일입니다.<br>
-        문의사항이 있으시면 고객센터(support@deal4u.com)로 연락주세요.
     </small></p>
 </div>
 </body>
