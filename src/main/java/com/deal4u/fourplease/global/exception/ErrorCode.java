@@ -60,7 +60,11 @@ public enum ErrorCode {
             "실패한 정산 작업을 스케줄링하는 중 오류가 발생했습니다."),
     FAILED_SETTLEMENT_SCHEDULE_CANCEL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,
             "실패한 정산 작업을 취소하는 중 오류가 발생했습니다."),
-    FAILED_SETTLEMENT_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "예약된 실패한 정산 작업이 존재하지 않습니다.");
+    EMAIL_SEND_FAILED_TO_SECOND_BIDDER(HttpStatus.INTERNAL_SERVER_ERROR,
+            "2순위 입찰자에게 이메일을 전송하는 데 실패했습니다."),
+    FAILED_SETTLEMENT_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "예약된 실패한 정산 작업이 존재하지 않습니다."),
+    PUSH_NOTIFICATION_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,
+            "차상위 입찰자에게 푸시 알림을 전송하는 데 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;

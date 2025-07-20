@@ -23,6 +23,7 @@ public class SettlementService {
 
     private final BidRepository bidRepository;
     private final FailedSettlementScheduleService scheduleService;
+    private final SecondBidderNotifier secondBidderNotifier;
 
     @Transactional
     public void offerSecondBidder(Long auctionId) {
@@ -36,6 +37,8 @@ public class SettlementService {
                 createSettlementForSecondBidder(secondHighestBid, auction, paymentDeadline);
 
         scheduleService.scheduleFailedSettlement(settlement.getSettlementId(), paymentDeadline);
+
+        secondBidderNotifier.send(secondHighestBid, auction, paymentDeadline);
     }
 
     @Transactional
