@@ -86,4 +86,4 @@ spring:
           starttls:
             enable: false        # starttls 활성화 여부
 toss:
-  secret-key: ${TOSS_SECRET_KEY}
+  secret-key: dummy-secret-key
