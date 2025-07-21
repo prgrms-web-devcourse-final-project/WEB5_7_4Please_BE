@@ -29,26 +29,15 @@ spring:
       client:
         registration:
           google:
-            client-id: dummy-google-client-id
-            client-secret: dummy-google-client-secret
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             redirect-uri: "http://localhost:8080/api/v1/login/google"
             scope:
               - email
               - profile
-          kakao:
-            client-id: dummy-kakao-client-id # 발급 받은 Client ID
-            client-secret: dummy-kakao-client-secret # 발급 받은 Client Secret
-            client-authentication-method: client_secret_post
-            authorization-grant-type: authorization_code
-            scope: # https://developers.kakao.com/docs/latest/ko/kakaologin/common#user-info
-              - profile_nickname
-              - profile_image
-              - account_email
-            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao"
-            client-name: Kakao
           naver:
-            client-id: dummy-naver-client-id # 발급 받은 Client ID
-            client-secret: dummy-naver-client-secret # 발급 받은 Client Secret
+            client-id: ${NAVER_CLIENT_ID} # 발급 받은 Client ID
+            client-secret: ${NAVER_CLIENT_SECRET} # 발급 받은 Client Secret
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
             redirect-uri: "http://localhost:8080/login/oauth2/code/naver"
@@ -65,25 +54,19 @@ spring:
             user-info-authentication-method: header
             user-name-attribute: response # Naver 응답 값 resultCode, message, response 중 response 지정
 
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-info-authentication-method: header
-            user-name-attribute: id # Kakao 응답 값 id, connected_at, properties, kakao_account 중 id 지정
   h2:
     console:
       enabled: true
   mail:
-    host: dummy       # SMTP 서버 호스트
-    port: 1025               # SMTP 서버 포트
-    username: test                # SMTP 서버 로그인 아이디
-    password: test                # SMTP 서버 로그인 비밀번호
+    host: ${SMTP_HOST}       # SMTP 서버 호스트
+    port: ${SMTP_PORT}               # SMTP 서버 포트
+    username: ${SMTP_USERNAME}                # SMTP 서버 로그인 아이디
+    password: ${SMTP_PASSWORD}                # SMTP 서버 로그인 비밀번호
     properties:
       mail:
         smtp:
-          auth: false            # 사용자 인증 시도 여부
+          auth: true            # 사용자 인증 시도 여부
           starttls:
-            enable: false        # starttls 활성화 여부
+            enable: true        # starttls 활성화 여부
 toss:
-  secret-key: dummy-secret-key
+  secret-key: ${TOSS_SECRET_KEY}

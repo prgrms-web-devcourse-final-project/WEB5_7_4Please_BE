@@ -53,6 +53,11 @@ jobs:
           SMTP_PORT: ${{secrets.SMTP_PORT}}
           SMTP_USERNAME: ${{secrets.SMTP_USERNAME}}
           TOSS_SECRET_KEY: ${{ secrets.TOSS_SECRET_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+
 
   build:
     runs-on: ubuntu-latest
