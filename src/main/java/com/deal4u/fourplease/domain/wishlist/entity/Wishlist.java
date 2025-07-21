@@ -11,14 +11,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
+@Builder
 @SQLRestriction("deleted = false")
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Wishlist extends BaseDateEntity {
 
@@ -32,7 +34,7 @@ public class Wishlist extends BaseDateEntity {
     @JoinColumn(name = "auction_id")
     private Auction auction;
 
-    private Boolean deleted = false;
+    private boolean deleted;
 
     public void delete() {
         this.deleted = true;

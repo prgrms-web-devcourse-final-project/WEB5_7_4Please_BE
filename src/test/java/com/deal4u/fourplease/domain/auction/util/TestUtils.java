@@ -66,6 +66,10 @@ public class TestUtils {
                 .build();
     }
 
+    public static Auction genAuction() {
+        return genAuctionCreateRequest().toEntity(genProduct());
+    }
+
     public static AuctionCreateRequest genAuctionCreateRequest() {
         return new AuctionCreateRequest(
                 "칫솔",
