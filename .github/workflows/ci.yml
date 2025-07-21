@@ -46,7 +46,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run Tests
-        run: ./gradlew test -Dspring.profiles.active=ci
+        run: SPRING_PROFILES_ACTIVE=ci ./gradlew test
         env:
           SMTP_HOST: ${{secrets.SMTP_HOST}}
           SMTP_PASSWORD: ${{secrets.SMTP_PASSWORD}}
@@ -76,4 +76,4 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build project only (skip test and checkstyle)
-        run: ./gradlew build -x test -x checkstyleMain
+        run: SPRING_PROFILES_ACTIVE=ci ./gradlew build -x test -x checkstyleMain
