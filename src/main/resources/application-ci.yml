@@ -16,8 +16,8 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+        #dialect: org.hibernate.dialect.MySQLDialect
     defer-datasource-initialization: true
-
 
   sql:
     init:
@@ -71,6 +71,19 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-info-authentication-method: header
             user-name-attribute: id # Kakao 응답 값 id, connected_at, properties, kakao_account 중 id 지정
-
+  h2:
+    console:
+      enabled: true
+  mail:
+    host: dummy       # SMTP 서버 호스트
+    port: 1025               # SMTP 서버 포트
+    username: test                # SMTP 서버 로그인 아이디
+    password: test                # SMTP 서버 로그인 비밀번호
+    properties:
+      mail:
+        smtp:
+          auth: false            # 사용자 인증 시도 여부
+          starttls:
+            enable: false        # starttls 활성화 여부
 toss:
   secret-key: ${TOSS_SECRET_KEY}
