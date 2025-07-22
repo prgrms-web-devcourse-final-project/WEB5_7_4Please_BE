@@ -45,7 +45,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             // 아직 닉네임 설정 안했으므로, 프론트 닉네임 설정 페이지로 redirect
             String tempToken = jwtProvider.generateTokenPair(member).accessToken(); // 임시 토큰 발급
             log.info("token: " + tempToken);
-            response.setHeader("X-Temp-Token", tempToken);
+            response.setHeader("Authorization", "Bearer " + tempToken);
             response.setHeader("X-Redirect-Url", SIGNUP_REDIRECT_URL);
         } else {
             // 새로운 JWT 발급

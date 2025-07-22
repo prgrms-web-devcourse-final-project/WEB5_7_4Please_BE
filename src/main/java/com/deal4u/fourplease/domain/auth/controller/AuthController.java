@@ -1,5 +1,6 @@
 package com.deal4u.fourplease.domain.auth.controller;
 
+import com.deal4u.fourplease.domain.auth.dto.RefreshRequest;
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
 import com.deal4u.fourplease.domain.auth.service.AuthService;
 import com.deal4u.fourplease.domain.auth.service.LogoutService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -27,10 +29,8 @@ public class AuthController {
 
     @PostMapping
     public ResponseEntity<TokenPair> refreshAccessToken(
-            @RequestHeader("Authorization") String refreshTokenHeader) {
-        String refreshToken = refreshTokenHeader.replace("Bearer ", "");
-        TokenPair tokenPair = authService.refreshAccessToken(refreshToken);
-        return ResponseEntity.ok(tokenPair);
+            @RequestBody RefreshRequest request) {
+        return ResponseEntity.ok(authService.refreshAccessToken(request));
     }
 
     @PostMapping("/logout")
@@ -41,17 +41,16 @@ public class AuthController {
     })
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> logout(
-            @RequestHeader("Authorization") String authHeader,
-            @AuthenticationPrincipal Member member
+            @RequestBody RefreshRequest request
     ) {
-        return logoutService.logout(authHeader, member);
+        return logoutService.logout(request);
     }
 
     @DeleteMapping("/members")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> disconnectPlatforms(
-            @RequestHeader("Authorization") String authHeader,
+            @RequestBody RefreshRequest request,
             @AuthenticationPrincipal Member member) {
-        return authService.deactivateMember(authHeader, member);
+        return authService.deactivateMember(request, member);
     }
 }

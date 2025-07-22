@@ -1,10 +1,9 @@
 package com.deal4u.fourplease.domain.auth.service;
 
+import com.deal4u.fourplease.domain.auth.dto.RefreshRequest;
 import com.deal4u.fourplease.domain.auth.entity.BlacklistedToken;
 import com.deal4u.fourplease.domain.auth.repository.BlacklistedTokenRepository;
-import com.deal4u.fourplease.domain.auth.repository.RefreshTokenRepository;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
-import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class LogoutService {
     private JwtProvider jwtProvider;
-    private RefreshTokenRepository refreshTokenRepository;
     private BlacklistedTokenRepository blacklistedTokenRepository;
 
     // Authorization 헤더 검증 로직
@@ -36,10 +34,10 @@ public class LogoutService {
     }
 
     @Transactional
-    public ResponseEntity<Void> logout(String refreshToken) {
-        // 토큰 유효성 검사
+    public ResponseEntity<Void> logout(RefreshRequest request) {
+        String refreshToken = request.refreshToken();
+        // 1. 토큰 유효성 검사
         jwtProvider.validateOrThrow(refreshToken);
-
 
         // 2. 토큰 타입이 Refresh인지 확인
         String tokenType = jwtProvider.getTokenType(refreshToken);
@@ -55,7 +53,7 @@ public class LogoutService {
         // 4. 토큰의 만료일 추출
         LocalDateTime expiration = jwtProvider.getExpirationFromToken(refreshToken);
 
-        // 액세스 토큰을 블랙리스트에 추가
+        // 5. 리프레시 토큰을 블랙리스트에 추가
         blacklistedTokenRepository.save(
                 BlacklistedToken.builder()
                         .token(refreshToken)

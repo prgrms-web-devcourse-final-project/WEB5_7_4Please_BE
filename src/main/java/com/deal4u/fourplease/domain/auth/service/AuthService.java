@@ -1,15 +1,14 @@
 package com.deal4u.fourplease.domain.auth.service;
 
 
+import com.deal4u.fourplease.domain.auth.dto.RefreshRequest;
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
-import com.deal4u.fourplease.domain.auth.entity.RefreshToken;
-import com.deal4u.fourplease.domain.auth.repository.RefreshTokenRepository;
+import com.deal4u.fourplease.domain.auth.repository.BlacklistedTokenRepository;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,31 +19,18 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AuthService {
     private final JwtProvider jwtProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
     private final MemberRepository memberRepository;
     private final LogoutService logoutService;
 
-    // 로그인 시 토큰 생성 및 저장
+    // 로그인 시 토큰 생성
     public TokenPair createTokenPair(Member member) {
-        TokenPair tokenPair = jwtProvider.generateTokenPair(member);
-
-        LocalDateTime expiryDate = jwtProvider.getExpirationFromToken(tokenPair.refreshToken());
-        refreshTokenRepository.findByMember(member)
-                .ifPresentOrElse(
-                        existing -> existing.updateToken(tokenPair.refreshToken(), expiryDate),
-                        () -> refreshTokenRepository.save(
-                                RefreshToken.builder()
-                                        .member(member)
-                                        .token(tokenPair.refreshToken())
-                                        .expiryDate(expiryDate)
-                                        .build()
-                        )
-                );
-        return tokenPair;
+        return  jwtProvider.generateTokenPair(member);
     }
 
-    // 리프레시 토큰을 통해 새로운 액세스토큰과 리프레시 토큰을 재발급
-    public TokenPair refreshAccessToken(String refreshToken) {
+    // 리프레시 토큰을 통해 새로운 토큰을 재발급
+    public TokenPair refreshAccessToken(RefreshRequest request) {
+        String refreshToken = request.refreshToken();
         // 토큰 유효성 검사
         jwtProvider.validateOrThrow(refreshToken);
 
@@ -54,22 +40,21 @@ public class AuthService {
             throw ErrorCode.INVALID_TOKEN_TYPE.toException();
         }
 
-        // DB에 저장된 토큰인지 확인
-        RefreshToken savedToken = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(ErrorCode.INVALID_REFRESH_TOKEN::toException);
-
-        // DB 기준으로 만료 여부 확인
-        if (savedToken.isExpired()) {
-            refreshTokenRepository.delete(savedToken); // 만료된 토큰 삭제
-            throw ErrorCode.TOKEN_EXPIRED.toException();
+        if (blacklistedTokenRepository.existsByToken(refreshToken)) {
+            throw ErrorCode.INVALID_REFRESH_TOKEN.toException();
         }
-        // 검증된 토큰을 가진 유저이므로 새로운 토큰 생성
-        Member member = savedToken.getMember();
+
+        // 4. 토큰에서 사용자 이메일 추출
+        String email = jwtProvider.getEmailFromToken(refreshToken);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
+
+        // 5. 새 토큰 발급 (Access + Refresh 둘 다)
         return createTokenPair(member);
     }
 
-    public ResponseEntity<Void> deactivateMember(String authHeader, Member member) {
-        logoutService.logout(authHeader, member);
+    public ResponseEntity<Void> deactivateMember(RefreshRequest request, Member member) {
+        logoutService.logout(request);
 
         member.setStatus(Status.DELETED);
         memberRepository.save(member);

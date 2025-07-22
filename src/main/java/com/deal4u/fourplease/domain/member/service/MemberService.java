@@ -78,7 +78,7 @@ public class MemberService {
         member.setStatus(Status.ACTIVE);
         memberRepository.save(member);
 
-        log.info("닉네임 설정된 유저: {}", member.getEmail());
+        log.info("설정된 닉네임: {}", member.getNickName());
 
         TokenPair tokenPair = authService.createTokenPair(member);
         SignupResponse response = SignupResponse.builder()
