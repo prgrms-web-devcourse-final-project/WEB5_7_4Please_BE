@@ -6,8 +6,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -15,9 +15,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.deal4u.fourplease.domain.common.PageResponse;
-import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
+import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
 import com.deal4u.fourplease.domain.wishlist.service.WishlistService;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,6 +1,5 @@
 package com.deal4u.fourplease.domain.auction.util;
 
-import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
@@ -15,6 +14,7 @@ import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.ProductImage;
 import com.deal4u.fourplease.domain.auction.entity.Seller;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
