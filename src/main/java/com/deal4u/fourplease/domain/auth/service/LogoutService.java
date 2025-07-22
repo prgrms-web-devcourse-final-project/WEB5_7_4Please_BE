@@ -36,31 +36,34 @@ public class LogoutService {
     }
 
     @Transactional
-    public ResponseEntity<Void> logout(String authHeader, Member member) {
-        // Authorization 헤더에서 토큰 추출 및 검증
-        String token = extractTokenFromHeader(authHeader);
-
+    public ResponseEntity<Void> logout(String refreshToken) {
         // 토큰 유효성 검사
-        jwtProvider.validateOrThrow(token);
+        jwtProvider.validateOrThrow(refreshToken);
 
-        // 이미 블랙리스트에 있는지 확인
-        if (blacklistedTokenRepository.existsByToken(token)) {
+
+        // 2. 토큰 타입이 Refresh인지 확인
+        String tokenType = jwtProvider.getTokenType(refreshToken);
+        if (!"refresh".equals(tokenType)) {
+            throw ErrorCode.INVALID_TOKEN_TYPE.toException();
+        }
+
+        // 3. 이미 블랙리스트에 있는지 확인
+        if (blacklistedTokenRepository.existsByToken(refreshToken)) {
             throw ErrorCode.TOKEN_ALREADY_BLACKLISTED.toException();
         }
 
+        // 4. 토큰의 만료일 추출
+        LocalDateTime expiration = jwtProvider.getExpirationFromToken(refreshToken);
+
         // 액세스 토큰을 블랙리스트에 추가
-        LocalDateTime expiration = jwtProvider.getExpirationFromToken(token);
         blacklistedTokenRepository.save(
                 BlacklistedToken.builder()
-                        .token(token)
+                        .token(refreshToken)
                         .expiryDate(expiration)
                         .build()
         );
-        log.info("Access token이 블랙리스트에 추가됨: {}", member.getEmail());
+        log.info("Refresh token이 블랙리스트에 추가됨");
 
-        // 리프레시 토큰 삭제
-        refreshTokenRepository.deleteByMember(member);
-        log.info("사용자 로그아웃 완료: {}", member.getEmail());
         return ResponseEntity.noContent().build();
     }
 }
