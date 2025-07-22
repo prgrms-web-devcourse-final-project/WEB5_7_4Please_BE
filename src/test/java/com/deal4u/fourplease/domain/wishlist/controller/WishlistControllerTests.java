@@ -3,7 +3,9 @@ package com.deal4u.fourplease.domain.wishlist.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -58,4 +60,17 @@ class WishlistControllerTests {
 
     }
 
+    @Test
+    @DisplayName("DELETE /api/v1/wishlist/{wishlistId}가 성공하면 wishlist를 삭제하고 204를 반환한다")
+    void deleteWishlistShouldReturn204() throws Exception {
+
+        Long wishlistId = 1L;
+
+        mockMvc.perform(
+                delete("/api/v1/wishlist/{wishlistId}", wishlistId)
+        ).andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(wishlistService).deleteByWishlistId(wishlistId);
+    }
 }

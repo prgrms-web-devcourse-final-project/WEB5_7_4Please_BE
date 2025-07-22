@@ -6,6 +6,7 @@ import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
 import com.deal4u.fourplease.domain.wishlist.repository.WishlistRepository;
+import com.deal4u.fourplease.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,5 +24,13 @@ public class WishlistService {
         Wishlist wishlist = request.toEntity(member, auction);
 
         return wishlistRepository.save(wishlist).getWishlistId();
+    }
+
+    @Transactional
+    public void deleteByWishlistId(Long wishlistId) {
+        Wishlist targetWishlist = wishlistRepository.findById(wishlistId)
+                .orElseThrow(ErrorCode.WISHLIST_NOT_FOUND::toException);
+
+        targetWishlist.delete();
     }
 }
