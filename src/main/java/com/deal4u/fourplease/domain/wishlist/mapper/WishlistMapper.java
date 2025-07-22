@@ -5,7 +5,7 @@ import org.springframework.data.domain.Sort;
 public class WishlistMapper {
 
     public static Sort getSort(String order) {
-        if (order.equals("newest")) {
+        if (order.equals("earliest")) {
             return Sort.by(Sort.Direction.ASC, "createdAt");
         } else {
             return Sort.by(Sort.Direction.DESC, "createdAt");

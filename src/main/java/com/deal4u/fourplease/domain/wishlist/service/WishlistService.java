@@ -1,15 +1,12 @@
 package com.deal4u.fourplease.domain.wishlist.service;
 
-import static com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse.toWishlistResponse;
-
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
-import com.deal4u.fourplease.domain.auction.service.AuctionSupportService;
-import com.deal4u.fourplease.domain.bid.entity.Bid;
-import com.deal4u.fourplease.domain.common.PageResponse;
-import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
+import com.deal4u.fourplease.domain.auction.service.AuctionSupportService;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
 import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
 import com.deal4u.fourplease.domain.wishlist.repository.WishlistRepository;
