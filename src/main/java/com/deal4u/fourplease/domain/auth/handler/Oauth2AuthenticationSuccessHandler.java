@@ -10,8 +10,11 @@ import com.deal4u.fourplease.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -51,7 +54,15 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             // 새로운 JWT 발급
             TokenPair tokenPair = authService.createTokenPair(member);
             response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
-            response.setHeader("X-Refresh-Token", tokenPair.refreshToken());
+            ResponseCookie refreshCookie = ResponseCookie
+                    .from("refreshToken", tokenPair.refreshToken())
+                    .httpOnly(true)
+                    .secure(false) // 운영 환경에서는 true
+                    .path("/")
+                    .sameSite("None") // 운영 환경에서는 Strict
+                    .maxAge(Duration.ofHours(1))
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
             response.setHeader("X-Redirect-Url", MAIN_REDIRECT_URL);
         }
 

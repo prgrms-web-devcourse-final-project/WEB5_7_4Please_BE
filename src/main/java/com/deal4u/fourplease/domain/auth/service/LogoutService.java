@@ -34,8 +34,7 @@ public class LogoutService {
     }
 
     @Transactional
-    public ResponseEntity<Void> logout(RefreshRequest request) {
-        String refreshToken = request.refreshToken();
+    public ResponseEntity<Void> logout(String refreshToken) {
         // 1. 토큰 유효성 검사
         jwtProvider.validateOrThrow(refreshToken);
 

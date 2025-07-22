@@ -1,7 +1,6 @@
 package com.deal4u.fourplease.domain.auth.service;
 
 
-import com.deal4u.fourplease.domain.auth.dto.RefreshRequest;
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
 import com.deal4u.fourplease.domain.auth.repository.BlacklistedTokenRepository;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
@@ -25,12 +24,11 @@ public class AuthService {
 
     // 로그인 시 토큰 생성
     public TokenPair createTokenPair(Member member) {
-        return  jwtProvider.generateTokenPair(member);
+        return jwtProvider.generateTokenPair(member);
     }
 
     // 리프레시 토큰을 통해 새로운 토큰을 재발급
-    public TokenPair refreshAccessToken(RefreshRequest request) {
-        String refreshToken = request.refreshToken();
+    public TokenPair refreshAccessToken(String refreshToken) {
         // 토큰 유효성 검사
         jwtProvider.validateOrThrow(refreshToken);
 
@@ -53,8 +51,8 @@ public class AuthService {
         return createTokenPair(member);
     }
 
-    public ResponseEntity<Void> deactivateMember(RefreshRequest request, Member member) {
-        logoutService.logout(request);
+    public ResponseEntity<Void> deactivateMember(String refreshToken, Member member) {
+        logoutService.logout(refreshToken);
 
         member.setStatus(Status.DELETED);
         memberRepository.save(member);
