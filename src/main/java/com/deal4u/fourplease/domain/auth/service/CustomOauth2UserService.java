@@ -25,11 +25,14 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
     @Override
     public OAuth2User loadUser(OAuth2UserRequest request) {
         log.info("CustomOAuth2UserService.loadUser 진입");
+
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oauth2User = delegate.loadUser(request); // Spring이 가져온 사용자 정보
+
         Map<String, Object> attributes = oauth2User.getAttributes();
-        String email = (String) attributes.get("email");
+
         String provider = request.getClientRegistration().getRegistrationId();
+        String email = extractEmail(provider, attributes);
 
         if (email == null || email.isBlank()) {
             throw ErrorCode.OAUTH_EMAIL_NOT_FOUND.toException();
@@ -50,11 +53,21 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
         Member newMember = memberRepository.save(
                 Member.builder()
                         .email(email)
-                        .provider("google")
+                        .provider(provider)
                         .role(Role.USER)
                         .status(Status.PENDING)
                         .build());
         log.info("신규 회원 저장됨: " + newMember.getMemberId());
         return new Customoauth2User(newMember, attributes);
+    }
+
+    private String extractEmail(String provider, Map<String, Object> attributes) {
+        if ("naver".equals(provider)) {
+            Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+            return (String) response.get("email");
+        }
+
+        // 기본은 구글
+        return (String) attributes.get("email");
     }
 }

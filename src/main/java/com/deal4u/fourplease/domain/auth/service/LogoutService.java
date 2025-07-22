@@ -19,20 +19,6 @@ public class LogoutService {
     private JwtProvider jwtProvider;
     private BlacklistedTokenRepository blacklistedTokenRepository;
 
-    // Authorization 헤더 검증 로직
-    private String extractTokenFromHeader(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw ErrorCode.INVALID_AUTH_HEADER.toException();
-        }
-
-        String token = authHeader.replace("Bearer ", "");
-        if (token.isBlank()) {
-            throw ErrorCode.INVALID_AUTH_HEADER.toException();
-        }
-
-        return token;
-    }
-
     @Transactional
     public ResponseEntity<Void> logout(String refreshToken) {
         // 1. 토큰 유효성 검사
