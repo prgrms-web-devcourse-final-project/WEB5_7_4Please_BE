@@ -66,7 +66,6 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
             Map<String, Object> response = (Map<String, Object>) attributes.get("response");
             return (String) response.get("email");
         }
-
         // 기본은 구글
         return (String) attributes.get("email");
     }

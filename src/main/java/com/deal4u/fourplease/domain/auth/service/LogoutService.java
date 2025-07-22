@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class LogoutService {
-    private JwtProvider jwtProvider;
-    private BlacklistedTokenRepository blacklistedTokenRepository;
+    private final JwtProvider jwtProvider;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     @Transactional
     public ResponseEntity<Void> logout(String refreshToken) {

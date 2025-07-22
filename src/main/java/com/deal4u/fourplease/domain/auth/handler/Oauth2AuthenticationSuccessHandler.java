@@ -47,7 +47,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         if (member.getStatus() == Status.PENDING) {
             // 아직 닉네임 설정 안했으므로, 프론트 닉네임 설정 페이지로 redirect
             String tempToken = jwtProvider.generateTokenPair(member).accessToken(); // 임시 토큰 발급
-            log.info("token: " + tempToken);
+            log.info("임시 token: " + tempToken);
             response.setHeader("Authorization", "Bearer " + tempToken);
             response.setHeader("X-Redirect-Url", SIGNUP_REDIRECT_URL);
         } else {
@@ -59,10 +59,13 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
                     .httpOnly(true)
                     .secure(false) // 운영 환경에서는 true
                     .path("/")
-                    .sameSite("None") // 운영 환경에서는 Strict
+                    .sameSite("Lax") // 운영 환경에서는 Strict
                     .maxAge(Duration.ofHours(1))
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            log.info("Access token: " + tokenPair.accessToken());
+            log.info("RefreshToken 쿠키 설정 완료: {}", refreshCookie);
+
             response.setHeader("X-Redirect-Url", MAIN_REDIRECT_URL);
         }
 
