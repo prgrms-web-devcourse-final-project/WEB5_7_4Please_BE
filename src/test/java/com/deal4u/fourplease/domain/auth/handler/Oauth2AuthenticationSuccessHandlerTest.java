@@ -12,12 +12,9 @@ import com.deal4u.fourplease.domain.auth.service.AuthService;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
-import com.deal4u.fourplease.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,18 +26,12 @@ import org.springframework.security.core.Authentication;
 
 @ExtendWith(MockitoExtension.class)
 class Oauth2AuthenticationSuccessHandlerTest {
-    private final String tempToken = "temp.jwt.token";
-    private final String accessToken = "access.jwt.token";
-    private final String refreshToken = "refresh.jwt.token";
-    private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     @InjectMocks
     private Oauth2AuthenticationSuccessHandler successHandler;
     @Mock
     private JwtProvider jwtProvider;
     @Mock
     private AuthService authService;
-    @Mock
-    private MemberService memberService;
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -53,10 +44,9 @@ class Oauth2AuthenticationSuccessHandlerTest {
     private Member member;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         when(authentication.getPrincipal()).thenReturn(customOauth2User);
         when(customOauth2User.getMember()).thenReturn(member);
-        when(response.getWriter()).thenReturn(new PrintWriter(outputStream, true));
     }
 
     @Test
@@ -64,6 +54,8 @@ class Oauth2AuthenticationSuccessHandlerTest {
     void onAuthenticationSuccessPendingStatusReturnsTempTokenAndRedirectToSignup()
             throws Exception {
         // given
+        String tempToken = "temp.jwt.token";
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         when(member.getStatus()).thenReturn(Status.PENDING);
         when(jwtProvider.generateTokenPair(member)).thenReturn(
                 new TokenPair(tempToken, "ignored"));
@@ -83,6 +75,9 @@ class Oauth2AuthenticationSuccessHandlerTest {
     @DisplayName("상태가 ACTIVE일 때 accessToken 헤더와 refreshToke 쿠키 반환")
     void onAuthenticationSuccessActiveStatusReturnsTokenPairAndRedirectToMain() throws Exception {
         // given
+        String accessToken = "access.jwt.token";
+        String refreshToken = "refresh.jwt.token";
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         when(member.getStatus()).thenReturn(Status.ACTIVE);
         when(authService.createTokenPair(member)).thenReturn(
                 new TokenPair(accessToken, refreshToken));

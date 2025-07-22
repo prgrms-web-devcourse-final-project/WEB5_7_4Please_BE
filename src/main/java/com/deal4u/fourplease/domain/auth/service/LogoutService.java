@@ -1,6 +1,5 @@
 package com.deal4u.fourplease.domain.auth.service;
 
-import com.deal4u.fourplease.domain.auth.dto.RefreshRequest;
 import com.deal4u.fourplease.domain.auth.entity.BlacklistedToken;
 import com.deal4u.fourplease.domain.auth.repository.BlacklistedTokenRepository;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
