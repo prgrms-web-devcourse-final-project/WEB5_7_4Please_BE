@@ -1,13 +1,22 @@
 package com.deal4u.fourplease.domain.wishlist.service;
 
-import com.deal4u.fourplease.domain.auction.dto.WishlistCreateRequest;
+import static com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse.toWishlistResponse;
+
+import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
+import com.deal4u.fourplease.domain.auction.service.AuctionSupportService;
+import com.deal4u.fourplease.domain.bid.entity.Bid;
+import com.deal4u.fourplease.domain.common.PageResponse;
+import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
 import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
 import com.deal4u.fourplease.domain.wishlist.repository.WishlistRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +26,7 @@ public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
     private final AuctionService auctionService;
+    private final AuctionSupportService auctionSupportService;
 
     @Transactional
     public Long save(WishlistCreateRequest request, Member member) {
@@ -32,5 +42,21 @@ public class WishlistService {
                 .orElseThrow(ErrorCode.WISHLIST_NOT_FOUND::toException);
 
         targetWishlist.delete();
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<WishlistResponse> findAll(Pageable pageable, Member member) {
+        Page<Wishlist> wishlistPage = wishlistRepository.findAll(pageable, member.getMemberId());
+
+        Page<WishlistResponse> wishlistResponsePage = wishlistPage
+                .map(wishlist -> {
+                    BidSummaryDto bidSummaryDto =
+                            auctionSupportService.getBidSummaryDto(
+                                    wishlist.getAuction().getAuctionId()
+                            );
+                    return WishlistResponse.toWishlistResponse(wishlist, bidSummaryDto);
+                });
+
+        return PageResponse.fromPage(wishlistResponsePage);
     }
 }
