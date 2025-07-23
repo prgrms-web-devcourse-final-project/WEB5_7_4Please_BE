@@ -6,6 +6,8 @@ import com.deal4u.fourplease.domain.review.dto.ReviewResponse;
 import com.deal4u.fourplease.domain.review.service.ReviewService;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +26,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Tag(name = "Review", description = "리뷰 관리 API")
 public class ReviewController {
 
-    private ReviewService reviewService;
+    private final ReviewService reviewService;
 
+    @Operation(summary = "리뷰 작성")
+    @ApiResponse(responseCode = "200", description = "리뷰 작성 성공")
+    @ApiResponse(responseCode = "400", description = "유효하지 않은 입력 값")
+    @ApiResponse(responseCode = "404", description = "경매 또는 주문을 찾을 수 없음")
+    @ApiResponse(responseCode = "409", description = "이미 리뷰를 작성한 경매")
     @PostMapping("/auctions/{auctionId}/review")
     @ResponseStatus(HttpStatus.OK)
     public void createReview(@PathVariable Long auctionId,
@@ -40,7 +48,9 @@ public class ReviewController {
     }
 
     @Operation(summary = "판매자 리뷰 조회")
-
+    @ApiResponse(responseCode = "200", description = "판매자 리뷰 목록 조회 성공")
+    @ApiResponse(responseCode = "400", description = "허용되지 않은 정렬 기준")
+    @ApiResponse(responseCode = "404", description = "판매자를 찾을 수 없음")
     @GetMapping("/reviews/{memberId}")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<ReviewResponse> getReviews(@PathVariable(name = "memberId") Long memberId,
