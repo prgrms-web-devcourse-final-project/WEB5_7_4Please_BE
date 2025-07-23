@@ -40,10 +40,10 @@ public class SaveAuctionImageService {
         SavePath savePath = auctionSaveDataFactory.create(member.getNickName(), imageType);
         URL url = fileSaver.save(savePath, file);
 
-        return AutionImageUrlMapper.toImageUrlResponse(chnageHostUrl(url));
+        return AutionImageUrlMapper.toImageUrlResponse(changeHostUrl(url));
     }
 
-    private URL chnageHostUrl(URL url) {
+    private URL changeHostUrl(URL url) {
         try {
             URI originalUri = url.toURI();
             URI modifiedUri = new URI(
