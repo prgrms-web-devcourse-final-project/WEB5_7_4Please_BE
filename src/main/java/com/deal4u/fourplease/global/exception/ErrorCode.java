@@ -23,7 +23,7 @@ public enum ErrorCode {
     WEBSOCKET_INVALID_REQUEST_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 요청 형식입니다."),
     INVALID_PRICE_NOT_UPPER(HttpStatus.BAD_REQUEST, "즉시 구매 가격이 현재 최고 입찰가보다 낮습니다."),
     PAYMENT_NOT_SUCCESS(HttpStatus.BAD_REQUEST, "결제 처리가 완료되지 않은 결제입니다."),
-    INVALID_REVIEW_SORT(HttpStatus.BAD_REQUEST, "리뷰는 최신순으로만 정렬 가능합니다."),
+    INVALID_REVIEW_SORT(HttpStatus.BAD_REQUEST, "리뷰는 작성일자로만 정렬 가능합니다."),
 
     // 403 - Forbidden
     BID_FORBIDDEN_PRICE(HttpStatus.FORBIDDEN, "기존 입찰 금액보다 높은 금액을 입력해주세요."),
