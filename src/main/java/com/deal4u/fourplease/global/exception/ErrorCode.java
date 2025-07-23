@@ -52,6 +52,8 @@ public enum ErrorCode {
     PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
     REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 리뷰가 작성되었습니다."),
 
+
+    INVALID_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "사용할 수 없는 타입입니다"),
     SETTLEMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 차상위 입찰자에 대한 정산이 존재합니다."),
     AUCTION_SCHEDULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 경매의 마감 스케쥴이 이미 등록되어 있습니다."),
 
@@ -65,7 +67,9 @@ public enum ErrorCode {
             "2순위 입찰자에게 이메일을 전송하는 데 실패했습니다."),
     FAILED_SETTLEMENT_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "예약된 실패한 정산 작업이 존재하지 않습니다."),
     PUSH_NOTIFICATION_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,
-            "차상위 입찰자에게 푸시 알림을 전송하는 데 실패했습니다.");
+            "차상위 입찰자에게 푸시 알림을 전송하는 데 실패했습니다."),
+
+    DOES_MODIFIED_URL(HttpStatus.INTERNAL_SERVER_ERROR, "알수없는 에러입니다.");
 
     private final HttpStatus status;
     private final String message;
