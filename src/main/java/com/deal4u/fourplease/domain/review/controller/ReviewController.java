@@ -39,7 +39,8 @@ public class ReviewController {
     @PostMapping("/auctions/{auctionId}/review")
     @ResponseStatus(HttpStatus.OK)
     public void createReview(@PathVariable Long auctionId,
-            @Valid @RequestBody @ParameterObject ReviewRequest request, @RequestParam("memberId") Long memberId) {
+            @Valid @RequestBody @ParameterObject ReviewRequest request,
+            @RequestParam("memberId") Long memberId) {
         // 1. 로그인한 유저 정보 취득
         // (현재는 `RequestParam`으로 처리하고 있으나 추후에 로그인 유저 정보에서 취득할 예정)
 
