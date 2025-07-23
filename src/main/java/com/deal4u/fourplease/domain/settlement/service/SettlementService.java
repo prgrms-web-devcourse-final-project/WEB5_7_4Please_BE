@@ -18,6 +18,7 @@ import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.global.scheduler.FailedSettlementScheduleService;
 import com.deal4u.fourplease.global.scheduler.SettlementScheduleService;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class SettlementService {
     private final AuctionRepository auctionRepository;
     private final SettlementScheduleService settlementScheduleService;
     private final FailedSettlementScheduleService scheduleService;
+    private final SecondBidderNotifier secondBidderNotifier;
 
     @Transactional
     public void save(Long auctionId, int days) {
@@ -88,6 +90,8 @@ public class SettlementService {
                 createSettlementForSecondBidder(secondHighestBid, auction, paymentDeadline);
 
         scheduleService.scheduleFailedSettlement(settlement.getSettlementId(), paymentDeadline);
+
+        secondBidderNotifier.send(secondHighestBid, auction, paymentDeadline);
     }
 
     @Transactional
@@ -139,8 +143,13 @@ public class SettlementService {
     }
 
     private Bid getSecondHighestBidOrThrow(Long auctionId) {
-        return bidRepository.findSecondHighestBidByAuctionId(auctionId)
-                .orElseThrow((SECOND_HIGHEST_BIDDER_NOT_FOUND::toException));
+        List<Bid> topBids = bidRepository.findTop2ByAuctionId(auctionId);
+
+        if (topBids.size() < 2) {
+            throw SECOND_HIGHEST_BIDDER_NOT_FOUND.toException();
+        }
+
+        return topBids.get(1);
     }
 
     private void validateIfSettlementAlreadyExists(Bid secondHighestBid) {

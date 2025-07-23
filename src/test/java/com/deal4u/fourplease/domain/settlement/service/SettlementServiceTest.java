@@ -20,6 +20,7 @@ import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import com.deal4u.fourplease.global.scheduler.FailedSettlementScheduleService;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,9 @@ class SettlementServiceTest {
 
     @Mock
     private FailedSettlementScheduleService scheduleService;
+
+    @Mock
+    private SecondBidderNotifier secondBidderNotifier;
 
     @InjectMocks
     private SettlementService settlementService;
@@ -94,11 +98,12 @@ class SettlementServiceTest {
         Long auctionId = 1L;
         Auction auction = createAuction();
         Bidder bidder = createBidder();
+        Bid highestBid = createBid(auction, createBidder());
         Bid secondHighestBid = createBid(auction, bidder);
         Settlement savedSettlement = createSettlement(auction);
 
-        given(bidRepository.findSecondHighestBidByAuctionId(auctionId))
-                .willReturn(Optional.of(secondHighestBid));
+        given(bidRepository.findTop2ByAuctionId(auctionId))
+                .willReturn(List.of(highestBid, secondHighestBid));
         given(settlementRepository.existsByAuctionAndBidder(auction, bidder))
                 .willReturn(false);
         given(settlementRepository.save(any(Settlement.class)))
@@ -111,6 +116,11 @@ class SettlementServiceTest {
         ArgumentCaptor<Settlement> settlementCaptor = ArgumentCaptor.forClass(Settlement.class);
         verify(settlementRepository).save(settlementCaptor.capture());
 
+        then(secondBidderNotifier).should().send(
+                eq(secondHighestBid),
+                eq(auction),
+                any(LocalDateTime.class)
+        );
         Settlement capturedSettlement = settlementCaptor.getValue();
         assertAll(
                 () -> assertThat(capturedSettlement.getAuction()).isEqualTo(auction),
@@ -133,8 +143,10 @@ class SettlementServiceTest {
         // given
         Long auctionId = 1L;
 
-        given(bidRepository.findSecondHighestBidByAuctionId(auctionId))
-                .willReturn(Optional.empty());
+        Bid onlyBid = createBid(createAuction(), createBidder());
+
+        given(bidRepository.findTop2ByAuctionId(auctionId))
+                .willReturn(List.of(onlyBid)); // 입찰이 1개만 있는 경우
 
         // when & then
         assertThatThrownBy(() -> settlementService.offerSecondBidder(auctionId))
@@ -151,10 +163,12 @@ class SettlementServiceTest {
         Long auctionId = 1L;
         Auction auction = createAuction();
         Bidder bidder = createBidder();
+
+        Bid highestBid = createBid(auction, createBidder());
         Bid secondHighestBid = createBid(auction, bidder);
 
-        given(bidRepository.findSecondHighestBidByAuctionId(auctionId))
-                .willReturn(Optional.of(secondHighestBid));
+        given(bidRepository.findTop2ByAuctionId(auctionId))
+                .willReturn(List.of(highestBid, secondHighestBid));
         given(settlementRepository.existsByAuctionAndBidder(auction, bidder))
                 .willReturn(true);
 
@@ -173,7 +187,6 @@ class SettlementServiceTest {
         Long settlementId = 1L;
         Auction auction = createAuction();
         Settlement settlement = createSettlement(auction);
-        LocalDateTime beforeUpdate = LocalDateTime.now();
 
         given(settlementRepository.findById(settlementId))
                 .willReturn(Optional.of(settlement));
