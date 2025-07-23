@@ -60,9 +60,7 @@ class AuctionControllerTests {
     void createAuctionShouldReturn201() throws Exception {
 
         AuctionCreateRequest req = genAuctionCreateRequest();
-
         when(memberRepository.findAll()).thenReturn(List.of(Mockito.mock(Member.class)));
-
         mockMvc.perform(
                         post("/api/v1/auctions")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -76,7 +74,7 @@ class AuctionControllerTests {
 
     @Test
     @DisplayName("GET /api/v1/auctions/{auctionId}/description이 성공하면 Id의 경매 정보와 200을 반환한다")
-    void readAuctionShouldReturn200() throws Exception {
+    void read_auction_should_return200() throws Exception {
 
         Long auctionId = 1L;
         AuctionDetailResponse resp = genAuctionDetailResponse();
@@ -94,7 +92,7 @@ class AuctionControllerTests {
 
     @Test
     @DisplayName("DELETE /api/v1/auctions/{auctionId}가 성공하면 soft delete 후 204를 반환한다")
-    void deleteAuctionShouldReturn204() throws Exception {
+    void delete_auction_should_return204() throws Exception {
 
         Long auctionId = 1L;
 

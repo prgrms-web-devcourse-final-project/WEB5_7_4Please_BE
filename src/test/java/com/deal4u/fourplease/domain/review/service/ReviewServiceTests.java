@@ -33,6 +33,7 @@ import com.deal4u.fourplease.domain.review.repository.ReviewRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +48,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTests {
@@ -258,16 +260,19 @@ class ReviewServiceTests {
         Pageable pageable = PageRequest.of(0, 10);
 
         Review review1 = Review.builder()
-                .reviewId(1L).content("좋은 상품입니다!").rating(4)
+                .reviewId(1L).content("좋은 상품입니다! 기존 리뷰").rating(4)
                 .seller(Seller.create(seller)).reviewer(Reviewer.create(buyer))
                 .build();
-        Review review2 = Review.builder()
-                .reviewId(2L).content("좋은 상품입니다!").rating(2)
-                .seller(Seller.create(seller)).reviewer(Reviewer.create(buyer))
-                .build();
+        ReflectionTestUtils.setField(review1, "createdAt", LocalDateTime.now().minusDays(1));
 
-        List<Review> reviews = List.of(review1, review2);
-        Page<Review> reviewPage = new PageImpl<>(reviews, pageable, reviews.size());
+        Review review2 = Review.builder()
+                .reviewId(2L).content("좋은 상품입니다! 최신 리뷰").rating(2)
+                .seller(Seller.create(seller)).reviewer(Reviewer.create(buyer))
+                .build();
+        ReflectionTestUtils.setField(review2, "createdAt", LocalDateTime.now());
+
+        List<Review> sortedReview = List.of(review2, review1);
+        Page<Review> reviewPage = new PageImpl<>(sortedReview, pageable, sortedReview.size());
 
         when(memberRepository.findByMemberIdAndStatus(sellerId, Status.ACTIVE)).thenReturn(
                 Optional.of(seller));
@@ -282,7 +287,8 @@ class ReviewServiceTests {
         assertThat(response).isNotNull();
         assertThat(response.getContent()).hasSize(2);
         assertThat(response.getTotalElements()).isEqualTo(2);
-        assertThat(response.getContent().getFirst().content()).isEqualTo("좋은 상품입니다!");
+        assertThat(response.getContent().getFirst().content()).isEqualTo("좋은 상품입니다! 최신 리뷰");
+        assertThat(response.getContent().getLast().content()).isEqualTo("좋은 상품입니다! 기존 리뷰");
 
         verify(memberRepository).findByMemberIdAndStatus(sellerId, Status.ACTIVE);
         verify(reviewRepository).findBySeller(any(Seller.class), any(Pageable.class));
