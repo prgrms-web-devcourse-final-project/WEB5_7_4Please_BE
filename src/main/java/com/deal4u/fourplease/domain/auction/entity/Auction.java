@@ -55,6 +55,10 @@ public class Auction extends BaseDateEntity {
         this.status = AuctionStatus.CLOSED;
     }
 
+    public void fail() {
+        this.status = AuctionStatus.FAIL;
+    }
+
     public void delete() {
         this.deleted = true;
     }
