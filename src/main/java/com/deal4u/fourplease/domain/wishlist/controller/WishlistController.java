@@ -8,6 +8,7 @@ import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
 import com.deal4u.fourplease.domain.wishlist.service.WishlistService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -55,6 +56,7 @@ public class WishlistController {
 
     @Operation(summary = "위시리스트 목록 조회")
     @ApiResponse(responseCode = "200", description = "위시리스트 목록 조회 성공")
+    @Parameter(description = "정렬 옵션: latest, earliest")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<WishlistResponse> readAllWishlist(
