@@ -60,9 +60,9 @@ public class WishlistController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<WishlistResponse> readAllWishlist(
-            @RequestParam(defaultValue = "0") @Min(0) int page,
-            @RequestParam(defaultValue = "20") @Min(0) @Max(100) int size,
-            @RequestParam(defaultValue = "latest") String order
+            @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+            @RequestParam(name = "size", defaultValue = "20") @Min(0) @Max(100) int size,
+            @RequestParam(name = "order", defaultValue = "latest") String order
     ) {
         Pageable pageable = PageRequest.of(page, size, getSort(order));
 
