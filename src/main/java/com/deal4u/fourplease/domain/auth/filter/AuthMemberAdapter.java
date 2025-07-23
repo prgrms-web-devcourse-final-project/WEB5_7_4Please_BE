@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AuthMemberAdapter implements AuthMemberReader{
+public class AuthMemberAdapter implements AuthMemberReader {
 
 
     private final MemberRepository memberRepository;
