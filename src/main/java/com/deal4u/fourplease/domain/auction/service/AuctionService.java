@@ -172,13 +172,13 @@ public class AuctionService {
             ) :
                     auctionRepository.findByCategoryId(categoryId, pageable);
         }
-        return isOrderByBidCount ? auctionRepository.findAll(pageable) :
-                auctionRepository.findAllOrderByBidCount(pageable);
+        return isOrderByBidCount ? auctionRepository.findAllOrderByBidCount(pageable) :
+                auctionRepository.findAll(pageable);
     }
 
     private Sort createSort(String order) {
         if (order.equals("timeout")) {
-            return Sort.by(Sort.Direction.ASC, "endTime");
+            return Sort.by(Sort.Direction.ASC, "duration.endTime");
         }
         return Sort.by(Sort.Direction.DESC, "createdAt");
     }

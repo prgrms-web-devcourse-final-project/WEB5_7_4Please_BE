@@ -19,7 +19,7 @@ public record SellerSaleSearchRequest(
         }
 
         if (size == null) {
-            size = 3;
+            size = 20;
         }
     }
 }

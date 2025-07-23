@@ -44,8 +44,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @Query("SELECT a "
             + "FROM Auction a "
-            + "WHERE a.deleted = false "
-            + "ORDER BY a.createdAt DESC")
+            + "WHERE a.deleted = false")
     Page<Auction> findAll(Pageable pageable);
 
     @Query("SELECT a "
@@ -81,7 +80,8 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "ON b.auction = a "
             + "WHERE a.deleted = false "
             + "GROUP BY a.auctionId "
-            + "ORDER BY COUNT(b) DESC")
+            + "ORDER BY COUNT(b) DESC, "
+            + "a.createdAt DESC")
     Page<Auction> findAllOrderByBidCount(Pageable pageable);
 
     @Query("SELECT a "
