@@ -31,21 +31,98 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "AND a.status = 'CLOSED'")
     Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(Long auctionId);
 
-    @Query("select a "
-            + "from Auction a "
-            + "join fetch a.product p "
-            + "where p.productId in :productIdList "
-            + "and a.deleted = false "
-            + "order by a.createdAt desc")
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "JOIN FETCH a.product p "
+            + "WHERE a.deleted = false "
+            + "AND p.productId in :productIdList "
+            + "ORDER BY a.createdAt DESC")
     Page<Auction> findAllByProductIdIn(
             @Param("productIdList") List<Long> productIdList,
             Pageable pageable
     );
 
-    @Query("select a "
-            + "from Auction a "
-            + "where a.deleted = false "
-            + "order by a.createdAt desc")
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "WHERE a.deleted = false "
+            + "ORDER BY a.createdAt DESC")
     Page<Auction> findAll(Pageable pageable);
 
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "JOIN a.product p "
+            + "JOIN p.category c "
+            + "WHERE a.deleted = false "
+            + "AND p.name LIKE %:keyword% "
+            + "AND c.categoryId = :categoryId")
+    Page<Auction> findByKeywordAndCategoryId(
+            @Param("keyword") String keyword,
+            @Param("categoryId") Long categoryId,
+            Pageable pageable
+    );
+
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "JOIN a.product p "
+            + "WHERE a.deleted = false "
+            + "AND p.name LIKE %:keyword%")
+    Page<Auction> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "JOIN a.product.category c "
+            + "WHERE a.deleted = false "
+            + "AND c.categoryId = :categoryId")
+    Page<Auction> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
+
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "LEFT JOIN Bid b "
+            + "ON b.auction = a "
+            + "WHERE a.deleted = false "
+            + "GROUP BY a.auctionId "
+            + "ORDER BY COUNT(b) DESC")
+    Page<Auction> findAllOrderByBidCount(Pageable pageable);
+
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "JOIN a.product p "
+            + "JOIN p.category c "
+            + "LEFT JOIN Bid b "
+            + "ON b.auction = a "
+            + "WHERE a.deleted = false "
+            + "AND p.name LIKE %:keyword% "
+            + "AND c.categoryId = :categoryId "
+            + "GROUP BY a.auctionId "
+            + "ORDER BY COUNT(b) DESC")
+    Page<Auction> findByKeywordAndCategoryIdOrderByBidCount(
+            @Param("keyword") String keyword,
+            @Param("categoryId") Long categoryId,
+            Pageable pageable
+    );
+
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "JOIN a.product p "
+            + "LEFT JOIN Bid b "
+            + "ON b.auction = a "
+            + "WHERE a.deleted = false "
+            + "AND p.name LIKE %:keyword% "
+            + "GROUP BY a.auctionId "
+            + "ORDER BY COUNT(b) DESC")
+    Page<Auction> findByKeywordOrderByBidCount(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "JOIN a.product.category c "
+            + "LEFT JOIN Bid b "
+            + "ON b.auction = a "
+            + "WHERE a.deleted = false "
+            + "AND c.categoryId = :categoryId "
+            + "GROUP BY a.auctionId "
+            + "ORDER BY COUNT(b) DESC")
+    Page<Auction> findByCategoryIdOrderByBidCount(
+            @Param("categoryId") Long categoryId,
+            Pageable pageable
+    );
 }

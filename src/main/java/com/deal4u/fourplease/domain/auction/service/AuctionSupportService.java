@@ -25,6 +25,7 @@ public class AuctionSupportService {
     private final SettlementRepository settlementRepository;
     private final ShipmentRepository shipmentRepository;
 
+    // TODO: bidRepository가 아닌 bidService에서 불러오는 방식으로 수정 필요
     @Transactional(readOnly = true)
     public BidSummaryDto getBidSummaryDto(Long auctionId) {
         List<BigDecimal> bidList = bidRepository.findPricesByAuctionIdOrderByPriceDesc(
