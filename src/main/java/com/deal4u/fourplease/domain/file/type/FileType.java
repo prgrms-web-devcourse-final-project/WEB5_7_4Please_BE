@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.domain.file.service;
+package com.deal4u.fourplease.domain.file.type;
 
 import java.util.Optional;
 import java.util.Set;
@@ -7,7 +7,7 @@ import org.springframework.lang.NonNull;
 public enum FileType {
     JPEG("image/jpeg", Set.of("jpeg", "jpg")),
     PNG("image/png", Set.of("png")),
-    GIF("image/gif", Set.of("gif")),
+    GIF("image/gif", Set.of("gif"))
     ;
 
     private final String mimeType;
