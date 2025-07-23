@@ -4,9 +4,9 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
-import com.deal4u.fourplease.domain.auction.dto.PageResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -59,6 +59,7 @@ public class AuctionController {
     public void createAuction(
             @Valid @RequestBody AuctionCreateRequest request
     ) {
+        // TODO: member 추후 수정 필요
         auctionService.save(request, memberRepository.findAll().getFirst());
     }
 
@@ -90,4 +91,5 @@ public class AuctionController {
             @RequestParam(name = "image") MultipartFile image) {
         return saveAuctionImageService.upload(memberRepository.findAll().getFirst(), image);
     }
+
 }

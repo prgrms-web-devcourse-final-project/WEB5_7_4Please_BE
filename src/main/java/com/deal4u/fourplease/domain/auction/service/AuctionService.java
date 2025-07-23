@@ -4,12 +4,12 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
-import com.deal4u.fourplease.domain.auction.dto.PageResponse;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.util.List;
@@ -98,6 +98,12 @@ public class AuctionService {
                 });
 
         return PageResponse.fromPage(sellerSaleListResponsePage);
+    }
+
+    @Transactional(readOnly = true)
+    public Auction getAuctionByAuctionId(Long auctionId) {
+        return auctionRepository.findByIdWithProduct(auctionId)
+                .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
     }
 
     private List<String> getProductImageUrlList(Product product) {

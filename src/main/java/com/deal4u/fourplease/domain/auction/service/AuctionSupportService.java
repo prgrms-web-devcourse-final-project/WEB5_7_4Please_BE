@@ -25,6 +25,7 @@ public class AuctionSupportService {
     private final SettlementRepository settlementRepository;
     private final ShipmentRepository shipmentRepository;
 
+    @Transactional(readOnly = true)
     public BidSummaryDto getBidSummaryDto(Long auctionId) {
         List<BigDecimal> bidList = bidRepository.findPricesByAuctionIdOrderByPriceDesc(
                 auctionId
