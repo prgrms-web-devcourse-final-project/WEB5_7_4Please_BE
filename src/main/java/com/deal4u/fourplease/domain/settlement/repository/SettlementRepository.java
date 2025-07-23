@@ -14,7 +14,7 @@ public interface SettlementRepository extends CrudRepository<Settlement, Long> {
     @Query("SELECT s.status "
             + "FROM Settlement s "
             + "WHERE s.auction.auctionId = :auctionId")
-    SettlementStatus getSettlementStatusByAuctionId(Long auctionId);
+    SettlementStatus getSettlementStatusByAuctionId(@Param("auctionId") Long auctionId);
 
     boolean existsByAuctionAndBidder(Auction auction, Bidder bidder);
 

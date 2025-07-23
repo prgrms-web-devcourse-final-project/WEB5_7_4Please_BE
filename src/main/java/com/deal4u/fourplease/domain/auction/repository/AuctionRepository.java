@@ -22,14 +22,16 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "WHERE a.auctionId = :auctionId "
             + "AND a.deleted = false "
             + "AND a.status = 'OPEN'")
-    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusOpen(Long auctionId);
+    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusOpen(
+            @Param("auctionId") Long auctionId);
 
     @Query("SELECT a "
             + "FROM Auction a "
             + "WHERE a.auctionId = :auctionId "
             + "AND a.deleted = false "
             + "AND a.status = 'CLOSED'")
-    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(Long auctionId);
+    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(
+            @Param("auctionId") Long auctionId);
 
     @Query("SELECT a "
             + "FROM Auction a "
