@@ -3,7 +3,7 @@ package com.deal4u.fourplease.domain.wishlist.controller;
 import static com.deal4u.fourplease.domain.wishlist.mapper.WishlistMapper.getSort;
 
 import com.deal4u.fourplease.domain.common.PageResponse;
-import com.deal4u.fourplease.domain.member.repository.MemberRepository;
+import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
 import com.deal4u.fourplease.domain.wishlist.service.WishlistService;
@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class WishlistController {
 
     private final WishlistService wishlistService;
-    private final MemberRepository memberRepository;
 
     @Operation(summary = "위시리스트 추가")
     @ApiResponse(responseCode = "200", description = "위시리스트 추가 성공")
@@ -47,10 +47,10 @@ public class WishlistController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Long createWishlist(
-            @Valid @RequestBody WishlistCreateRequest request
+            @Valid @RequestBody WishlistCreateRequest request,
+            @AuthenticationPrincipal Member member
     ) {
-        // TODO: member 추후 수정 필요
-        return wishlistService.save(request, memberRepository.findAll().getFirst());
+        return wishlistService.save(request, member);
     }
 
 
@@ -62,12 +62,13 @@ public class WishlistController {
     public PageResponse<WishlistResponse> readAllWishlist(
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(0) @Max(100) int size,
-            @RequestParam(defaultValue = "latest") String order
+            @RequestParam(defaultValue = "latest") String order,
+            @AuthenticationPrincipal Member member
+
     ) {
         Pageable pageable = PageRequest.of(page, size, getSort(order));
 
-        // TODO: member 추후 수정 필요
-        return wishlistService.findAll(pageable, memberRepository.findAll().getFirst());
+        return wishlistService.findAll(pageable, member);
     }
 
     @Operation(summary = "위시리스트 삭제")

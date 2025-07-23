@@ -156,7 +156,7 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(member));
 
             // When
-            String orderId = orderService.saveOrder(auctionId, orderType, orderCreateRequest);
+            String orderId = orderService.saveOrder(auctionId, orderType, 1L ,orderCreateRequest);
 
             // Then
             assertNotNull(orderId);
@@ -189,7 +189,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, invalidPriceRequest))
+                    () -> orderService.saveOrder(auctionId, orderType,1L ,invalidPriceRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("요청된 가격이 즉시 입찰가와 일치하지 않습니다.")
                     .extracting("status")
@@ -211,7 +211,7 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(winningBid));
 
             // When
-            String orderId = orderService.saveOrder(auctionId, orderType, awardOrderCreateRequest);
+            String orderId = orderService.saveOrder(auctionId, orderType,1L ,awardOrderCreateRequest);
 
             // Then
             assertNotNull(orderId);
@@ -246,7 +246,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, invalidPriceRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L ,invalidPriceRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("요청된 가격이 낙찰가와 일치하지 않습니다.")
                     .extracting("status")
@@ -267,7 +267,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, orderCreateRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L ,orderCreateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("해당 경매를 찾을 수 없습니다.")
                     .extracting("status")
@@ -288,7 +288,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, awardOrderCreateRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L ,awardOrderCreateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("해당 경매를 찾을 수 없습니다.")
                     .extracting("status")
@@ -307,7 +307,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, orderCreateRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L ,orderCreateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("해당 유저를 찾을 수 없습니다.")
                     .extracting("status")
@@ -330,7 +330,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, awardOrderCreateRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L ,awardOrderCreateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("해당 사용자는 경매의 낙찰자가 아닙니다.")
                     .extracting("status")
@@ -346,7 +346,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, orderCreateRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L ,orderCreateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("유효하지 않은 주문 타입입니다.")
                     .extracting("status")
