@@ -14,7 +14,7 @@ FROM member;
 
 -- H2 DB의 경우 ID 시퀀스 초기화
 ALTER TABLE member
-    ALTER COLUMN id RESTART WITH 1;
+    ALTER COLUMN member_id RESTART WITH 1;
 ALTER TABLE product_categories
     ALTER COLUMN category_id RESTART WITH 1;
 ALTER TABLE products
