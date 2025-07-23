@@ -6,6 +6,7 @@ public record CategoryDto(
         Long categoryId,
         String name
 ) {
+
     public static CategoryDto toCategoryDto(Category category) {
         return new CategoryDto(
                 category.getCategoryId(),
