@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.file.service;
 
-public record SaveData(String filePath, String savedFileName) {
+public record SavePath(String filePath, String savedFileName) {
 
     private static final String SEPARATOR = "/";
 

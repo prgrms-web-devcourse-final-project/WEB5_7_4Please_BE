@@ -53,6 +53,11 @@ jobs:
           SMTP_PORT: ${{secrets.SMTP_PORT}}
           SMTP_USERNAME: ${{secrets.SMTP_USERNAME}}
           TOSS_SECRET_KEY: ${{ secrets.TOSS_SECRET_KEY }}
+          HOST_URL: ${{secrets.HOST_URL}}
+          S3_ACCESS_KEY: ${{secrets.S3_ACCESS_KEY}}
+          S3_REGION: ${{secrets.S3_REGION}}
+          S3_SECRET_KEY: ${{secrets.S3_SECRET_KEY}}
+          S3_BUCKET_NAME: ${{secrets.S3_BUCKET_NAME}}
 
   build:
     runs-on: ubuntu-latest
