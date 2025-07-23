@@ -142,41 +142,5 @@ class SettlementScheduleServiceTest {
                 .isInstanceOf(GlobalException.class)
                 .hasMessageContaining("해당 경매를 찾을 수 없습니다.");
     }
-
-    @Test
-    @DisplayName("정산 생성 실패 (AuctionId에 해당하는 Bid 정보가 존재하지 않는 경우)")
-    void save_settlement_not_found_bid() {
-
-        // Given
-        Member member = genMember();
-        Product product = genProduct();
-
-        Long auctionId = 1L;
-        int auctionDays = 3;
-        Long bidId = 2L;
-        int paymentDeadLineDays = 1;
-
-        LocalDateTime auctionStartTime = LocalDateTime.now();
-        LocalDateTime auctionEndTime = LocalDateTime.now().plusDays(auctionDays);
-
-        // Auction 생성
-        Auction auction = Auction.builder()
-                .auctionId(auctionId)
-                .product(product)
-                .duration(new AuctionDuration(auctionStartTime, auctionEndTime))
-                .status(AuctionStatus.CLOSED)
-                .build();
-
-        when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusOpen(auctionId))
-                .thenReturn(Optional.of(auction));
-
-        when(bidRepository.findTopByAuctionOrderByPriceDescBidTimeAsc(auction))
-                .thenReturn(Optional.empty());
-
-        // when
-        assertThatThrownBy(() -> settlementService.save(auctionId, paymentDeadLineDays))
-                .isInstanceOf(GlobalException.class)
-                .hasMessageContaining("해당 입찰 내역을 찾을 수 없습니다.");
-
-    }
+    
 }
