@@ -3,6 +3,7 @@ package com.deal4u.fourplease.domain.auction.service;
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionSearchRequest;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
@@ -67,19 +68,13 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<AuctionListResponse> findAll(
-            int page,
-            int size,
-            String keyword,
-            @Nullable Long categoryId,
-            String order
-    ) {
+    public PageResponse<AuctionListResponse> findAll(AuctionSearchRequest request) {
         Page<Auction> auctionPage = getAuctionPage(
-                page,
-                size,
-                keyword,
-                categoryId,
-                order
+                request.page(),
+                request.size(),
+                request.keyword(),
+                request.categoryId(),
+                request.order()
         );
 
         Page<AuctionListResponse> auctionListResponsePage =

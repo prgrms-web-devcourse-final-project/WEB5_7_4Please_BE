@@ -2,10 +2,9 @@ package com.deal4u.fourplease.domain.auction.mapper;
 
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.ProductImage;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public class ProductImageMapper {
 
     public static ProductImage toEntity(Product product, String url) {
