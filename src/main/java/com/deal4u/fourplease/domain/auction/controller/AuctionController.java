@@ -2,8 +2,10 @@ package com.deal4u.fourplease.domain.auction.controller;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
+import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,8 +24,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Validated
 @RestController
@@ -34,6 +38,7 @@ public class AuctionController {
 
     private final AuctionService auctionService;
     private final MemberRepository memberRepository;
+    private final SaveAuctionImageService saveAuctionImageService;
 
     @Operation(summary = "전체 경매 조회")
     @ApiResponse(responseCode = "200", description = "경매 목록 응답")
@@ -75,6 +80,16 @@ public class AuctionController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAuction(@PathVariable(name = "auctionId") @Positive Long auctionId) {
         auctionService.deleteByAuctionId(auctionId);
+    }
+
+    @Operation(summary = "이미지 업로드")
+    @ApiResponse(responseCode = "200", description = "이미지 업로드 성공")
+    @ApiResponse(responseCode = "400", description = "업로드 불가능한 이미지 형식")
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/images")
+    public AuctionImageUrlResponse readAuctionImageUrl(
+            @RequestParam(name = "image") MultipartFile image) {
+        return saveAuctionImageService.upload(memberRepository.findAll().getFirst(), image);
     }
 
 }
