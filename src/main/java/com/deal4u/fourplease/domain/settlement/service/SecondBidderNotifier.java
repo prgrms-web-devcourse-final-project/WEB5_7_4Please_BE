@@ -5,10 +5,9 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.PUSH_NOTIFICATION
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
+import com.deal4u.fourplease.domain.notification.NotificationSender;
 import com.deal4u.fourplease.domain.notification.email.HtmlEmailMessage;
-import com.deal4u.fourplease.domain.notification.email.HtmlEmailService;
 import com.deal4u.fourplease.domain.notification.pushnotification.message.PushNotificationMessage;
-import com.deal4u.fourplease.domain.notification.pushnotification.service.PushNotificationService;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SecondBidderNotifier {
 
-    private final HtmlEmailService htmlEmailService;
-    private final PushNotificationService pushNotificationService;
+    private final NotificationSender notificationSender;
 
     public void send(Bid secondHighestBid, Auction auction,
                      LocalDateTime paymentDeadline) {
@@ -44,7 +42,7 @@ public class SecondBidderNotifier {
                     .addData("paymentUrl", "/") // todo: 실제 url로 변경
                     .build();
 
-            htmlEmailService.send(emailMessage);
+            notificationSender.send(emailMessage);
 
         } catch (MailSendException e) {
             throw EMAIL_SEND_FAILED_TO_SECOND_BIDDER.toException(e);
@@ -63,7 +61,7 @@ public class SecondBidderNotifier {
                     .addReceiver(secondHighestBid.getBidder().getMember().getMemberId())
                     .build();
 
-            pushNotificationService.send(pushMessage);
+            notificationSender.send(pushMessage);
 
         } catch (Exception e) {
             throw PUSH_NOTIFICATION_SEND_FAILED.toException(e);
