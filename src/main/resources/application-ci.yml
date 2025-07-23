@@ -1,5 +1,5 @@
 jwt:
-  secret: your-very-long-secret-key-which-is-512-bit-or-more
+  secret: ${JWT_SECRET}
   access-token-expiration: 900000   # 15분 (ms 단위)
   refresh-token-expiration: 604800000 # 7일
 
