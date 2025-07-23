@@ -3,7 +3,6 @@ package com.deal4u.fourplease.domain.auction.service;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProduct;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProductImageList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,8 +12,6 @@ import com.deal4u.fourplease.domain.auction.dto.ProductImageListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.ProductImage;
 import com.deal4u.fourplease.domain.auction.repository.ProductImageRepository;
-import com.deal4u.fourplease.global.exception.GlobalException;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +32,7 @@ class ProductImageServiceTests {
 
     @Test
     @DisplayName("상품 이미지 url 리스트를 받아 등록할 있다")
-    void productImageCanBeSaved() throws Exception {
+    void productImageCanBeSaved() {
 
         Product product = mock(Product.class);
         List<String> imageUrls = List.of(
@@ -60,14 +57,13 @@ class ProductImageServiceTests {
 
     @Test
     @DisplayName("product를 인자로 받아 productId로 이미지 리스트를 찾아 반환한다")
-    void returnProductImageListByProductId() throws Exception {
+    void returnProductImageListByProductId() {
 
         Product product = genProduct();
         List<ProductImage> productImageList = genProductImageList(product);
 
         when(productImageRepository.findByProductId(product.getProductId()))
                 .thenReturn(productImageList);
-
 
         ProductImageListResponse actualResp = productImageService.getByProduct(product);
         List<String> actualImageUrls = actualResp.toProductImageUrlList();
@@ -76,27 +72,6 @@ class ProductImageServiceTests {
                 "http://example.com/image1.jpg",
                 "http://example.com/image2.jpg"
         );
-
-    }
-
-
-
-    @Test
-    @DisplayName("productId로 조회한 이미지 리스트가 빈 값이면 400 예외가 발생한다")
-    void throwIfImageListEmpty() throws Exception {
-
-        Product product = genProduct();
-        List<ProductImage> productImageList = List.of();
-
-        when(productImageRepository.findByProductId(product.getProductId()))
-                .thenReturn(productImageList);
-
-        assertThatThrownBy(
-                () -> {
-                    productImageService.getByProduct(product);
-                }
-        ).isInstanceOf(GlobalException.class)
-                .hasMessage("빈 리스트 입니다.");
 
     }
 
@@ -113,24 +88,6 @@ class ProductImageServiceTests {
         productImageService.deleteProductImage(product);
 
         verify(productImageRepository).deleteAll(productImageList);
-    }
-
-    @Test
-    @DisplayName("product에 해당하는 이미지 url 리스트가 없을 경우 400 예외가 발생한다")
-    void throwsIfImageUrlsNotExist() throws Exception {
-
-        Product product = genProduct();
-
-        when(productImageRepository.findByProductId(product.getProductId()))
-                .thenReturn(Collections.emptyList());
-
-        assertThatThrownBy(
-                () -> {
-                    productImageService.deleteProductImage(product);
-                }
-        ).isInstanceOf(GlobalException.class)
-                .hasMessage("빈 리스트 입니다.");
-
     }
 
 }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -15,26 +16,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
-import com.deal4u.fourplease.domain.auction.dto.PageResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionSearchRequest;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
+import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
+import com.deal4u.fourplease.domain.auth.BaseTokenTest;
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.Role;
+import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
+import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(AuctionController.class)
-class AuctionControllerTests {
+@SpringBootTest(webEnvironment = WebEnvironment.MOCK)
+@AutoConfigureMockMvc
+class AuctionControllerTests extends BaseTokenTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,6 +61,17 @@ class AuctionControllerTests {
 
     @MockitoBean
     private SaveAuctionImageService saveAuctionImageService;
+
+    @BeforeEach
+    void setUp() {
+        Member member = Member.builder()
+                .memberId(1L)
+                .email("test@nave.com")
+                .role(Role.USER)
+                .status(Status.ACTIVE)
+                .build();
+        init(member);
+    }
 
     @Test
     @DisplayName("POST /api/v1/auctions가 성공하면 경매를 등록한 후 201을 반환한다")

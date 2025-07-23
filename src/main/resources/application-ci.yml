@@ -32,19 +32,6 @@ spring:
           auth: true            # 사용자 인증 시도 여부
           starttls:
             enable: true        # starttls 활성화 여부
-
-toss:
-  secret-key: ${TOSS_SECRET_KEY}
-deal4u:
-  host-url: ${HOST_URL}
-  s3:
-    region: ${S3_REGION}
-    bucket-name: ${S3_BUCKET_NAME}
-    secret-key: ${S3_SECRET_KEY}
-    access-key: ${S3_ACCESS_KEY}
-
-
-
   security:
     oauth2:
       client:
@@ -75,19 +62,12 @@ deal4u:
             user-info-authentication-method: header
             user-name-attribute: response # Naver 응답 값 resultCode, message, response 중 response 지정
 
-  h2:
-    console:
-      enabled: true
-  mail:
-    host: ${SMTP_HOST}       # SMTP 서버 호스트
-    port: ${SMTP_PORT}               # SMTP 서버 포트
-    username: ${SMTP_USERNAME}                # SMTP 서버 로그인 아이디
-    password: ${SMTP_PASSWORD}                # SMTP 서버 로그인 비밀번호
-    properties:
-      mail:
-        smtp:
-          auth: true            # 사용자 인증 시도 여부
-          starttls:
-            enable: true        # starttls 활성화 여부
 toss:
   secret-key: ${TOSS_SECRET_KEY}
+deal4u:
+  host-url: ${HOST_URL}
+  s3:
+    region: ${S3_REGION}
+    bucket-name: ${S3_BUCKET_NAME}
+    secret-key: ${S3_SECRET_KEY}
+    access-key: ${S3_ACCESS_KEY}

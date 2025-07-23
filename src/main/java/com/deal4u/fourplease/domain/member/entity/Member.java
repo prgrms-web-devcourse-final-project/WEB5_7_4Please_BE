@@ -43,6 +43,19 @@ public class Member extends BaseDateEntity {
     @Setter
     private Status status;
 
+    @Column(nullable = false)
+    private String provider;
+
+    @Builder
+    public Member(String email, String nickName, Role role, Status status,
+            String provider) {
+        this.email = email;
+        this.nickName = nickName;
+        this.role = role != null ? role : Role.USER;
+        this.status = status != null ? status : Status.ACTIVE;
+        this.provider = provider;
+    }
+
     @Override
     public final boolean equals(Object object) {
         if (this == object) {
@@ -69,18 +82,5 @@ public class Member extends BaseDateEntity {
         return this instanceof HibernateProxy hibernateProxy
                 ? hibernateProxy.getHibernateLazyInitializer()
                 .getPersistentClass().hashCode() : getClass().hashCode();
-    }
-
-    @Column(nullable = false)
-    private String provider;
-
-    @Builder
-    public Member(String email, String nickName, Role role, Status status,
-                  String provider) {
-        this.email = email;
-        this.nickName = nickName;
-        this.role = role != null ? role : Role.USER;
-        this.status = status != null ? status : Status.ACTIVE;
-        this.provider = provider;
     }
 }
