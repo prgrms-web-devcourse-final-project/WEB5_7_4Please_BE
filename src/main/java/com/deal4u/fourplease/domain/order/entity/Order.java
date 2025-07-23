@@ -48,6 +48,8 @@ public class Order extends BaseDateEntity {
     private String phone;
     private String content;
     private String receiver;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
