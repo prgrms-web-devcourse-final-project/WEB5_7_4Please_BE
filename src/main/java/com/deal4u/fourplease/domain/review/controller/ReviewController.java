@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +39,7 @@ public class ReviewController {
     @PostMapping("/auctions/{auctionId}/review")
     @ResponseStatus(HttpStatus.OK)
     public void createReview(@PathVariable Long auctionId,
-            @Valid @RequestBody ReviewRequest request, @RequestParam("memberId") Long memberId) {
+            @Valid @RequestBody @ParameterObject ReviewRequest request, @RequestParam("memberId") Long memberId) {
         // 1. 로그인한 유저 정보 취득
         // (현재는 `RequestParam`으로 처리하고 있으나 추후에 로그인 유저 정보에서 취득할 예정)
 
@@ -54,7 +55,7 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<ReviewResponse> getReviews(
             @PathVariable(name = "memberId") Long memberId,
-            @Valid @ModelAttribute ReviewListRequest request) {
+            @Valid @ModelAttribute @ParameterObject ReviewListRequest request) {
 
         // 1. Pageable 검증 및 변환
         Pageable pageable = request.toPageable();
