@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>차상위 입찰자 결제 안내</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .content {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .highlight {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-left: 4px solid #4CAF50;
+            margin: 20px 0;
+        }
+
+        .deadline {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+
+        .btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white !important; /* 글씨색 고정 */
+            padding: 12px 24px;
+            text-decoration: none !important; /* 밑줄 제거 */
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>🎉 축하합니다!</h1>
+    <p>차상위 입찰자로 선정되셨습니다</p>
+</div>
+
+<div class="content">
+    <p th:text="|${bidderName}님 안녕하세요!|">고객님 안녕하세요!</p>
+
+    <p>최상위 입찰자의 결제가 완료되지 않아, <strong th:text="${bidderName}"></strong>고객님께서 차상위 입찰자로 낙찰 기회를 얻으셨습니다.</p>
+
+    <div class="highlight">
+        <h3>📋 낙찰 정보</h3>
+        <ul>
+            <li><strong>경매 상품:</strong> <span th:text="${auctionTitle}">상품명</span></li>
+            <li><strong>낙찰 금액:</strong> <span th:text="|${#numbers.formatInteger(bidAmount, 0, 'COMMA')}원|">0원</span>
+            </li>
+            <li><strong>결제 마감:</strong> <span class="deadline"
+                                              th:text="${#temporals.format(paymentDeadline, 'yyyy년 MM월 dd일 HH시 mm분')}">마감시간</span>
+            </li>
+        </ul>
+    </div>
+
+    <p><span class="deadline">⚠️ 주의사항:</span></p>
+    <ul>
+        <li>결제 마감시간까지 결제를 완료하지 않으시면 낙찰이 취소됩니다.</li>
+        <li>결제는 마감시간 <strong>48시간 이내</strong>에 완료해주세요.</li>
+        <li>결제 완료 후 판매자와의 거래가 진행됩니다.</li>
+    </ul>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a th:href="${paymentUrl}" class="btn">지금 결제하기</a>
+    </div>
+
+    <hr>
+
+    <p><small>
+        본 메일은 자동으로 발송된 메일입니다.<br>
+    </small></p>
+</div>
+</body>
+</html>
