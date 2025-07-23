@@ -6,7 +6,7 @@ import lombok.Builder;
 public record SignupResponse(
         String message,
         String accessToken,
-        String refreshToken,
         String redirectUrl
 ) {
+
 }

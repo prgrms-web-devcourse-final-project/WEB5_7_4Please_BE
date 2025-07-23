@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -56,12 +57,13 @@ class MemberServiceTest {
         when(memberRepository.existsByNickName(nickname)).thenReturn(false);
         when(authService.createTokenPair(member)).thenReturn(new TokenPair("access", "refresh"));
 
-        SignupResponse response = memberService.signup(validToken, request).getBody();
+        ResponseEntity<SignupResponse> data = memberService.signup(validToken, request);
+
+        SignupResponse response = data.getBody();
 
         assertThat(response).isNotNull();
         assertThat(response.message()).contains("로그인 성공");
         assertThat(response.accessToken()).isEqualTo("access");
-        assertThat(response.refreshToken()).isEqualTo("refresh");
         assertThat(response.redirectUrl()).isEqualTo("/");
 
         ArgumentCaptor<Member> captor = ArgumentCaptor.forClass(Member.class);

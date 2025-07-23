@@ -10,9 +10,12 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class MemberService {
+
     private static final String MAIN_REDIRECT_URL = "/";
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
@@ -84,10 +88,20 @@ public class MemberService {
         SignupResponse response = SignupResponse.builder()
                 .message("닉네임 설정 완료, 로그인 성공")
                 .accessToken(tokenPair.accessToken())
-                .refreshToken(tokenPair.refreshToken())
                 .redirectUrl(MAIN_REDIRECT_URL)
                 .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        ResponseCookie refreshCookie = ResponseCookie
+                .from("refreshToken", tokenPair.refreshToken())
+                .httpOnly(true)
+                .secure(false) // 운영 환경에서는 true
+                .path("/")
+                .sameSite("None") // 운영 환경에서는 Strict
+                .maxAge(Duration.ofHours(1))
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).header(
+                HttpHeaders.SET_COOKIE, refreshCookie.toString()
+        ).body(response);
     }
 
     public ResponseEntity<UpdateMemberResponse> updateMember(Member member, String nickName) {
