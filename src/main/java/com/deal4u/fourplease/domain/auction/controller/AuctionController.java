@@ -2,9 +2,9 @@ package com.deal4u.fourplease.domain.auction.controller;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.PageResponse;
-import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
