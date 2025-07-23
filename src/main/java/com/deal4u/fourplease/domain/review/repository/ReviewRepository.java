@@ -15,6 +15,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Optional<Review> findByAuctionAndReviewer(Auction auction, Reviewer reviewer);
 
-    @Query("select r from Review r where r.seller = :seller ORDER BY  r.createdAt DESC")
+    @Query("select r from Review r where r.seller = :seller")
     Page<Review> findBySeller(@Param("seller") Seller seller, Pageable pageable);
 }

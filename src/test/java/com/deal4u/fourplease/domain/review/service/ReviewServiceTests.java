@@ -269,7 +269,7 @@ class ReviewServiceTests {
                 .reviewId(2L).content("좋은 상품입니다! 최신 리뷰").rating(2)
                 .seller(Seller.create(seller)).reviewer(Reviewer.create(buyer))
                 .build();
-        ReflectionTestUtils.setField(review1, "createdAt", LocalDateTime.now());
+        ReflectionTestUtils.setField(review2, "createdAt", LocalDateTime.now());
 
         List<Review> sortedReview = List.of(review2, review1);
         Page<Review> reviewPage = new PageImpl<>(sortedReview, pageable, sortedReview.size());

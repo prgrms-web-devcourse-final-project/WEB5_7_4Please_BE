@@ -4,9 +4,12 @@ import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.review.dto.ReviewRequest;
 import com.deal4u.fourplease.domain.review.dto.ReviewResponse;
 import com.deal4u.fourplease.domain.review.service.ReviewService;
+import com.deal4u.fourplease.global.exception.ErrorCode;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,11 +39,24 @@ public class ReviewController {
         reviewService.createReview(request, memberId);
     }
 
+    @Operation(summary = "판매자 리뷰 조회")
+
     @GetMapping("/reviews/{memberId}")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<ReviewResponse> getReviews(@PathVariable(name = "memberId") Long memberId,
-            @PageableDefault Pageable pageable) {
-        // 1. 리뷰 내역 조회 호출
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        // 1. Sort 검증
+        if (pageable.getSort().isSorted()) {
+            for (Sort.Order order : pageable.getSort()) {
+                if (!order.getProperty().equals("createdAt")) {
+                    throw ErrorCode.INVALID_REVIEW_SORT.toException();
+                }
+            }
+        }
+
+        // 2. 리뷰 내역 조회 호출
         return reviewService.getReviewListFor(memberId, pageable);
     }
 }
