@@ -1,7 +1,5 @@
 package com.deal4u.fourplease.domain.auction.service;
 
-import static com.deal4u.fourplease.domain.auction.validator.Validator.validateListNotEmpty;
-
 import com.deal4u.fourplease.domain.auction.dto.ProductImageListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.ProductImage;
@@ -30,16 +28,12 @@ public class ProductImageService {
     public ProductImageListResponse getByProduct(Product product) {
         List<ProductImage> productImageList = findByProduct(product);
 
-        validateListNotEmpty(productImageList);
-
         return new ProductImageListResponse(productImageList);
     }
 
     @Transactional
     public void deleteProductImage(Product product) {
         List<ProductImage> targetProductImageList = findByProduct(product);
-
-        validateListNotEmpty(targetProductImageList);
 
         productImageRepository.deleteAll(targetProductImageList);
     }
