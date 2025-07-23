@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionSearchRequest;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.dto.CategoryDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
@@ -250,14 +251,17 @@ class AuctionServiceTests {
     @DisplayName("전체 경매 목록에서 검색어로 필터랑하고 최신순으로 정렬한다")
     void findAllShouldFillerByKeywordAndOrderByLatest() {
 
-        int page = 0;
-        int size = 20;
-        String keyword = "축구공";
-        Long categoryId = null;
-        String orderBy = "latest";
+        AuctionSearchRequest req = new AuctionSearchRequest(
+                0,
+                20,
+                "축구공",
+                null,
+                "latest"
+        );
 
         Pageable pageable =
-                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+                PageRequest.of(req.page(), req.size(),
+                        Sort.by(Sort.Direction.DESC, "createdAt"));
         List<Auction> auctionList = genAuctionList();
 
         // PageImpl로 Page 객체 모킹
@@ -282,12 +286,12 @@ class AuctionServiceTests {
                 auctionListResponseList.size()
         );
 
-        when(auctionRepository.findByKeyword(keyword, pageable)).thenReturn(auctionPage);
+        when(auctionRepository.findByKeyword(req.keyword(), pageable)).thenReturn(auctionPage);
         when(auctionSupportService.getAuctionListResponses(auctionPage))
                 .thenReturn(auctionListResponsePage);
 
         PageResponse<AuctionListResponse> resp =
-                auctionService.findAll(page, size, keyword, categoryId, orderBy);
+                auctionService.findAll(req);
 
         assertThat(resp.getContent().getFirst().name()).isEqualTo("축구공");
         assertThat(resp.getTotalElements()).isEqualTo(auctionListResponseList.size());
@@ -298,13 +302,15 @@ class AuctionServiceTests {
     @DisplayName("전체 경매 목록에서 카테고리로 필터링하고 입찰순으로 필터링한다")
     void findAllShouldFilterByCategoryAndOrderByBidCount() {
 
-        int page = 0;
-        int size = 20;
-        String keyword = "";
-        Long categoryId = 4L; // 생활용품
-        String orderBy = "bids";
+        AuctionSearchRequest req = new AuctionSearchRequest(
+                0,
+                20,
+                "",
+                4L, // 생활용품
+                "bids"
+        );
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(req.page(), req.size());
         List<Auction> auctionList = genAuctionList();
 
         Page<Auction> auctionPage = new PageImpl<>(auctionList, pageable, auctionList.size());
@@ -337,13 +343,12 @@ class AuctionServiceTests {
         Page<AuctionListResponse> auctionListResponsePage =
                 new PageImpl<>(auctionListResponseList, pageable, auctionListResponseList.size());
 
-        when(auctionRepository.findByCategoryIdOrderByBidCount(categoryId, pageable))
+        when(auctionRepository.findByCategoryIdOrderByBidCount(req.categoryId(), pageable))
                 .thenReturn(auctionPage);
         when(auctionSupportService.getAuctionListResponses(auctionPage))
                 .thenReturn(auctionListResponsePage);
 
-        PageResponse<AuctionListResponse> resp = auctionService.findAll(page, size, keyword,
-                categoryId, orderBy);
+        PageResponse<AuctionListResponse> resp = auctionService.findAll(req);
 
         assertThat(resp.getContent().getFirst().bidCount()).isEqualTo(40);
         assertThat(resp.getContent().getLast().bidCount()).isEqualTo(20);

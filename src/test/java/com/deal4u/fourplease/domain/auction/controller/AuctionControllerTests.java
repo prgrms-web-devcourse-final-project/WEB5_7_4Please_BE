@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionSearchRequest;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
@@ -101,23 +102,25 @@ class AuctionControllerTests {
     @DisplayName("GET /api/v1/auctions가 성공하면 전체 경매 목록과 200을 반환한다")
     void readAllAuctionsShouldReturn200() throws Exception {
 
-        int page = 0;
-        int size = 20;
-        String keyword = "";
-        Long categoryId = 4L;
-        String order = "latest";
+        AuctionSearchRequest req = new AuctionSearchRequest(
+                0,
+                20,
+                "",
+                4L,
+                "latest"
+        );
 
         PageResponse<AuctionListResponse> resp = genAuctionListResponsePageResponse();
 
-        when(auctionService.findAll(page, size, keyword, categoryId, order)).thenReturn(resp);
+        when(auctionService.findAll(req)).thenReturn(resp);
 
         mockMvc.perform(
                         get("/api/v1/auctions")
                                 .param("page", "0")
                                 .param("size", "20")
-                                .param("keyword", keyword)
-                                .param("categoryId", String.valueOf(categoryId))
-                                .param("order", order)
+                                .param("keyword", req.keyword())
+                                .param("categoryId", String.valueOf(req.categoryId()))
+                                .param("order", req.order())
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name")
                         .value(resp.getContent().get(0).name()))
