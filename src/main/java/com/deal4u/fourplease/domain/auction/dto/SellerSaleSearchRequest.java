@@ -6,11 +6,20 @@ import jakarta.validation.constraints.Min;
 public record SellerSaleSearchRequest(
         @Min(0)
         @Max(100)
-        int page,
+        Integer page,
 
         @Min(0)
         @Max(100)
-        int size
+        Integer size
 ) {
 
+    public SellerSaleSearchRequest {
+        if (page == null) {
+            page = 0;
+        }
+
+        if (size == null) {
+            size = 3;
+        }
+    }
 }

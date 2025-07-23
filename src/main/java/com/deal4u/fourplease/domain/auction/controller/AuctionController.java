@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,7 +49,7 @@ public class AuctionController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<AuctionListResponse> readAllAuctions(
-            @Valid @ModelAttribute AuctionSearchRequest request
+            @Valid @ModelAttribute @ParameterObject AuctionSearchRequest request
     ) {
         return auctionService.findAll(request);
     }

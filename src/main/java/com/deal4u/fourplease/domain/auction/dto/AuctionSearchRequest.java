@@ -9,11 +9,11 @@ import jakarta.validation.constraints.Positive;
 public record AuctionSearchRequest(
         @Min(0)
         @Max(100)
-        int page,
+        Integer page,
 
         @Min(0)
         @Max(100)
-        int size,
+        Integer size,
 
         String keyword,
 
@@ -23,6 +23,25 @@ public record AuctionSearchRequest(
 
         @Pattern(regexp = "latest|bids|timeout")
         String order
+
 ) {
+
+    public AuctionSearchRequest {
+        if (page == null) {
+            page = 0;
+        }
+
+        if (size == null) {
+            size = 3;
+        }
+
+        if (keyword == null) {
+            keyword = "";
+        }
+
+        if (order == null || order.isBlank()) {
+            order = "latest";
+        }
+    }
 
 }
