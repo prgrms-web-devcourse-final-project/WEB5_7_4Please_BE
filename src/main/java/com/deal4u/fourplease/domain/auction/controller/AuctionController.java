@@ -8,6 +8,7 @@ import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -38,6 +39,7 @@ public class AuctionController {
     @Operation(summary = "전체 경매 조회")
     @ApiResponse(responseCode = "200", description = "경매 목록 응답")
     @ApiResponse(responseCode = "404", description = "경매를 찾을 수 없음")
+    @Parameter(description = "정렬 옵션: latest, bids, timeout")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<AuctionListResponse> readAllAuctions(
