@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class SaleController {
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<SellerSaleListResponse> getSales(
             @PathVariable(name = "sellerId") @Positive Long sellerId,
-            @Valid @ModelAttribute SellerSaleSearchRequest request
+            @Valid @ModelAttribute @ParameterObject SellerSaleSearchRequest request
     ) {
         Pageable pageable = PageRequest.of(request.page(), request.size());
         return auctionService.findSalesBySellerId(sellerId, pageable);
