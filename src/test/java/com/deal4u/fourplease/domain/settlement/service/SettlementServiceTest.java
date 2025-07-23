@@ -20,6 +20,7 @@ import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import com.deal4u.fourplease.global.sheduler.FailedSettlementScheduleService;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -97,11 +98,12 @@ class SettlementServiceTest {
         Long auctionId = 1L;
         Auction auction = createAuction();
         Bidder bidder = createBidder();
+        Bid highestBid = createBid(auction, createBidder());
         Bid secondHighestBid = createBid(auction, bidder);
         Settlement savedSettlement = createSettlement(auction);
 
-        given(bidRepository.findSecondHighestBidByAuctionId(auctionId))
-                .willReturn(Optional.of(secondHighestBid));
+        given(bidRepository.findTop2ByAuctionId(auctionId))
+                .willReturn(List.of(highestBid, secondHighestBid));
         given(settlementRepository.existsByAuctionAndBidder(auction, bidder))
                 .willReturn(false);
         given(settlementRepository.save(any(Settlement.class)))
@@ -113,6 +115,7 @@ class SettlementServiceTest {
         // then
         ArgumentCaptor<Settlement> settlementCaptor = ArgumentCaptor.forClass(Settlement.class);
         verify(settlementRepository).save(settlementCaptor.capture());
+
         then(secondBidderNotifier).should().send(
                 eq(secondHighestBid),
                 eq(auction),
@@ -140,9 +143,10 @@ class SettlementServiceTest {
     void offerSecondBidderSecondHighestBidderNotFound() {
         // given
         Long auctionId = 1L;
+        Bid onlyBid = createBid(createAuction(), createBidder());
 
-        given(bidRepository.findSecondHighestBidByAuctionId(auctionId))
-                .willReturn(Optional.empty());
+        given(bidRepository.findTop2ByAuctionId(auctionId))
+                .willReturn(List.of(onlyBid)); // 입찰이 1개만 있는 경우
 
         // when & then
         assertThatThrownBy(() -> settlementService.offerSecondBidder(auctionId))
@@ -152,6 +156,7 @@ class SettlementServiceTest {
                 .isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+
     @Test
     @DisplayName("이미 정산이 존재하면 예외를 발생시킨다")
     void offerSecondBidderSettlementAlreadyExists() {
@@ -159,10 +164,11 @@ class SettlementServiceTest {
         Long auctionId = 1L;
         Auction auction = createAuction();
         Bidder bidder = createBidder();
+        Bid highestBid = createBid(auction, createBidder());
         Bid secondHighestBid = createBid(auction, bidder);
 
-        given(bidRepository.findSecondHighestBidByAuctionId(auctionId))
-                .willReturn(Optional.of(secondHighestBid));
+        given(bidRepository.findTop2ByAuctionId(auctionId))
+                .willReturn(List.of(highestBid, secondHighestBid));
         given(settlementRepository.existsByAuctionAndBidder(auction, bidder))
                 .willReturn(true);
 
@@ -181,7 +187,6 @@ class SettlementServiceTest {
         Long settlementId = 1L;
         Auction auction = createAuction();
         Settlement settlement = createSettlement(auction);
-        LocalDateTime beforeUpdate = LocalDateTime.now();
 
         given(settlementRepository.findById(settlementId))
                 .willReturn(Optional.of(settlement));

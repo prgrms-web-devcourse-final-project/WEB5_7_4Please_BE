@@ -12,6 +12,7 @@ import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
 import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.global.sheduler.FailedSettlementScheduleService;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,8 +83,13 @@ public class SettlementService {
     }
 
     private Bid getSecondHighestBidOrThrow(Long auctionId) {
-        return bidRepository.findSecondHighestBidByAuctionId(auctionId)
-                .orElseThrow((SECOND_HIGHEST_BIDDER_NOT_FOUND::toException));
+        List<Bid> topBids = bidRepository.findTop2ByAuctionId(auctionId);
+
+        if (topBids.size() < 2) {
+            throw SECOND_HIGHEST_BIDDER_NOT_FOUND.toException();
+        }
+
+        return topBids.get(1);
     }
 
     private void validateIfSettlementAlreadyExists(Bid secondHighestBid) {
