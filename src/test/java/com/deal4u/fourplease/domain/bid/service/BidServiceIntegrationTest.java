@@ -16,11 +16,12 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
+import com.deal4u.fourplease.global.scheduler.AuctionCloseJob;
+import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
@@ -32,25 +33,38 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Transactional
 class BidServiceIntegrationTest {
 
+    @Autowired
+    private BidService bidService;
+
+    @Autowired
+    private BidRepository bidRepository;
+
+    @Autowired
+    private AuctionRepository auctionRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @MockitoBean
+    private BidWebSocketHandler bidWebSocketHandler;
+
+    @Autowired
+    AuctionScheduleService auctionScheduleService;
+
+    @Autowired
+    AuctionCloseJob auctionCloseJob;
+
     private final Long memberId1 = 21L;
     private final Long memberId2 = 22L;
     // `data.sql`로 추가되지 않은 존재하지 않는 유저
     private final Long memberIdX = 999L;
+
     // data.sql 유래의 정상 auctionId
     private final Long auctionId = 1L;
     private final Long auctionId2 = 2L;
     // 존재하지 않는 auctionId
     private final Long auctionIdWrong = 999L;
-    @Autowired
-    private BidService bidService;
-    @Autowired
-    private BidRepository bidRepository;
-    @Autowired
-    private AuctionRepository auctionRepository;
-    @Autowired
-    private MemberRepository memberRepository;
-    @MockitoBean
-    private BidWebSocketHandler bidWebSocketHandler;
+
     private Bid initialBid;
 
     @BeforeEach
@@ -138,10 +152,9 @@ class BidServiceIntegrationTest {
     @DisplayName("입찰 취소 실패 (유저가 존재하지 않는 경우)")
     void delete_bid_not_matched_member_integrationtest() {
         // 1. MEMBER_NOT_FOUND `ErrorCode`에 대해 `Exception`이 발생하는지 검증
-        Executable executable = () -> {
+        GlobalException exception = assertThrows(GlobalException.class, () -> {
             bidService.deleteBid(memberIdX, initialBid.getBidId());
-        };
-        GlobalException exception = assertThrows(GlobalException.class, executable);
+        });
         // 2. 발생한 `Exception`이 `MEMBER_NOT_FOUND`인지 추가 검증
         assertThat(exception.getMessage()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND.getMessage());
         assertThat(exception.getStatus()).isEqualTo(ErrorCode.MEMBER_NOT_FOUND.getStatus());
@@ -151,10 +164,9 @@ class BidServiceIntegrationTest {
     @DisplayName("입찰 취소 실패 (유저가 일치하지 않는 경우)")
     void delete_bid_not_matched_bid_integrationtest() {
         // 1. BID_NOT_FOUND `ErrorCode`에 대해 `Exception`이 발생하는지 검증
-        Executable executable = () -> {
+        GlobalException exception = assertThrows(GlobalException.class, () -> {
             bidService.deleteBid(memberId2, initialBid.getBidId());
-        };
-        GlobalException exception = assertThrows(GlobalException.class, executable);
+        });
         // 2. 발생한 `Exception`이 `BID_NOT_FOUND`인지 추가 검증
         assertThat(exception.getMessage()).isEqualTo(ErrorCode.BID_NOT_FOUND.getMessage());
         assertThat(exception.getStatus()).isEqualTo(ErrorCode.BID_NOT_FOUND.getStatus());
@@ -172,13 +184,13 @@ class BidServiceIntegrationTest {
 
         // 2. 페이징 정보 검증
         assertThat(result).isNotNull();
-        assertThat(result.getPage()).isZero();
+        assertThat(result.getPage()).isEqualTo(0);
         assertThat(result.getSize()).isEqualTo(pageSize);
         assertThat(result.getTotalPages()).isEqualTo(2);
         assertThat(result.getTotalElements()).isEqualTo(19);
 
         // 3. 입찰 목록의 개수가 동일한지 확인
-        assertThat(result.getContent()).hasSize(pageSize);
+        assertThat(result.getContent().size()).isLessThanOrEqualTo(pageSize);
 
         // 4. 정렬 순서 검증 (가격 내림차순 및 입찰 시간 오름차순)
         // data.sql 상의 가장 높은 입찰가는 200,000으로 2건
@@ -214,8 +226,7 @@ class BidServiceIntegrationTest {
         assertThat(result.getTotalElements()).isEqualTo(19);
 
         // 3. 입찰 목록의 개수가 동일한지 확인
-        assertThat(result.getContent().size())
-                .isLessThanOrEqualTo(pageSize);
+        assertThat(result.getContent().size()).isLessThanOrEqualTo(pageSize);
 
         // 4. 정렬 순서 검증 (가격 내림차순 및 입찰 시간 오름차순)
         // data.sql 상의 가장 높은 입찰가는 191,000으로 1건

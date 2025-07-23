@@ -16,7 +16,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
-@ConditionalOnProperty(prefix = "deal4u.s3", name = {"access_key", "secret_key", "region"})
+@ConditionalOnProperty(prefix = "deal4u.s3", name = {"access-key", "secret-key", "region"})
 @RequiredArgsConstructor
 public class S3Config {
 

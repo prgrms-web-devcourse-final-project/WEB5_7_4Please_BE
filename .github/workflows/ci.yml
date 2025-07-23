@@ -57,7 +57,11 @@ jobs:
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
-
+          HOST_URL: ${{secrets.HOST_URL}}
+          S3_ACCESS_KEY: ${{secrets.S3_ACCESS_KEY}}
+          S3_REGION: ${{secrets.S3_REGION}}
+          S3_SECRET_KEY: ${{secrets.S3_SECRET_KEY}}
+          S3_BUCKET_NAME: ${{secrets.S3_BUCKET_NAME}}
 
   build:
     runs-on: ubuntu-latest

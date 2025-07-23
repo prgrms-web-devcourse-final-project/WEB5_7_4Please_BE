@@ -207,7 +207,7 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(closedAuction));
             when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(bidRepository.findSuccessFulBid(auctionId, member))
+            when(bidRepository.findSuccessfulBid(auctionId, member))
                     .thenReturn(Optional.of(winningBid));
 
             // When
@@ -241,7 +241,7 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(closedAuction));
             when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(bidRepository.findSuccessFulBid(auctionId, member))
+            when(bidRepository.findSuccessfulBid(auctionId, member))
                     .thenReturn(Optional.of(winningBid));
 
             // When, Then
@@ -325,7 +325,7 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(closedAuction));
             when(memberRepository.findById(1L))
                     .thenReturn(Optional.of(member));
-            when(bidRepository.findSuccessFulBid(auctionId, member))
+            when(bidRepository.findSuccessfulBid(auctionId, member))
                     .thenReturn(Optional.empty());  // 낙찰 입찰이 없음
 
             // When, Then
