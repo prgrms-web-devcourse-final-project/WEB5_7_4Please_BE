@@ -35,3 +35,11 @@ spring:
       enabled: true
 toss:
   secret-key: ${TOSS_SECRET_KEY}
+
+deal4u:
+  host-url: ${HOST_URL}
+  s3:
+    region: ${S3_REGION}
+    bucket-name: ${S3_BUCKET_NAME}
+    secret-key: ${S3_SECRET_KEY}
+    access-key: ${S3_ACCESS_KEY}

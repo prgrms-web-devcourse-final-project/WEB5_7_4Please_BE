@@ -1,7 +1,5 @@
 package com.deal4u.fourplease.domain.auction.service;
 
-import static com.deal4u.fourplease.domain.auction.validator.Validator.validateListNotEmpty;
-
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
@@ -40,8 +38,6 @@ public class ProductService {
     }
 
     public List<Product> getProductListBySellerId(Long sellerId) {
-        List<Product> productList = productRepository.findBySellerId(sellerId);
-        validateListNotEmpty(productList);
-        return productList;
+        return productRepository.findBySellerId(sellerId);
     }
 }

@@ -110,10 +110,17 @@ public class AuctionService {
         return PageResponse.fromPage(sellerSaleListResponsePage);
     }
 
+
     // TODO: auction 상태를 CLOSED로 변경하는 메서드로 대체 필요
     @Transactional
     public void close(Auction auction) {
         auction.close();
+    }
+
+    @Transactional(readOnly = true)
+    public Auction getAuctionByAuctionId(Long auctionId) {
+        return auctionRepository.findByIdWithProduct(auctionId)
+                .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
     }
 
     private List<String> getProductImageUrlList(Product product) {
@@ -136,7 +143,8 @@ public class AuctionService {
                 PageRequest.of(page, size, createSort(order));
 
         if (hasKeyword && hasCategoryId) {
-            return isOrderByBidCount ? auctionRepository.findByKeywordAndCategoryIdOrderByBidCount(
+            return isOrderByBidCount
+                    ? auctionRepository.findByKeywordAndCategoryIdOrderByBidCount(
                     keyword,
                     categoryId,
                     pageable
