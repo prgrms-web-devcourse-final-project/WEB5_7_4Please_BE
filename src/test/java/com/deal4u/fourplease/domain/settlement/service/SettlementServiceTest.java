@@ -18,7 +18,7 @@ import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
 import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
-import com.deal4u.fourplease.global.sheduler.FailedSettlementScheduleService;
+import com.deal4u.fourplease.global.scheduler.FailedSettlementScheduleService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -121,7 +121,6 @@ class SettlementServiceTest {
                 eq(auction),
                 any(LocalDateTime.class)
         );
-
         Settlement capturedSettlement = settlementCaptor.getValue();
         assertAll(
                 () -> assertThat(capturedSettlement.getAuction()).isEqualTo(auction),
@@ -143,6 +142,7 @@ class SettlementServiceTest {
     void offerSecondBidderSecondHighestBidderNotFound() {
         // given
         Long auctionId = 1L;
+
         Bid onlyBid = createBid(createAuction(), createBidder());
 
         given(bidRepository.findTop2ByAuctionId(auctionId))
@@ -156,7 +156,6 @@ class SettlementServiceTest {
                 .isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-
     @Test
     @DisplayName("이미 정산이 존재하면 예외를 발생시킨다")
     void offerSecondBidderSettlementAlreadyExists() {
@@ -164,6 +163,7 @@ class SettlementServiceTest {
         Long auctionId = 1L;
         Auction auction = createAuction();
         Bidder bidder = createBidder();
+
         Bid highestBid = createBid(auction, createBidder());
         Bid secondHighestBid = createBid(auction, bidder);
 

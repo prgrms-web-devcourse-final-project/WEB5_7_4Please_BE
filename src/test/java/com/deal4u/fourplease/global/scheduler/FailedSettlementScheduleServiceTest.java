@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.global.sheduler;
+package com.deal4u.fourplease.global.scheduler;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;

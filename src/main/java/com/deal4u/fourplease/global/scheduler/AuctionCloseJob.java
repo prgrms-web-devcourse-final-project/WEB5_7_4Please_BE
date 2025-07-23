@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.global.sheduler;
+package com.deal4u.fourplease.global.scheduler;
 
 import com.deal4u.fourplease.domain.settlement.service.SettlementService;
 import lombok.RequiredArgsConstructor;
@@ -9,15 +9,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class FailedSettlementJob extends QuartzJobBean {
+public class AuctionCloseJob extends QuartzJobBean {
 
     private final SettlementService settlementService;
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-        Long settlementId = dataMap.getLong("settlementId");
-
-        settlementService.handleFailedSettlement(settlementId);
+        Long auctionId = dataMap.getLong("auctionId");
+        settlementService.save(auctionId, 1);
     }
 }

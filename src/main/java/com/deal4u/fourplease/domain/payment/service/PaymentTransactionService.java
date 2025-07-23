@@ -45,6 +45,7 @@ class PaymentTransactionService {
     public void updatePaymentStatusToFailed(Payment payment, Order order) {
         payment.statusFailed();
         order.failed();
+        settlementService.changeSettlementFailure(order.getAuction());
     }
 
     @Transactional

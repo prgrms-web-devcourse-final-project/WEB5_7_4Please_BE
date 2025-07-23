@@ -1,5 +1,4 @@
-package com.deal4u.fourplease.global.sheduler;
-
+package com.deal4u.fourplease.global.scheduler;
 
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.time.LocalDateTime;
@@ -64,7 +63,6 @@ public class AuctionScheduleService {
             scheduler.deleteJob(new JobKey("auctionCloseJob_" + auctionId, "auction-jobs"));
         } catch (Exception e) {
             throw ErrorCode.AUCTION_SCHEDULE_ALREADY_EXISTS.toException();
-
         }
     }
 

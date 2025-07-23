@@ -19,11 +19,13 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     Optional<Bid> findTopByAuctionAndBidderOrderByPriceDesc(Auction auction, Bidder bidder);
 
+    Optional<Bid> findTopByAuctionOrderByPriceDescBidTimeAsc(Auction auction);
+
     @Query("SELECT b.price "
             + "FROM Bid b "
             + "WHERE b.deleted = false "
             + "AND b.auction.auctionId = :auctionId "
-            + "ORDER BY b.price DESC")
+            + "ORDER BY b.price DESC, b.bidTime ASC")
     List<BigDecimal> findPricesByAuctionIdOrderByPriceDesc(@Param("auctionId") Long auctionId);
 
     @Query("SELECT b "
@@ -31,8 +33,18 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "WHERE b.auction.auctionId = :auctionId "
             + "AND b.bidder.member = :member "
             + "AND b.isSuccessfulBidder = true")
-    Optional<Bid> findSuccessFulBid(@Param("auctionId") Long auctionId,
-                                    @Param("member") Member member);
+    Optional<Bid> findSuccessfulBid(@Param("auctionId") Long auctionId,
+            @Param("member") Member member);
+
+    @Query("SELECT b "
+            + "FROM Bid b "
+            + "WHERE b.auction.auctionId = :auctionId "
+            + "AND b.deleted = false "
+            + "AND b.isSuccessfulBidder = true "
+            + "AND b.price < (SELECT MAX(b2.price) FROM Bid b2 "
+            + "WHERE b2.auction.auctionId = :auctionId AND b2.deleted = false) "
+            + "ORDER BY b.price DESC, b.bidTime ASC")
+    Optional<Bid> findSecondHighestBidByAuctionId(@Param("auctionId") Long auctionId);
 
     @Query("""
             SELECT b
@@ -52,7 +64,19 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     Optional<Bid> findByBidIdAndBidder(Long bidId, Bidder bidder);
 
+    Optional<Bid> findByAuctionAndBidder(Auction auction, Bidder bidder);
+
     @SuppressWarnings("checkstyle:MethodName")
     Page<Bid> findByAuctionAndDeletedFalseOrderByPriceDescBidTimeAsc(Auction auction,
-                                                                     Pageable pageable);
+            Pageable pageable);
+
+    @Query("SELECT b "
+            + "FROM Bid b "
+            + "WHERE b.auction.auctionId = :auctionId "
+            + "AND b.deleted = false "
+            + "AND b.isSuccessfulBidder = false "
+            + "AND b.price < (SELECT MAX(b2.price) FROM Bid b2 "
+            + "WHERE b2.auction.auctionId = :auctionId AND b2.deleted = false) "
+            + "ORDER BY b.price DESC, b.bidTime ASC")
+    Optional<Bid> findSecondHighestBidByAuctionIdForSchedule(@Param("auctionId") Long auctionId);
 }

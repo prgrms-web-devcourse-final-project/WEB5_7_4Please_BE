@@ -147,4 +147,5 @@ public class BidService {
                 .orElseThrow(ErrorCode.MEMBER_NOT_FOUND::toException);
         return Bidder.createBidder(member);
     }
+
 }

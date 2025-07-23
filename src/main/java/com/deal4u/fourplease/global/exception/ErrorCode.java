@@ -43,7 +43,6 @@ public enum ErrorCode {
     SECOND_HIGHEST_BIDDER_NOT_FOUND(HttpStatus.NOT_FOUND, "차상위 입찰자를 찾을 수 없습니다."),
     AUCTION_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 마감 스케쥴을 찾을 수 없습니다."),
 
-
     BID_PERIOD_NOT_FOUND(HttpStatus.NOT_FOUND, "경매 기간을 찾을 수 없습니다."),
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "상품을 찾을 수 없습니다."),
     STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "일치하는 상태를 찾을 수 없습니다."),
@@ -52,12 +51,10 @@ public enum ErrorCode {
 
     // 409 - Conflict
     PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
-    REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 리뷰가 작성되었습니다."),
-
-
-    INVALID_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "사용할 수 없는 타입입니다"),
     SETTLEMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 차상위 입찰자에 대한 정산이 존재합니다."),
     AUCTION_SCHEDULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 경매의 마감 스케쥴이 이미 등록되어 있습니다."),
+    REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 리뷰가 작성되었습니다."),
+    INVALID_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "사용할 수 없는 타입입니다"),
 
     // 500 - Internal Server Error
     WEBSOCKET_SEND_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "WebSocket 메시지 전송 중 오류가 발생하였습니다."),

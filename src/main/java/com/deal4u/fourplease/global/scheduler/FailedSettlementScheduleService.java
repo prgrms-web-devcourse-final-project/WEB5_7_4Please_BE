@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.global.sheduler;
+package com.deal4u.fourplease.global.scheduler;
 
 import static com.deal4u.fourplease.global.exception.ErrorCode.FAILED_SETTLEMENT_SCHEDULE_CANCEL_ERROR;
 import static com.deal4u.fourplease.global.exception.ErrorCode.FAILED_SETTLEMENT_SCHEDULE_ERROR;

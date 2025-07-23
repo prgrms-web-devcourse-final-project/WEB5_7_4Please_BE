@@ -45,7 +45,7 @@ public class Settlement extends BaseDateEntity {
     private String rejectedReason;
 
     private LocalDateTime paidAt;
-    
+
     public void updateStatus(SettlementStatus status, LocalDateTime paidAt, String rejectedReason) {
         this.status = status;
         if (status == SettlementStatus.SUCCESS) {

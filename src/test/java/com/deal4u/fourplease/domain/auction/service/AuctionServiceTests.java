@@ -30,6 +30,7 @@ import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.GlobalException;
+import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,6 +66,9 @@ class AuctionServiceTests {
     @Mock
     private AuctionSupportService auctionSupportService;
 
+    @Mock
+    private AuctionScheduleService auctionScheduleService;
+
     @Test
     @DisplayName("경매를 등록할 수 있다")
     void saveShouldSaveAuction() {
@@ -72,10 +76,18 @@ class AuctionServiceTests {
         Member member = genMember();
         AuctionCreateRequest req = genAuctionCreateRequest();
 
-        ProductCreateDto productDto = req.toProductCreateDto(member);
         Product product = genProduct();
+        ProductCreateDto productDto = req.toProductCreateDto(member);
+
+        Auction auctionWithoutId = req.toEntity(product);
+        Auction savedAuctionWithId = Auction.builder()
+                .auctionId(1L)
+                .product(product)
+                .duration(auctionWithoutId.getDuration())
+                .build();
 
         when(productService.save(productDto)).thenReturn(product);
+        when(auctionRepository.save(any(Auction.class))).thenReturn(savedAuctionWithId);
 
         auctionService.save(req, member);
 

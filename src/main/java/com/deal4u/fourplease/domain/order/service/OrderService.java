@@ -127,7 +127,7 @@ public class OrderService {
     }
 
     private BigDecimal getSuccessFulBidPrice(Auction auction, Member member) {
-        return bidRepository.findSuccessFulBid(auction.getAuctionId(), member)
+        return bidRepository.findSuccessfulBid(auction.getAuctionId(), member)
                 .map(Bid::getPrice)
                 .orElseThrow(INVALID_AUCTION_BIDDER::toException);
     }
