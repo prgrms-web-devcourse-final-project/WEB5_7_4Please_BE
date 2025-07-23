@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.payment.entity;
 
-import com.deal4u.fourplease.domain.BaseDateEntity;
+import com.deal4u.fourplease.domain.common.BaseDateEntity;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

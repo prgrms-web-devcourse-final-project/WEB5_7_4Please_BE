@@ -2,6 +2,7 @@ package com.deal4u.fourplease.domain.auction.controller;
 
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionCreateRequest;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionDetailResponse;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionListResponsePageResponse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
+import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
+import com.deal4u.fourplease.domain.auction.dto.PageResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
@@ -28,8 +31,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -53,7 +57,7 @@ class AuctionControllerTests {
 
     @Test
     @DisplayName("POST /api/v1/auctions가 성공하면 경매를 등록한 후 201을 반환한다")
-    void create_auction_should_return201() throws Exception {
+    void createAuctionShouldReturn201() throws Exception {
 
         AuctionCreateRequest req = genAuctionCreateRequest();
         when(memberRepository.findAll()).thenReturn(List.of(Mockito.mock(Member.class)));
@@ -164,5 +168,33 @@ class AuctionControllerTests {
         mockMvc.perform(multipart("/api/v1/auctions/images").file(file)
                 ).andExpect(status().isBadRequest())
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/auctions가 성공하면 전체 경매 목록과 200을 반환한다")
+    void readAllAuctionsShouldReturn200() throws Exception {
+
+        Pageable pageable = PageRequest.of(0, 20);
+        PageResponse<AuctionListResponse> resp = genAuctionListResponsePageResponse();
+
+        when(auctionService.findAll(pageable)).thenReturn(resp);
+
+        mockMvc.perform(
+                        get("/api/v1/auctions")
+                                .param("page", "0")
+                                .param("size", "20")
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name")
+                        .value(resp.getContent().get(0).name()))
+                .andExpect(jsonPath("$.content[1].name")
+                        .value(resp.getContent().get(1).name()))
+                .andExpect(jsonPath("$.content[2].name")
+                        .value(resp.getContent().get(2).name()))
+                .andExpect(jsonPath("$.totalElements").value(resp.getTotalElements()))
+                .andExpect(jsonPath("$.totalPages").value(resp.getTotalPages()))
+                .andExpect(jsonPath("$.page").value(resp.getPage()))
+                .andExpect(jsonPath("$.size").value(resp.getSize()))
+                .andDo(print());
+
     }
 }
