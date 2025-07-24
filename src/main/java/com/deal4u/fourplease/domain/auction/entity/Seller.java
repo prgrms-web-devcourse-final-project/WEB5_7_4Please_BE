@@ -1,7 +1,6 @@
 package com.deal4u.fourplease.domain.auction.entity;
 
 import com.deal4u.fourplease.domain.member.entity.Member;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class Seller {
 
     // TODO: 병합 후 cascade = CascadeType.PERSIST 삭제 필요
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     public static Seller create(Member member) {

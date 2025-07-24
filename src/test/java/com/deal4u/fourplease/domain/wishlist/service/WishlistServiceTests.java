@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.wishlist.service;
 
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuction;
+import static com.deal4u.fourplease.testutil.TestUtils.genAuction;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;

@@ -1,4 +1,4 @@
-package com.deal4u.fourplease.domain.auction.util;
+package com.deal4u.fourplease.testutil;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;

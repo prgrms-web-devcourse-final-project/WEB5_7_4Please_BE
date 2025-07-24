@@ -1,7 +1,7 @@
 package com.deal4u.fourplease.global.scheduler;
 
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProduct;
+import static com.deal4u.fourplease.testutil.TestUtils.genMember;
+import static com.deal4u.fourplease.testutil.TestUtils.genProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

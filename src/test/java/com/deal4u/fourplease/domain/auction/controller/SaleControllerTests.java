@@ -1,6 +1,6 @@
 package com.deal4u.fourplease.domain.auction.controller;
 
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genSellerSaleListResponsePageResponse;
+import static com.deal4u.fourplease.testutil.TestUtils.genSellerSaleListResponsePageResponse;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
