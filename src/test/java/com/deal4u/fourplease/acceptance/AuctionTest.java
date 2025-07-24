@@ -16,11 +16,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 @DisplayName("경매관련 인수 테스트")
+@TestInstance(Lifecycle.PER_METHOD)
+@Transactional
 class AuctionTest extends BaseAcceptTest {
 
     @Autowired
@@ -61,7 +65,9 @@ class AuctionTest extends BaseAcceptTest {
         List<AuctionListResponse> responses = request()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .get("/api/v1/auctions?keyword={keyword}", auctionCreateRequest.productName())
-                .then().assertThat().statusCode(HttpStatus.OK.value())
+                .then()
+                .log().all()
+                .assertThat().statusCode(HttpStatus.OK.value())
                 .extract().jsonPath().getList("content", AuctionListResponse.class);
 
         assertThat(responses).hasSize(1);
@@ -100,5 +106,47 @@ class AuctionTest extends BaseAcceptTest {
                 auction.getProduct().getThumbnailUrl());
         assertThat(auctionDetailResponse.startingPrice()).isEqualTo(auction.getStartingPrice());
         assertThat(auctionDetailResponse.productName()).isEqualTo(auction.getProduct().getName());
+    }
+
+    @Test
+    @DisplayName("경매를 등록하고 경매를 취소 시킨다")
+    @Transactional
+    void deleteAuction() {
+        long memberId = 1L;
+        AuctionCreateRequest auctionCreateRequest = new AuctionCreateRequest(
+                "김 조던",
+                "김조던은 어쩌구 저쩌구 입니다",
+                "http://deal4U.com/thumbnail.jpg",
+                List.of("http://deal4U.com/image.jpg"),
+                memberId,
+                "서울시 관악구 신림동",
+                "몰라~~",
+                "624803",
+                "010-1111-1111",
+                LocalDateTime.now(),
+                THREE,
+                BigDecimal.valueOf(10000L),
+                null
+        );
+        authRequest(memberId)
+                .body(auctionCreateRequest)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .post("/api/v1/auctions")
+                .then().assertThat().statusCode(HttpStatus.CREATED.value());
+
+        List<AuctionListResponse> responses = request()
+                .get("/api/v1/auctions?keyword={keyword}", auctionCreateRequest.productName())
+                .then()
+                .log().all()
+                .assertThat().statusCode(HttpStatus.OK.value())
+                .extract().jsonPath().getList("content", AuctionListResponse.class);
+
+        authRequest(memberId)
+                .body(auctionCreateRequest)
+                .when()
+                .delete("/api/v1/auctions/{id}",responses.getFirst().auctionId())
+                .then().assertThat().statusCode(HttpStatus.NO_CONTENT.value());
+
     }
 }
