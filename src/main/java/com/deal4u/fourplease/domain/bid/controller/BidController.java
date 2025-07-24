@@ -4,18 +4,19 @@ import com.deal4u.fourplease.domain.bid.dto.BidRequest;
 import com.deal4u.fourplease.domain.bid.dto.BidResponse;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
+import com.deal4u.fourplease.domain.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,22 +47,22 @@ public class BidController {
     @PostMapping("/bids")
     @ResponseStatus(HttpStatus.OK)
     public void createBid(@Valid @RequestBody BidRequest request,
-            @RequestParam("memberId") Long memberId) {
+            @AuthenticationPrincipal Member member) {
         // 1. 로그인한 유저 정보 취득
         // (현재는 `RequestParam`으로 처리하고 있으나 추후에 로그인 유저 정보에서 취득할 예정)
 
         // 2. 입찰 생성 호출
-        bidService.createBid(memberId, request);
+        bidService.createBid(member.getMemberId(), request);
     }
 
     @DeleteMapping("/bids/{bidId}")
     public void deleteBid(@PathVariable("bidId") long bidId,
-            @RequestParam("memberId") Long memberId) {
+            @AuthenticationPrincipal Member member) {
         // 1. 로그인한 유저 정보 취득
         // (현재는 `RequestParam`으로 처리하고 있으나 추후에 로그인 유저 정보에서 취득할 예정)
 
         // 2. 입찰 취소 호출
-        bidService.deleteBid(memberId, bidId);
+        bidService.deleteBid(member.getMemberId(), bidId);
     }
 
 }
