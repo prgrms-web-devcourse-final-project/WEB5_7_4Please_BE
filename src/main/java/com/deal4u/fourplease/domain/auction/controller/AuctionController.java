@@ -8,6 +8,7 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionSearchRequest;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
 import com.deal4u.fourplease.domain.common.PageResponse;
+import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,9 +62,10 @@ public class AuctionController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void createAuction(
-            @Valid @RequestBody AuctionCreateRequest request
+            @Valid @RequestBody AuctionCreateRequest request,
+            @AuthenticationPrincipal Member member
     ) {
-        auctionService.save(request, memberRepository.findAll().getFirst());
+        auctionService.save(request, member);
     }
 
     @Operation(summary = "상품 설명")

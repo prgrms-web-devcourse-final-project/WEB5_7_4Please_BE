@@ -22,13 +22,30 @@ public enum ErrorCode {
     PAYMENT_ERROR(HttpStatus.BAD_REQUEST, "결제 처리 중 오류가 발생했습니다."),
     WEBSOCKET_INVALID_REQUEST_FORMAT(HttpStatus.BAD_REQUEST, "잘못된 요청 형식입니다."),
     INVALID_PRICE_NOT_UPPER(HttpStatus.BAD_REQUEST, "즉시 구매 가격이 현재 최고 입찰가보다 낮습니다."),
+    INVALID_AUTH_HEADER(HttpStatus.BAD_REQUEST, "Authorization 헤더 형식이 잘못되었습니다."),
+    INVALID_TOKEN_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 토큰 타입입니다."),
+    MALFORMED_TOKEN(HttpStatus.BAD_REQUEST, "토큰 형식이 올바르지 않습니다."),
+    UNSUPPORTED_TOKEN(HttpStatus.BAD_REQUEST, "지원되지 않는 토큰 형식입니다."),
+    TOKEN_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "토큰 타입을 찾을 수 없습니다."),
+    OAUTH_EMAIL_NOT_FOUND(HttpStatus.BAD_REQUEST, "소셜 로그인으로부터 이메일을 받아올 수 없습니다."),
+    NICKNAME_LENGTH_INVALID(HttpStatus.BAD_REQUEST, "닉네임은 2~20자 사이여야 합니다."),
+    INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "닉네임은 공백일 수 없습니다."),
+    INVALID_NICKNAME_FORMAT(HttpStatus.BAD_REQUEST, "닉네임 형식이 잘못되었습니다."),
     PAYMENT_NOT_SUCCESS(HttpStatus.BAD_REQUEST, "결제 처리가 완료되지 않은 결제입니다."),
     INVALID_REVIEW_SORT(HttpStatus.BAD_REQUEST, "리뷰는 작성일자로만 정렬 가능합니다."),
 
-    // 403 - Forbidden
+    // 401 - Unauthorized,
+    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰이 유효하지 않습니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다."),
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
+    SOCIAL_REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "소셜 리프레시 토큰이 만료되었습니다. 재동의가 필요합니다."),
+
+    // 403 - Forbidden,
     BID_FORBIDDEN_PRICE(HttpStatus.FORBIDDEN, "기존 입찰 금액보다 높은 금액을 입력해주세요."),
     AUCTION_NOT_OPEN(HttpStatus.FORBIDDEN, "해당 경매는 종료되었습니다."),
     AUCTION_NOT_CLOSED(HttpStatus.FORBIDDEN, "해당 경매는 종료되지 않았습니다."),
+    MEMBER_WITHDRAWN(HttpStatus.FORBIDDEN, "탈퇴한 회원입니다."),
+    TOKEN_ALREADY_BLACKLISTED(HttpStatus.FORBIDDEN, "이미 블랙리스트 처리된 토큰입니다."),
     FORBIDDEN_RECEIVER(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // 404 - Not Found
@@ -53,6 +70,11 @@ public enum ErrorCode {
     PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
     SETTLEMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 차상위 입찰자에 대한 정산이 존재합니다."),
     AUCTION_SCHEDULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 경매의 마감 스케쥴이 이미 등록되어 있습니다."),
+
+    // 422 - Unprocessable Entity,
+    NICKNAME_ALREADY_EXISTS(HttpStatus.UNPROCESSABLE_ENTITY, "이미 존재하는 닉네임입니다."),
+
+    // 500 - Internal Server Error,
     REVIEW_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 리뷰가 작성되었습니다."),
     INVALID_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "사용할 수 없는 타입입니다"),
 

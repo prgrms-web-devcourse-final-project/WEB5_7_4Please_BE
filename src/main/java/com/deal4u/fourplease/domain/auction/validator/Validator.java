@@ -2,10 +2,9 @@ package com.deal4u.fourplease.domain.auction.validator;
 
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public class Validator {
 
     public static void validateListNotEmpty(List<?> list) {

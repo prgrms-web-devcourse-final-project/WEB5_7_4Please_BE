@@ -3,7 +3,6 @@ package com.deal4u.fourplease.domain.auction.service;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProduct;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProductImageList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,8 +12,6 @@ import com.deal4u.fourplease.domain.auction.dto.ProductImageListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.ProductImage;
 import com.deal4u.fourplease.domain.auction.repository.ProductImageRepository;
-import com.deal4u.fourplease.global.exception.GlobalException;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,7 +64,6 @@ class ProductImageServiceTests {
 
         when(productImageRepository.findByProductId(product.getProductId()))
                 .thenReturn(productImageList);
-
 
         ProductImageListResponse actualResp = productImageService.getByProduct(product);
         List<String> actualImageUrls = actualResp.toProductImageUrlList();

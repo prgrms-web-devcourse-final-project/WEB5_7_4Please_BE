@@ -46,18 +46,23 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run Tests
-        run: ./gradlew test -Dspring.profiles.active=ci
+        run: SPRING_PROFILES_ACTIVE=ci ./gradlew test
         env:
           SMTP_HOST: ${{secrets.SMTP_HOST}}
           SMTP_PASSWORD: ${{secrets.SMTP_PASSWORD}}
           SMTP_PORT: ${{secrets.SMTP_PORT}}
           SMTP_USERNAME: ${{secrets.SMTP_USERNAME}}
           TOSS_SECRET_KEY: ${{ secrets.TOSS_SECRET_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
           HOST_URL: ${{secrets.HOST_URL}}
           S3_ACCESS_KEY: ${{secrets.S3_ACCESS_KEY}}
           S3_REGION: ${{secrets.S3_REGION}}
           S3_SECRET_KEY: ${{secrets.S3_SECRET_KEY}}
           S3_BUCKET_NAME: ${{secrets.S3_BUCKET_NAME}}
+          JWT_SECRET: ${{secrets.JWT_SECRET}}
 
   build:
     runs-on: ubuntu-latest
@@ -76,4 +81,4 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build project only (skip test and checkstyle)
-        run: ./gradlew build -x test -x checkstyleMain
+        run: SPRING_PROFILES_ACTIVE=ci ./gradlew build -x test -x checkstyleMain

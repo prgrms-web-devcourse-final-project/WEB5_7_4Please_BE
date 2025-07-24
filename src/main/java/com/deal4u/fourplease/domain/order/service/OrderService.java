@@ -40,12 +40,11 @@ public class OrderService {
     private final BidRepository bidRepository;
 
     @Transactional
-    public String saveOrder(Long auctionId, String orderType,
-                            OrderCreateRequest orderCreateRequest) {
+    public String saveOrder(Long auctionId, String orderType, Long memberId,
+            OrderCreateRequest orderCreateRequest) {
         OrderType orderTypeEnum = validateOrderType(orderType);
 
-        // todo: 컨텍스트 홀더에서 주문자 꺼내기
-        Member member = getMemberOrThrow(1L);
+        Member member = getMemberOrThrow(memberId);
         Auction auction = getAuctionForOrder(auctionId, orderTypeEnum);
         BigDecimal expectedPrice = determineOrderPrice(auction, member, orderTypeEnum);
         validateOrderPrice(BigDecimal.valueOf(orderCreateRequest.price()), expectedPrice,
@@ -85,15 +84,15 @@ public class OrderService {
     }
 
     private void validateOrderPrice(BigDecimal requestPrice, BigDecimal expectedPrice,
-                                    OrderType orderType) {
+            OrderType orderType) {
         if (requestPrice.compareTo(expectedPrice) != 0) {
             throw getOrderPriceException(orderType);
         }
     }
 
     private GlobalException getOrderPriceException(OrderType orderType) {
-        return OrderType.BUY_NOW.equals(orderType) ? INVALID_INSTANT_BID_PRICE.toException() :
-                INVALID_BID_PRICE.toException();
+        return OrderType.BUY_NOW.equals(orderType) ? INVALID_INSTANT_BID_PRICE.toException()
+                : INVALID_BID_PRICE.toException();
     }
 
     private BigDecimal determineOrderPrice(Auction auction, Member member, OrderType orderType) {
@@ -106,15 +105,9 @@ public class OrderService {
     }
 
     private Order createOrder(Auction auction, Orderer orderer, OrderId orderId,
-                              BigDecimal orderPrice, OrderType orderType) {
-        return Order.builder()
-                .orderId(orderId)
-                .auction(auction)
-                .orderer(orderer)
-                .price(orderPrice)
-                .orderStatus(OrderStatus.PENDING)
-                .orderType(orderType)
-                .build();
+            BigDecimal orderPrice, OrderType orderType) {
+        return Order.builder().orderId(orderId).auction(auction).orderer(orderer).price(orderPrice)
+                .orderStatus(OrderStatus.PENDING).orderType(orderType).build();
     }
 
     private Auction getAuctionForOrder(Long auctionId, OrderType orderTypeEnum) {
@@ -127,8 +120,7 @@ public class OrderService {
     }
 
     private BigDecimal getSuccessFulBidPrice(Auction auction, Member member) {
-        return bidRepository.findSuccessfulBid(auction.getAuctionId(), member)
-                .map(Bid::getPrice)
+        return bidRepository.findSuccessfulBid(auction.getAuctionId(), member).map(Bid::getPrice)
                 .orElseThrow(INVALID_AUCTION_BIDDER::toException);
     }
 
@@ -143,8 +135,7 @@ public class OrderService {
     }
 
     private Member getMemberOrThrow(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(USER_NOT_FOUND::toException);
+        return memberRepository.findById(memberId).orElseThrow(USER_NOT_FOUND::toException);
     }
 
     private Order getOrderOrThrow(Long orderId) {

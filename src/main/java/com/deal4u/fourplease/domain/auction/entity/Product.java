@@ -42,7 +42,7 @@ public class Product extends BaseDateEntity {
     private String thumbnailUrl;
 
     @Embedded
-    @AttributeOverrides({
+    @AttributeOverrides(value = {
             @AttributeOverride(name = "address", column = @Column(name = "address")),
             @AttributeOverride(name = "addressDetail", column = @Column(name = "detail_address")),
             @AttributeOverride(name = "zipCode", column = @Column(name = "zip_code"))
