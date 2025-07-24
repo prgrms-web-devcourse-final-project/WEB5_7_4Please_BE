@@ -35,7 +35,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @DisplayName("경매관련 인수 테스트")
 @TestInstance(Lifecycle.PER_METHOD)
 @Transactional
-class AuctionTest extends BaseAcceptTest {
+class AuctionTest extends MockMvcBaseAcceptTest {
 
     @Autowired
     private AuctionRepository auctionRepository;
@@ -417,7 +417,7 @@ class AuctionTest extends BaseAcceptTest {
     private URL testUrl(SavePath savePath) {
 
         try {
-            URI uri = new URI("http", null, "localhost", port, "/" + savePath.fullPath(), null,
+            URI uri = new URI("http", null, "localhost", 8080, "/" + savePath.fullPath(), null,
                     null);
             return uri.toURL();
         } catch (MalformedURLException | URISyntaxException e) {

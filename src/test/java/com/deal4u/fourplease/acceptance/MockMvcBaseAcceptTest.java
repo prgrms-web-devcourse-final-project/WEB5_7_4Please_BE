@@ -4,18 +4,16 @@ import com.deal4u.fourplease.domain.auth.dto.TokenPair;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
-import io.restassured.RestAssured;
-import io.restassured.specification.RequestSpecification;
+import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import io.restassured.module.mockmvc.specification.MockMvcRequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public abstract class BaseAcceptTest {
-
-    @LocalServerPort
-    protected int port;
+@SpringBootTest(webEnvironment = WebEnvironment.MOCK)
+public abstract class MockMvcBaseAcceptTest {
 
     @Autowired
     private MemberRepository memberRepository;
@@ -23,19 +21,23 @@ public abstract class BaseAcceptTest {
     @Autowired
     private JwtProvider jwtProvider;
 
+    @Autowired
+    private WebApplicationContext context;
+
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
+        RestAssuredMockMvc.webAppContextSetup(context);
     }
 
-    protected RequestSpecification authRequest(Long memberId) {
+
+    protected MockMvcRequestSpecification authRequest(Long memberId) {
         String assessToken = getAssessToke(getMember(memberId));
 
         return request().header("Authorization", "Bearer " + assessToken);
     }
 
-    protected RequestSpecification request() {
-        return RestAssured.given().port(port);
+    protected MockMvcRequestSpecification request() {
+        return RestAssuredMockMvc.given();
     }
 
     private Member getMember(Long memberId) {

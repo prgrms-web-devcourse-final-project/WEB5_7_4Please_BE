@@ -82,6 +82,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-quartz'
 
     testImplementation 'io.rest-assured:rest-assured:5.5.5'
+    testImplementation 'io.rest-assured:spring-mock-mvc:5.5.5'
 }
 
 tasks.named('check') {
