@@ -62,7 +62,7 @@ public class WishlistController {
     public PageResponse<WishlistResponse> readAllWishlist(
             @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
             @RequestParam(name = "size", defaultValue = "20") @Min(0) @Max(100) int size,
-            @RequestParam(name = "order", defaultValue = "latest") String order
+            @RequestParam(name = "order", defaultValue = "latest") String order,
             @AuthenticationPrincipal Member member
     ) {
         Pageable pageable = PageRequest.of(page, size, getSort(order));

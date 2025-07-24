@@ -65,6 +65,7 @@ public class BidController {
         // 2. 입찰 생성 호출
         bidService.createBid(member.getMemberId(), request);
     }
+
     @Operation(summary = "입찰 취소")
     @ApiResponse(responseCode = "204", description = "입찰 취소 성공")
     @ApiResponse(responseCode = "404", description = "경매중인 경매 또는 입찰을 찾을 수 없음")
