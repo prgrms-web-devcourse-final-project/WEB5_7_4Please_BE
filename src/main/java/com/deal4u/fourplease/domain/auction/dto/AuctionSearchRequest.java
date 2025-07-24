@@ -32,7 +32,7 @@ public record AuctionSearchRequest(
         }
 
         if (size == null) {
-            size = 3;
+            size = 20;
         }
 
         if (keyword == null) {

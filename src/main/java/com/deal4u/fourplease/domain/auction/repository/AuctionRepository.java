@@ -22,14 +22,16 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "WHERE a.auctionId = :auctionId "
             + "AND a.deleted = false "
             + "AND a.status = 'OPEN'")
-    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusOpen(Long auctionId);
+    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusOpen(
+            @Param("auctionId") Long auctionId);
 
     @Query("SELECT a "
             + "FROM Auction a "
             + "WHERE a.auctionId = :auctionId "
             + "AND a.deleted = false "
             + "AND a.status = 'CLOSED'")
-    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(Long auctionId);
+    Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(
+            @Param("auctionId") Long auctionId);
 
     @Query("SELECT a "
             + "FROM Auction a "
@@ -44,8 +46,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @Query("SELECT a "
             + "FROM Auction a "
-            + "WHERE a.deleted = false "
-            + "ORDER BY a.createdAt DESC")
+            + "WHERE a.deleted = false")
     Page<Auction> findAll(Pageable pageable);
 
     @Query("SELECT a "
@@ -81,7 +82,8 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "ON b.auction = a "
             + "WHERE a.deleted = false "
             + "GROUP BY a.auctionId "
-            + "ORDER BY COUNT(b) DESC")
+            + "ORDER BY COUNT(b) DESC, "
+            + "a.createdAt DESC")
     Page<Auction> findAllOrderByBidCount(Pageable pageable);
 
     @Query("SELECT a "

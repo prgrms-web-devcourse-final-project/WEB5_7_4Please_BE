@@ -119,11 +119,16 @@ public class AuctionService {
         return PageResponse.fromPage(sellerSaleListResponsePage);
     }
 
-
     // TODO: auction 상태를 CLOSED로 변경하는 메서드로 대체 필요
     @Transactional
     public void close(Auction auction) {
         auction.close();
+    }
+
+    // TODO: auction 상태를 FAIL로 변경하는 메서드로 대체 필요
+    @Transactional
+    public void fail(Auction auction) {
+        auction.fail();
     }
 
     @Transactional(readOnly = true)
@@ -172,13 +177,13 @@ public class AuctionService {
             ) :
                     auctionRepository.findByCategoryId(categoryId, pageable);
         }
-        return isOrderByBidCount ? auctionRepository.findAll(pageable) :
-                auctionRepository.findAllOrderByBidCount(pageable);
+        return isOrderByBidCount ? auctionRepository.findAllOrderByBidCount(pageable) :
+                auctionRepository.findAll(pageable);
     }
 
     private Sort createSort(String order) {
         if (order.equals("timeout")) {
-            return Sort.by(Sort.Direction.ASC, "endTime");
+            return Sort.by(Sort.Direction.ASC, "duration.endTime");
         }
         return Sort.by(Sort.Direction.DESC, "createdAt");
     }

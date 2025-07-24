@@ -106,7 +106,7 @@ INSERT INTO auctions (product_product_id, starting_price, instant_bid_price, sta
 VALUES (1, 100000, 800000, CURRENT_TIMESTAMP, DATEADD('DAY', 7, CURRENT_TIMESTAMP), 'OPEN',
         false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        (2, 1200000, 1500000, CURRENT_TIMESTAMP, DATEADD('DAY', 7, CURRENT_TIMESTAMP), 'OPEN',
-        false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+        false, DATEADD('DAY', 1, CURRENT_TIMESTAMP), DATEADD('DAY', 1, CURRENT_TIMESTAMP));
 
 -- =================================================================
 -- 3. 입찰 정보 (Bid)

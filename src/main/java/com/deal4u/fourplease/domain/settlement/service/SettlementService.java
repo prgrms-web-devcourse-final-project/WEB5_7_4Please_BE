@@ -8,6 +8,7 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.SETTLEMENT_NOT_FO
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
@@ -19,6 +20,7 @@ import com.deal4u.fourplease.global.scheduler.FailedSettlementScheduleService;
 import com.deal4u.fourplease.global.scheduler.SettlementScheduleService;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,13 @@ public class SettlementService {
 
         // 2. 로그인 유저의 정보를 기반으로 입찰자 조회
         Bidder bidder = getBidder(auction);
+
+        // 3. 입찰자가 존재하지 않는 경우 스케쥴러 등록하지 않고 종료
+        // 해당 부분은 추후 고도화 시에 method 형식으로 수정할 수 있습니다.
+        if (bidder == null) {
+            auction.fail();
+            return;
+        }
 
         // 3. 정산 생성 및 스케쥴러 등록
         saveSettlement(auction, bidder, days);
@@ -70,11 +79,15 @@ public class SettlementService {
     }
 
     private Bidder getBidder(Auction auction) {
-        Bid bid = bidRepository.findTopByAuctionOrderByPriceDescBidTimeAsc(auction)
-                .orElseThrow(BID_NOT_FOUND::toException);
-        // 낙찰자로 상태 변경
-        bid.update(true);
-        return bid.getBidder();
+        Optional<Bid> bid = bidRepository.findTopByAuctionOrderByPriceDescBidTimeAsc(auction);
+
+        if (bid.isPresent()) {
+            Bid updateBid = bid.get();
+            updateBid.update(true);
+            return updateBid.getBidder();
+        }
+
+        return null;
     }
 
 
