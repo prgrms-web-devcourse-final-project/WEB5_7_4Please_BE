@@ -5,6 +5,9 @@ import com.deal4u.fourplease.domain.bid.dto.BidResponse;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@Tag(name = "Bid", description = "입찰 관리 API")
 public class BidController {
 
     private final BidService bidService;
@@ -36,6 +40,9 @@ public class BidController {
      *                  우선 구현하였습니다.
      * @return Paging 처리 된 입찰 목록
      */
+    @Operation(summary = "입찰 내역 조회")
+    @ApiResponse(responseCode = "200", description = "해당 경매의 입찰 내역 조회 성공")
+    @ApiResponse(responseCode = "404", description = "경매를 찾을 수 없음")
     @GetMapping("/auctions/{auctionId}/bids")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<BidResponse> getBids(@PathVariable(name = "auctionId") Long auctionId,
@@ -44,8 +51,12 @@ public class BidController {
         return bidService.getBidListForAuction(auctionId, pageable);
     }
 
+    @Operation(summary = "입찰 추가")
+    @ApiResponse(responseCode = "201", description = "해당 경매에 대해 입찰을 성공")
+    @ApiResponse(responseCode = "404", description = "경매를 찾을 수 없음")
+    @ApiResponse(responseCode = "403", description = "해당 경매가 종료, 혹은 기존 입찰보다 낮은 입찰가인 경우")
     @PostMapping("/bids")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public void createBid(@Valid @RequestBody BidRequest request,
             @AuthenticationPrincipal Member member) {
         // 1. 로그인한 유저 정보 취득
@@ -54,8 +65,11 @@ public class BidController {
         // 2. 입찰 생성 호출
         bidService.createBid(member.getMemberId(), request);
     }
-
+    @Operation(summary = "입찰 취소")
+    @ApiResponse(responseCode = "204", description = "입찰 취소 성공")
+    @ApiResponse(responseCode = "404", description = "경매중인 경매 또는 입찰을 찾을 수 없음")
     @DeleteMapping("/bids/{bidId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBid(@PathVariable("bidId") long bidId,
             @AuthenticationPrincipal Member member) {
         // 1. 로그인한 유저 정보 취득
