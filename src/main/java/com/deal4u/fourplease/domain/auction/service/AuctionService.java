@@ -10,6 +10,7 @@ import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
@@ -33,6 +34,8 @@ public class AuctionService {
     private final ProductImageService productImageService;
     private final AuctionScheduleService auctionScheduleService;
 
+    private final BidService bidService;
+
     private final AuctionSupportService auctionSupportService;
 
     @Transactional
@@ -50,7 +53,7 @@ public class AuctionService {
 
     @Transactional(readOnly = true)
     public AuctionDetailResponse getByAuctionId(Long auctionId) {
-        BidSummaryDto bidSummaryDto = auctionSupportService.getBidSummaryDto(auctionId);
+        BidSummaryDto bidSummaryDto = bidService.getBidSummaryDto(auctionId);
 
         Auction auction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
@@ -65,9 +68,12 @@ public class AuctionService {
     }
 
     @Transactional
-    public void deleteByAuctionId(Long auctionId) {
+    public void deleteByAuctionId(Long auctionId, Member member) {
         Auction targetAuction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
+
+        // 낙찰된 경매는 취소 불가
+        // TODO: Auction status 업데이트 후 수정 가능
 
         // 경매 스케쥴 취소
         auctionScheduleService.cancelAuctionClose(targetAuction.getAuctionId());
@@ -107,7 +113,7 @@ public class AuctionService {
 
         Page<SellerSaleListResponse> sellerSaleListResponsePage = auctionPage
                 .map(auction -> {
-                    BidSummaryDto bidSummaryDto = auctionSupportService
+                    BidSummaryDto bidSummaryDto = bidService
                             .getBidSummaryDto(auction.getAuctionId());
                     return SellerSaleListResponse.toSellerSaleListResponse(
                             auction,

@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.domain.bid.service;
 
 import com.deal4u.fourplease.config.BidWebSocketHandler;
+import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
@@ -17,6 +18,8 @@ import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.lock.NamedLock;
 import com.deal4u.fourplease.global.lock.NamedLockProvider;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -124,6 +127,15 @@ public class BidService {
         } finally {
             lock.unlock();
         }
+    }
+
+    // bid maxprice와 bidCount를 반환
+    @Transactional(readOnly = true)
+    public BidSummaryDto getBidSummaryDto(Long auctionId) {
+        List<BigDecimal> bidList = bidRepository.findPricesByAuctionIdOrderByPriceDesc(
+                auctionId
+        );
+        return BidSummaryDto.toBidSummaryDto(bidList);
     }
 
     public PageResponse<BidResponse> getBidListForAuction(Long auctionId, Pageable pageable) {

@@ -80,11 +80,15 @@ public class AuctionController {
 
     @Operation(summary = "경매제거")
     @ApiResponse(responseCode = "204", description = "경매 삭제 성공")
+    @ApiResponse(responseCode = "403", description = "권한 없음")
     @ApiResponse(responseCode = "409", description = "낙찰된 경매는 제거 불가능")
     @DeleteMapping("/{auctionId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAuction(@PathVariable(name = "auctionId") @Positive Long auctionId) {
-        auctionService.deleteByAuctionId(auctionId);
+    public void deleteAuction(
+            @PathVariable(name = "auctionId") @Positive Long auctionId,
+            @AuthenticationPrincipal Member member
+    ) {
+        auctionService.deleteByAuctionId(auctionId, member);
     }
 
     @Operation(summary = "이미지 업로드")

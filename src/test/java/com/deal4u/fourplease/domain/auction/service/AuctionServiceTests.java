@@ -27,6 +27,7 @@ import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.SaleAuctionStatus;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.GlobalException;
@@ -65,6 +66,9 @@ class AuctionServiceTests {
 
     @Mock
     private AuctionSupportService auctionSupportService;
+
+    @Mock
+    private BidService bidService;
 
     @Mock
     private AuctionScheduleService auctionScheduleService;
@@ -124,7 +128,7 @@ class AuctionServiceTests {
         List<String> productImageUrlList = List.of("http://example.com/image1.jpg",
                 "http://example.com/image2.jpg");
 
-        when(auctionSupportService.getBidSummaryDto(auctionId)).thenReturn(bidSummaryDto);
+        when(bidService.getBidSummaryDto(auctionId)).thenReturn(bidSummaryDto);
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
         when(productImageService.getByProduct(product)).thenReturn(productImageListResponse);
         when(productImageListResponse.toProductImageUrlList()).thenReturn(productImageUrlList);
@@ -207,7 +211,7 @@ class AuctionServiceTests {
         when(auctionRepository.findAllByProductIdIn(productIdList, pageable))
                 .thenReturn(auctionPage);
 
-        when(auctionSupportService.getBidSummaryDto(anyLong()))
+        when(bidService.getBidSummaryDto(anyLong()))
                 // id 별로 다른 값 반환
                 .thenAnswer(invocation -> {
                     Long auctionId = invocation.getArgument(0);

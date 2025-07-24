@@ -11,6 +11,7 @@ import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.AuctionSupportService;
+import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
@@ -44,7 +45,7 @@ class WishlistServiceTests {
     private AuctionService auctionService;
 
     @Mock
-    private AuctionSupportService auctionSupportService;
+    private BidService bidService;
 
     @Test
     @DisplayName("위시리스트를 등록할 수 있다")
@@ -114,7 +115,7 @@ class WishlistServiceTests {
 
         when(member.getMemberId()).thenReturn(1L);
         when(wishlistRepository.findAll(pageable, 1L)).thenReturn(wishlistPage);
-        when(auctionSupportService.getBidSummaryDto(auction.getAuctionId()))
+        when(bidService.getBidSummaryDto(auction.getAuctionId()))
                 .thenReturn(bidSummaryDto);
 
         PageResponse<WishlistResponse> resp = wishlistService.findAll(pageable, member);

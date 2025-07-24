@@ -41,7 +41,7 @@ public class WishlistController {
     private final WishlistService wishlistService;
 
     @Operation(summary = "위시리스트 추가")
-    @ApiResponse(responseCode = "200", description = "위시리스트 추가 성공")
+    @ApiResponse(responseCode = "201", description = "위시리스트 추가 성공")
     @ApiResponse(responseCode = "401", description = "인증 실패")
     @ApiResponse(responseCode = "403", description = "권한 없음")
     @PostMapping
@@ -72,6 +72,7 @@ public class WishlistController {
 
     @Operation(summary = "위시리스트 삭제")
     @ApiResponse(responseCode = "204", description = "위시리스트 삭제 성공")
+    @ApiResponse(responseCode = "403", description = "권한 없음")
     @ApiResponse(responseCode = "404", description = "해당 위시리스트를 찾을 수 없음")
     @DeleteMapping("/{wishlistId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

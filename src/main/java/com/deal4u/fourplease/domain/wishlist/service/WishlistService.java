@@ -4,6 +4,7 @@ import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.AuctionSupportService;
+import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
@@ -23,7 +24,7 @@ public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
     private final AuctionService auctionService;
-    private final AuctionSupportService auctionSupportService;
+    private final BidService bidService;
 
     @Transactional
     public Long save(WishlistCreateRequest request, Member member) {
@@ -48,7 +49,7 @@ public class WishlistService {
         Page<WishlistResponse> wishlistResponsePage = wishlistPage
                 .map(wishlist -> {
                     BidSummaryDto bidSummaryDto =
-                            auctionSupportService.getBidSummaryDto(
+                            bidService.getBidSummaryDto(
                                     wishlist.getAuction().getAuctionId()
                             );
                     return WishlistResponse.toWishlistResponse(wishlist, bidSummaryDto);
