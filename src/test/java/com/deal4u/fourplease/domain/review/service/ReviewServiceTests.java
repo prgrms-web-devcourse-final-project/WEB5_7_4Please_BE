@@ -132,7 +132,7 @@ class ReviewServiceTests {
 
     @Test
     @DisplayName("리뷰 작성 성공")
-    void create_review_success() throws Exception {
+    void create_review_success() {
 
         // Given
         Long buyerId = buyer.getMemberId();
@@ -171,7 +171,7 @@ class ReviewServiceTests {
 
     @Test
     @DisplayName("리뷰 작성 실패 (존재하지 않는 경매)")
-    void create_review_not_found_auction() throws Exception {
+    void create_review_not_found_auction() {
         // Given
         Long nonExistingAuctionId = 99L;
         ReviewRequest request = new ReviewRequest(nonExistingAuctionId, 5, "...");
@@ -190,7 +190,7 @@ class ReviewServiceTests {
 
     @Test
     @DisplayName("리뷰 작성 실패 (존재하지 않는 주문 내역)")
-    void create_review_not_found_order() throws Exception {
+    void create_review_not_found_order() {
         // Given
         ReviewRequest request = new ReviewRequest(auction.getAuctionId(), 5, "...");
         Long buyerId = buyer.getMemberId();
@@ -209,7 +209,7 @@ class ReviewServiceTests {
 
     @Test
     @DisplayName("리뷰 작성 실패 (존재하지 않는 결제 내역)")
-    void create_review_not_found_payment() throws Exception {
+    void create_review_not_found_payment() {
         // Given
         ReviewRequest request = new ReviewRequest(auction.getAuctionId(), 5, "...");
         Long buyerId = buyer.getMemberId();
@@ -229,7 +229,7 @@ class ReviewServiceTests {
 
     @Test
     @DisplayName("리뷰 작성 실패 (이미 작성된 리뷰가 존재하는 경우)")
-    void create_review_already_exists_review() throws Exception {
+    void create_review_already_exists_review() {
         // Given
         ReviewRequest request = new ReviewRequest(auction.getAuctionId(), 5, "...");
         Long buyerId = buyer.getMemberId();

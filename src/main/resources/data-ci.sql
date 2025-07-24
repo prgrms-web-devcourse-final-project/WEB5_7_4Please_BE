@@ -30,52 +30,54 @@ ALTER TABLE bid
 
 -- 판매자 정보
 -- role, status와 같은 예약어는 백틱(`) 또는 큰따옴표(")로 감싸주는 것이 안전합니다.
-INSERT INTO member (email, nick_name, `role`, `status`, created_at, updated_at)
-VALUES ('seller@example.com', '판매자', 'USER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO member (email, nick_name, `role`, `status`, provider, created_at, updated_at)
+VALUES ('seller@example.com', '판매자', 'USER', 'ACTIVE', 'google'
+
+       , CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 입찰자 정보 (총 20명, ID: 2 ~ 21)
-INSERT INTO member (email, nick_name, role, status, created_at, updated_at)
-VALUES ('bidderA@example.com', '입찰자A', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+INSERT INTO member (email, nick_name, role, status, provider, created_at, updated_at)
+VALUES ('bidderA@example.com', '입찰자A', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 2
-       ('bidderB@example.com', '입찰자B', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderB@example.com', '입찰자B', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 3
-       ('bidderC@example.com', '입찰자C', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderC@example.com', '입찰자C', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 4
-       ('bidderD@example.com', '입찰자D', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderD@example.com', '입찰자D', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 5
-       ('bidderE@example.com', '입찰자E', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderE@example.com', '입찰자E', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 6
-       ('bidderF@example.com', '입찰자F', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderF@example.com', '입찰자F', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 7
-       ('bidderG@example.com', '입찰자G', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderG@example.com', '입찰자G', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 8
-       ('bidderH@example.com', '입찰자H', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderH@example.com', '입찰자H', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 9
-       ('bidderI@example.com', '입찰자I', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderI@example.com', '입찰자I', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 10
-       ('bidderJ@example.com', '입찰자J', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderJ@example.com', '입찰자J', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 11
-       ('bidderK@example.com', '입찰자K', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderK@example.com', '입찰자K', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 12
-       ('bidderL@example.com', '입찰자L', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderL@example.com', '입찰자L', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 13
-       ('bidderM@example.com', '입찰자M', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderM@example.com', '입찰자M', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 14
-       ('bidderN@example.com', '입찰자N', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderN@example.com', '입찰자N', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 15
-       ('bidderO@example.com', '입찰자O', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderO@example.com', '입찰자O', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 16
-       ('bidderP@example.com', '입찰자P', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderP@example.com', '입찰자P', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 17
-       ('bidderQ@example.com', '입찰자Q', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderQ@example.com', '입찰자Q', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 18
-       ('bidderR@example.com', '입찰자R', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderR@example.com', '입찰자R', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 19
-       ('bidderS@example.com', '입찰자S', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidderS@example.com', '입찰자S', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 20
-       ('bidder1@example.com', '입찰자1', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidder1@example.com', '입찰자1', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP), -- ID: 21
-       ('bidder2@example.com', '입찰자2', 'USER', 'ACTIVE', CURRENT_TIMESTAMP,
+       ('bidder2@example.com', '입찰자2', 'USER', 'ACTIVE', 'google', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP) -- ID: 22
 ;
 
