@@ -13,6 +13,7 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
+import com.deal4u.fourplease.domain.auction.entity.Seller;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.ProductService;
@@ -89,15 +90,17 @@ class AuctionScheduleServiceTest {
     void delete_by_auction_id_should_delete_auction_and_cancel_schedule() {
         // Given
         Long auctionId = 1L;
+        Product product = genProduct();
+        Seller seller = product.getSeller();
         Auction auction = Auction.builder()
                 .auctionId(auctionId)
-                .product(genProduct())
+                .product(product)
                 .build();
 
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
 
         // when
-        auctionService.deleteByAuctionId(auctionId);
+        auctionService.deleteByAuctionId(auctionId, seller.getMember());
 
         // then - schedule
         verify(auctionScheduleService, times(1)).cancelAuctionClose(auctionId);

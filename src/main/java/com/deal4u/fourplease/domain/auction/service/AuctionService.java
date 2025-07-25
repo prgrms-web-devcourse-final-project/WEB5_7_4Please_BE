@@ -1,5 +1,7 @@
 package com.deal4u.fourplease.domain.auction.service;
 
+import static com.deal4u.fourplease.domain.auction.validator.Validator.validateSeller;
+
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
@@ -9,6 +11,7 @@ import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
+import com.deal4u.fourplease.domain.auction.reader.AuctionReader;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
@@ -72,8 +75,10 @@ public class AuctionService {
         Auction targetAuction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
-        // 낙찰된 경매는 취소 불가
-        // TODO: Auction status 업데이트 후 수정 가능
+        // TODO: Auction status 업데이트 후 낙찰된 경매는 취소 불가 기능 추가
+
+        // Seller가 member와 일치하지 않으면 403 예외 발생
+        validateSeller(targetAuction.getProduct().getSeller(), member);
 
         // 경매 스케쥴 취소
         auctionScheduleService.cancelAuctionClose(targetAuction.getAuctionId());
@@ -137,12 +142,6 @@ public class AuctionService {
         auction.fail();
     }
 
-    @Transactional(readOnly = true)
-    public Auction getAuctionByAuctionId(Long auctionId) {
-        return auctionRepository.findByIdWithProduct(auctionId)
-                .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
-    }
-
     private List<String> getProductImageUrls(Product product) {
         return productImageService.getByProduct(product)
                 .toProductImageUrls();
@@ -193,5 +192,4 @@ public class AuctionService {
         }
         return Sort.by(Sort.Direction.DESC, "createdAt");
     }
-
 }

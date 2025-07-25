@@ -77,9 +77,10 @@ public class WishlistController {
     @DeleteMapping("/{wishlistId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWishlist(
-            @PathVariable(name = "wishlistId") @Positive Long wishlistId
+            @PathVariable(name = "wishlistId") @Positive Long wishlistId,
+            @AuthenticationPrincipal Member member
     ) {
-        wishlistService.deleteByWishlistId(wishlistId);
+        wishlistService.deleteByWishlistId(wishlistId, member);
     }
 
 }

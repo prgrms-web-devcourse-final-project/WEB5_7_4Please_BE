@@ -26,6 +26,7 @@ import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.SaleAuctionStatus;
+import com.deal4u.fourplease.domain.auction.entity.Seller;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
@@ -168,11 +169,13 @@ class AuctionServiceTests {
 
         Long auctionId = 1L;
 
-        Auction auction = genAuctionCreateRequest().toEntity(genProduct());
+        Product product = genProduct();
+        Auction auction = genAuctionCreateRequest().toEntity(product);
+        Seller seller = product.getSeller();
 
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
 
-        auctionService.deleteByAuctionId(auctionId);
+        auctionService.deleteByAuctionId(auctionId, seller.getMember());
 
         verify(productService).deleteProduct(auction.getProduct());
 
@@ -188,8 +191,26 @@ class AuctionServiceTests {
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> {
-            auctionService.deleteByAuctionId(auctionId);
+            auctionService.deleteByAuctionId(auctionId, genMember());
         }).isInstanceOf(GlobalException.class).hasMessage("해당 경매를 찾을 수 없습니다.");
+
+    }
+
+    @Test
+    @DisplayName("seller가 아닌 멤버가 경매 삭제를 시도하면 403 예외가 발생한다")
+    void throwsWhenTryToDeleteByDifferentMemberFromSeller() {
+
+        Long auctionId = 1L;
+
+        Product product = genProduct();
+        Auction auction = genAuctionCreateRequest().toEntity(product);
+
+        when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
+
+
+        assertThatThrownBy(() -> {
+            auctionService.deleteByAuctionId(auctionId, genMember());
+        }).isInstanceOf(GlobalException.class).hasMessage("권한이 없습니다.");
 
     }
 
