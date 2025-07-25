@@ -21,6 +21,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BidRepository extends JpaRepository<Bid, Long> {
 
+
+    @Query("SELECT b "
+            + "FROM Bid b "
+            + "WHERE b.auction.auctionId = :auctionId "
+            + "AND b.bidder.member = :member "
+            + "AND b.isSuccessfulBidder = true")
+    Optional<Bid> findSuccessfulBid(@Param("auctionId") Long auctionId,
+                                    @Param("member") Member member);
+
     Optional<Bid> findTopByAuctionAndBidderOrderByPriceDesc(Auction auction, Bidder bidder);
 
     Optional<Bid> findTopByAuctionOrderByPriceDescBidTimeAsc(Auction auction);
@@ -101,6 +110,16 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             @Param("memberId") Long memberId,
             @Param("auctionIds") List<Long> auctionIds
     );
+
+    @Query("""
+            SELECT b
+            FROM Bid b
+            WHERE b.auction.auctionId = :auctionId
+              AND b.deleted = false
+            ORDER BY b.price DESC
+            LIMIT 2
+            """)
+    List<Bid> findTop2ByAuctionId(@Param("auctionId") Long auctionId);
 
     // 최고가 입찰 정보 조회
     @Query("""
