@@ -34,6 +34,7 @@ public class AuctionService {
     private final AuctionScheduleService auctionScheduleService;
 
     private final AuctionSupportService auctionSupportService;
+    private final AuctionStatusService auctionStatusService;
 
     @Transactional
     public void save(AuctionCreateRequest request, Member member) {
@@ -73,7 +74,7 @@ public class AuctionService {
         auctionScheduleService.cancelAuctionClose(targetAuction.getAuctionId());
 
         productService.deleteProduct(targetAuction.getProduct());
-        targetAuction.delete();
+        auctionStatusService.deleteAuction(targetAuction);
     }
 
     @Transactional(readOnly = true)
@@ -117,18 +118,6 @@ public class AuctionService {
                 });
 
         return PageResponse.fromPage(sellerSaleListResponsePage);
-    }
-
-    // TODO: auction 상태를 CLOSED로 변경하는 메서드로 대체 필요
-    @Transactional
-    public void close(Auction auction) {
-        auction.close();
-    }
-
-    // TODO: auction 상태를 FAIL로 변경하는 메서드로 대체 필요
-    @Transactional
-    public void fail(Auction auction) {
-        auction.fail();
     }
 
     @Transactional(readOnly = true)

@@ -104,7 +104,7 @@ public class MyPageBidHistoryService {
                                             Boolean isSuccessfulBidder) {
         return switch (auctionStatus) {
             case FAIL -> "패찰";
-            case CLOSED -> Boolean.TRUE.equals(isSuccessfulBidder) ? "낙찰" : "경매 종료";
+            case CLOSE -> Boolean.TRUE.equals(isSuccessfulBidder) ? "낙찰" : "경매 종료";
             default -> "진행중";
         };
     }

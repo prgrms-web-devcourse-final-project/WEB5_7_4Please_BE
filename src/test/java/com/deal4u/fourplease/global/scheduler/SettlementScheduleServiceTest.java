@@ -71,7 +71,7 @@ class SettlementScheduleServiceTest {
                 .auctionId(auctionId)
                 .product(product)
                 .duration(new AuctionDuration(auctionStartTime, auctionEndTime))
-                .status(AuctionStatus.CLOSED)
+                .status(AuctionStatus.CLOSE)
                 .build();
 
         // Bid 생성
@@ -103,7 +103,7 @@ class SettlementScheduleServiceTest {
 
         // then
         // 1. 경매 종료
-        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.CLOSED);
+        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.CLOSE);
 
         // 2. 낙찰자 설정
         assertThat(bid.isSuccessfulBidder()).isTrue();
@@ -142,5 +142,5 @@ class SettlementScheduleServiceTest {
                 .isInstanceOf(GlobalException.class)
                 .hasMessageContaining("해당 경매를 찾을 수 없습니다.");
     }
-    
+
 }

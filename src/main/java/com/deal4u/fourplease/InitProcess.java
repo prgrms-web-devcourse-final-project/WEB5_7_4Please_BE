@@ -73,7 +73,7 @@ public class InitProcess implements CommandLineRunner {
                                     }
                                 }
 
-                                if (AuctionStatus.CLOSED == auctionPair.auctionStatus) {
+                                if (AuctionStatus.CLOSE == auctionPair.auctionStatus) {
                                     ps.setLong(1, auctionPair.auctionId());
                                     ps.setInt(2, (countValue % 20) + 2);
                                     ps.setInt(3, countValue + 10000);

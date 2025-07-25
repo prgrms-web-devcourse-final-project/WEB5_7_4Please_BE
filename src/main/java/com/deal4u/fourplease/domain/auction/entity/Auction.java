@@ -66,7 +66,7 @@ public class Auction extends BaseDateEntity {
         this.deleted = true;
     }
 
-    // 낙찰 상태로 변경
+    // 결제 성공 상태로 변경
     public void markAsSuccess() {
         this.status = AuctionStatus.SUCCESS;
     }
@@ -81,8 +81,13 @@ public class Auction extends BaseDateEntity {
         this.status = AuctionStatus.REJECTED;
     }
 
-    // 배송 완료 상태로 변경
+    // 배송중 상태로 변경
     public void markAsInTransit() {
         this.status = AuctionStatus.INTRANSIT;
+    }
+
+    // 구매 확정 상태로 변경
+    public void markAsDelivered() {
+        this.status = AuctionStatus.DELIVERED;
     }
 }

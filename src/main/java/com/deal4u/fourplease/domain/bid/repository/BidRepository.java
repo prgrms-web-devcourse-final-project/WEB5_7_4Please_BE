@@ -83,7 +83,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                 JOIN a.product p
                 JOIN b.bidder bd
                 JOIN bd.member m
-                WHERE m.memberId = :memberId 
+                WHERE m.memberId = :memberId
                 AND b.deleted = false
                 ORDER BY b.bidTime DESC
             """)
@@ -165,12 +165,12 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                 LEFT JOIN Shipment sh ON sh.auction = a
                 LEFT JOIN (
                     SELECT ba.auctionId AS auctionId, MAX(bb.price) AS highestPrice
-                    FROM Bid bb 
+                    FROM Bid bb
                     JOIN bb.auction ba
                     WHERE bb.deleted = false
                     GROUP BY ba.auctionId
                 ) maxBid ON maxBid.auctionId = a.auctionId
-                WHERE m.memberId = :memberId 
+                WHERE m.memberId = :memberId
                 AND b.deleted = false
                 ORDER BY b.bidTime DESC
             """)

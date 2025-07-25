@@ -254,8 +254,8 @@ class AuctionServiceTests {
         assertThat(auction.getStatus()).isEqualTo(AuctionStatus.OPEN);
 
         auctionService.close(auction);
-        
-        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.CLOSED);
+
+        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.CLOSE);
 
     }
 
