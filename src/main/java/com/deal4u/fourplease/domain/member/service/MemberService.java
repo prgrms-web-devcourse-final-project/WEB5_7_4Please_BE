@@ -78,6 +78,8 @@ public class MemberService {
 
         validateMember(member);
 
+        validateNickName(request.nickName());
+
         member.setNickName(request.nickName());
         member.setStatus(Status.ACTIVE);
         memberRepository.save(member);
@@ -105,6 +107,7 @@ public class MemberService {
     }
 
     public ResponseEntity<UpdateMemberResponse> updateMember(Member member, String nickName) {
+        validateNickName(nickName);
         member.setNickName(nickName);
         memberRepository.save(member);
         UpdateMemberResponse response = UpdateMemberResponse.builder()
