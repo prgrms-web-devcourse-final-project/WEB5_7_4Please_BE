@@ -5,8 +5,8 @@ import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.mypage.dto.HighestBidInfo;
+import com.deal4u.fourplease.domain.member.mypage.dto.MyBidBase;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyPageBidHistoryBase;
-import com.deal4u.fourplease.domain.member.mypage.dto.MyPageBidHistoryComplete;
 import com.deal4u.fourplease.domain.member.mypage.dto.SettlementInfo;
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,7 +28,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "AND b.bidder.member = :member "
             + "AND b.isSuccessfulBidder = true")
     Optional<Bid> findSuccessfulBid(@Param("auctionId") Long auctionId,
-                                    @Param("member") Member member);
+            @Param("member") Member member);
 
     Optional<Bid> findTopByAuctionAndBidderOrderByPriceDesc(Auction auction, Bidder bidder);
 
@@ -47,7 +47,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "AND b.bidder.member = :member "
             + "AND b.isSuccessfulBidder = true")
     Optional<Bid> findSuccessFulBid(@Param("auctionId") Long auctionId,
-                                    @Param("member") Member member);
+            @Param("member") Member member);
 
     @Query("SELECT MAX(b.price) "
             + "FROM Bid b "
@@ -61,7 +61,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     @SuppressWarnings("checkstyle:MethodName")
     Page<Bid> findByAuctionAndDeletedFalseOrderByPriceDescBidTimeAsc(Auction auction,
-                                                                     Pageable pageable);
+            Pageable pageable);
 
     @Query("""
                 SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyPageBidHistoryBase(
@@ -83,7 +83,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                 JOIN a.product p
                 JOIN b.bidder bd
                 JOIN bd.member m
-                WHERE m.memberId = :memberId 
+                WHERE m.memberId = :memberId
                 AND b.deleted = false
                 ORDER BY b.bidTime DESC
             """)
@@ -91,6 +91,27 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             @Param("memberId") Long memberId,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT b
+            FROM Bid b
+            WHERE b.auction.auctionId = :auctionId
+              AND b.deleted = false
+            ORDER BY b.price DESC
+            LIMIT 2
+            """)
+    List<Bid> findTop2ByAuctionId(@Param("auctionId") Long auctionId);
+
+    @Query("SELECT b "
+            + "FROM Bid b "
+            + "WHERE b.auction.auctionId = :auctionId "
+            + "AND b.deleted = false "
+            + "AND b.isSuccessfulBidder = false "
+            + "AND b.price < (SELECT MAX(b2.price) FROM Bid b2 "
+            + "WHERE b2.auction.auctionId = :auctionId AND b2.deleted = false) "
+            + "ORDER BY b.price DESC, b.bidTime ASC")
+    Optional<Bid> findSecondHighestBidByAuctionIdForSchedule(@Param("auctionId") Long auctionId);
+
 
     // 결제/배송 상태 조회
     @Query("""
@@ -111,22 +132,12 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             @Param("auctionIds") List<Long> auctionIds
     );
 
-    @Query("""
-            SELECT b
-            FROM Bid b
-            WHERE b.auction.auctionId = :auctionId
-              AND b.deleted = false
-            ORDER BY b.price DESC
-            LIMIT 2
-            """)
-    List<Bid> findTop2ByAuctionId(@Param("auctionId") Long auctionId);
-
     // 최고가 입찰 정보 조회
     @Query("""
                 SELECT new com.deal4u.fourplease.domain
                             .member.mypage.dto.HighestBidInfo(
                     a.auctionId,
-                    CAST(MAX(b.price) AS double)
+                    CAST(MAX(b.price) AS bigdecimal)
                 )
                 FROM Bid b
                 JOIN b.auction a
@@ -136,56 +147,44 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             """)
     List<HighestBidInfo> findHighestBidInfoByAuctionIds(@Param("auctionIds") List<Long> auctionIds);
 
-
     @Query("""
-                SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyPageBidHistoryComplete(
+                SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyBidBase(
                     a.auctionId,
-                    b.bidId,
-                    p.thumbnailUrl,
-                    p.name,
-                    a.status,
                     a.startingPrice,
                     a.instantBidPrice,
+                    a.status,
+                    p.seller,
+                    p.name,
+                    p.thumbnailUrl,
+                    b.bidId,
                     b.price,
-                    b.isSuccessfulBidder,
                     b.bidTime,
-                    b.createdAt,
-                    p.seller.member.nickName,
+                    b.isSuccessfulBidder,
                     s.status,
                     s.paymentDeadline,
                     sh.status,
-                    maxBid.highestPrice
+                    maxBid.highestBid
                 )
                 FROM Bid b
                 JOIN b.auction a
                 JOIN a.product p
                 JOIN b.bidder bd
                 JOIN bd.member m
-                LEFT JOIN Settlement s ON s.auction = a AND s.bidder.member.memberId = :memberId
-                LEFT JOIN Shipment sh ON sh.auction = a
+                LEFT JOIN Settlement s ON s.auction.auctionId = a.auctionId AND s.bidder.member.memberId = :memberId
+                LEFT JOIN Shipment sh ON sh.auction.auctionId = a.auctionId
                 LEFT JOIN (
-                    SELECT ba.auctionId AS auctionId, MAX(bb.price) AS highestPrice
-                    FROM Bid bb 
-                    JOIN bb.auction ba
-                    WHERE bb.deleted = false
-                    GROUP BY ba.auctionId
-                ) maxBid ON maxBid.auctionId = a.auctionId
-                WHERE m.memberId = :memberId 
-                AND b.deleted = false
-                ORDER BY b.bidTime DESC
+                        SELECT ba.auctionId AS auctionId, MAX(bb.price) AS highestBid
+                        FROM Bid bb
+                        JOIN bb.auction ba
+                        WHERE bb.deleted = false
+                        GROUP BY ba.auctionId
+                    ) maxBid ON maxBid.auctionId = a.auctionId
+                    WHERE m.memberId = :memberId
+                    AND b.deleted = false
+                    ORDER BY b.bidTime DESC
             """)
-    Page<MyPageBidHistoryComplete> findMyBidHistoryComplete(
+    Page<MyBidBase> findMyBidHistory(
             @Param("memberId") Long memberId,
             Pageable pageable
     );
-
-    @Query("SELECT b "
-            + "FROM Bid b "
-            + "WHERE b.auction.auctionId = :auctionId "
-            + "AND b.deleted = false "
-            + "AND b.isSuccessfulBidder = false "
-            + "AND b.price < (SELECT MAX(b2.price) FROM Bid b2 "
-            + "WHERE b2.auction.auctionId = :auctionId AND b2.deleted = false) "
-            + "ORDER BY b.price DESC, b.bidTime ASC")
-    Optional<Bid> findSecondHighestBidByAuctionIdForSchedule(@Param("auctionId") Long auctionId);
 }

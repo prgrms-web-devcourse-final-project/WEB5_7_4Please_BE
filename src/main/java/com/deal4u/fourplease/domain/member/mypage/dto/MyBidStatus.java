@@ -1,7 +1,6 @@
-package com.deal4u.fourplease.domain.auction.entity;
+package com.deal4u.fourplease.domain.member.mypage.dto;
 
-// BidStatus
-public enum AuctionStatus {
+public enum MyBidStatus {
     OPEN,            // 경매 진행 중
     FAIL,            // 유찰
     CLOSE,           // 경매 종료
