@@ -8,6 +8,7 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_ORDER_TYP
 import static com.deal4u.fourplease.global.exception.ErrorCode.ORDER_NOT_FOUND;
 import static com.deal4u.fourplease.global.exception.ErrorCode.USER_NOT_FOUND;
 
+import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
@@ -107,7 +108,7 @@ public class OrderService {
     private Order createOrder(Auction auction, Orderer orderer, OrderId orderId,
                               BigDecimal orderPrice, OrderType orderType) {
         return Order.builder().orderId(orderId).auction(auction).orderer(orderer).price(orderPrice)
-                .orderStatus(OrderStatus.PENDING).orderType(orderType).build();
+                .orderStatus(OrderStatus.PENDING).orderType(orderType).address(Address.empty()).build();
     }
 
     private Auction getAuctionForOrder(Long auctionId, OrderType orderTypeEnum) {
