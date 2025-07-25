@@ -19,7 +19,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,7 +50,6 @@ public class AuctionController {
     @Parameter(description = "정렬 옵션: latest, bids, timeout")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("permitAll")
     public PageResponse<AuctionListResponse> readAllAuctions(
             @Valid @ModelAttribute @ParameterObject AuctionSearchRequest request
     ) {
