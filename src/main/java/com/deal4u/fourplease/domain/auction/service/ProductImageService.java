@@ -26,16 +26,16 @@ public class ProductImageService {
 
     @Transactional(readOnly = true)
     public ProductImageListResponse getByProduct(Product product) {
-        List<ProductImage> productImageList = findByProduct(product);
+        List<ProductImage> productImages = findByProduct(product);
 
-        return new ProductImageListResponse(productImageList);
+        return new ProductImageListResponse(productImages);
     }
 
     @Transactional
     public void deleteProductImage(Product product) {
-        List<ProductImage> targetProductImageList = findByProduct(product);
+        List<ProductImage> targetProductImages = findByProduct(product);
 
-        productImageRepository.deleteAll(targetProductImageList);
+        productImageRepository.deleteAll(targetProductImages);
     }
 
     private List<ProductImage> findByProduct(Product product) {

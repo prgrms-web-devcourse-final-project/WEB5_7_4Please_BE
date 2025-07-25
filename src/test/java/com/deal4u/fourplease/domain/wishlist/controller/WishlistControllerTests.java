@@ -1,5 +1,6 @@
 package com.deal4u.fourplease.domain.wishlist.controller;
 
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genWishlistResponsePageResponse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -124,6 +125,6 @@ class WishlistControllerTests extends BaseTokenTest {
                 ).andExpect(status().isNoContent())
                 .andDo(print());
 
-        verify(wishlistService).deleteByWishlistId(wishlistId);
+        verify(wishlistService).deleteByWishlistId(eq(wishlistId), any(Member.class));
     }
 }

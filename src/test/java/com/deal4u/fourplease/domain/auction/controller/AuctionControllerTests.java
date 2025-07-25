@@ -3,7 +3,9 @@ package com.deal4u.fourplease.domain.auction.controller;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionCreateRequest;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionDetailResponse;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionListResponsePageResponse;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -119,7 +121,7 @@ class AuctionControllerTests extends BaseTokenTest {
                 ).andExpect(status().isNoContent())
                 .andDo(print());
 
-        verify(auctionService).deleteByAuctionId(auctionId);
+        verify(auctionService).deleteByAuctionId(eq(auctionId), any(Member.class));
     }
 
     @Test
