@@ -50,10 +50,11 @@ class BidTest extends MockMvcBaseAcceptTest {
                 .when()
                 .post("/api/v1/bids")
                 .then()
+                .log().all()
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
     }
 
     @Test
@@ -190,7 +191,7 @@ class BidTest extends MockMvcBaseAcceptTest {
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
     }
 
     @Test
