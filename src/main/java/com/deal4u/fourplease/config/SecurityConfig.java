@@ -3,6 +3,7 @@ package com.deal4u.fourplease.config;
 import com.deal4u.fourplease.domain.auth.filter.JwtAuthenticationFilter;
 import com.deal4u.fourplease.domain.auth.handler.Oauth2AuthenticationSuccessHandler;
 import com.deal4u.fourplease.domain.auth.service.CustomOauth2UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,6 +58,11 @@ public class SecurityConfig {
                                 "/api/v1/auth/**"
                         ).authenticated()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(
+                        exceptions -> exceptions.authenticationEntryPoint(
+                                (request, response, authException) -> response.sendError(
+                                        HttpServletResponse.SC_FORBIDDEN))
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
