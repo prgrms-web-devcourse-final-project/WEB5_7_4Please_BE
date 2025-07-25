@@ -84,46 +84,9 @@ class AuctionEndTest extends MockMvcBaseAcceptTest {
     @Test
     @DisplayName("경매 상태가 CLOSED로 변경되면 입찰 불가")
     void bidOnClosedAuctionFails() {
-        // given - 진행 중인 경매 생성
-        LocalDateTime currentStartTime = LocalDateTime.now();
-        AuctionCreateRequest auctionCreateRequest = new AuctionCreateRequest(
-                "진행 중 상품",
-                "진행 중인 상품 설명입니다",
-                "http://deal4U.com/thumbnail.jpg",
-                List.of("http://deal4U.com/image.jpg"),
-                1L,
-                "서울시 관악구 신림동",
-                "상세 주소",
-                "12345",
-                "010-1234-5678",
-                currentStartTime,
-                THREE,
-                BigDecimal.valueOf(10000L),
-                null
-        );
-
-        // 경매 생성
-        authRequest(1L)
-                .body(auctionCreateRequest)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when()
-                .post("/api/v1/auctions")
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
-
-        // 생성된 경매 조회
-        List<Auction> auctions = auctionRepository.findAll();
-        Auction createdAuction = auctions.stream()
-                .filter(auction -> auction.getProduct().getName().equals("진행 중 상품"))
-                .findFirst()
-                .orElseThrow();
-
-        // 경매 상태를 CLOSED로 변경
-        createdAuction.close();
-        auctionRepository.save(createdAuction);
 
         // when - 종료된 경매에 입찰 시도
-        BidRequest bidRequest = new BidRequest(createdAuction.getAuctionId(), 15000);
+        BidRequest bidRequest = new BidRequest(3L, 15000);
         ExtractableResponse<MockMvcResponse> response = authRequest(21L)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(bidRequest)

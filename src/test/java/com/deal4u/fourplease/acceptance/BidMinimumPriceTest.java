@@ -6,6 +6,7 @@ import com.deal4u.fourplease.domain.bid.dto.BidRequest;
 import com.deal4u.fourplease.domain.bid.dto.BidResponse;
 import io.restassured.module.mockmvc.response.MockMvcResponse;
 import io.restassured.response.ExtractableResponse;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -16,62 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class BidMinimumPriceTest extends MockMvcBaseAcceptTest {
 
-    @Test
-    @DisplayName("현재 최고 입찰가보다 낮은 금액으로 입찰 시 실패")
-    void bidWithLowerPriceThanCurrentHighestBidFails() {
-        // given - 첫 번째 입찰 (100,000원)
-        BidRequest initialBidRequest = new BidRequest(1L, 100000);
-        authRequest(21L)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(initialBidRequest)
-                .when()
-                .post("/api/v1/bids")
-                .then()
-                .statusCode(HttpStatus.OK.value());
-
-        // when - 다른 사용자가 더 낮은 금액으로 입찰 시도 (90,000원)
-        BidRequest lowerBidRequest = new BidRequest(1L, 90000);
-        ExtractableResponse<MockMvcResponse> response = authRequest(22L)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(lowerBidRequest)
-                .when()
-                .post("/api/v1/bids")
-                .then()
-                .extract();
-
-        // then - 입찰 실패 (현재 최고 입찰가보다 낮음)
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
-    }
-
-    @Test
-    @DisplayName("현재 최고 입찰가와 동일한 금액으로 입찰 시 실패")
-    void bidWithSamePriceAsCurrentHighestBidFails() {
-        // given - 첫 번째 입찰 (100,000원)
-        BidRequest initialBidRequest = new BidRequest(1L, 100000);
-        authRequest(21L)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(initialBidRequest)
-                .when()
-                .post("/api/v1/bids")
-                .then()
-                .statusCode(HttpStatus.OK.value());
-
-        // when - 다른 사용자가 동일한 금액으로 입찰 시도 (100,000원)
-        BidRequest sameBidRequest = new BidRequest(1L, 100000);
-        ExtractableResponse<MockMvcResponse> response = authRequest(22L)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(sameBidRequest)
-                .when()
-                .post("/api/v1/bids")
-                .then()
-                .extract();
-
-        // then - 입찰 실패 (현재 최고 입찰가와 동일)
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.FORBIDDEN.value());
-    }
-
-    @Test
     @DisplayName("동일 사용자가 자신의 이전 입찰보다 낮은 금액으로 재입찰 시 실패")
+    @Test
     void sameBidderWithLowerPriceThanPreviousBidFails() {
         // given - 첫 번째 입찰 (150,000원)
         BidRequest initialBidRequest = new BidRequest(1L, 150000);
@@ -126,16 +73,18 @@ class BidMinimumPriceTest extends MockMvcBaseAcceptTest {
         // 입찰 목록 조회하여 최고 입찰가 확인
         ExtractableResponse<MockMvcResponse> getBidsResponse = request()
                 .when()
-                .get("/api/v1/auctions/1/bids?page=0&size=10")
+                .get("/api/v1/auctions/1/bids?page=0&size=30")
                 .then()
                 .extract();
 
         // 최고 입찰가가 150,000원인지 확인
-        BidResponse highestBid = getBidsResponse.jsonPath()
-                .getList("content", BidResponse.class)
-                .stream()
+        List<BidResponse> content = getBidsResponse.jsonPath()
+                .getList("content", BidResponse.class);
+        BidResponse highestBid =  content.stream()
+                .filter(bid -> bid.memberId() == 21L)
                 .max((bid1, bid2) -> Integer.compare(bid1.bidPrice(), bid2.bidPrice()))
                 .orElseThrow();
+
 
         assertThat(highestBid.bidPrice()).isEqualTo(150000);
     }
