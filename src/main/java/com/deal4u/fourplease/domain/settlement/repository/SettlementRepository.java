@@ -11,13 +11,31 @@ import org.springframework.data.repository.query.Param;
 
 public interface SettlementRepository extends CrudRepository<Settlement, Long> {
 
-    @Query("select s.status "
-            + "from Settlement s "
-            + "where s.auction.auctionId = :auctionId")
-    SettlementStatus getSettlementStatusByAuctionId(Long auctionId);
+    @Query("SELECT s.status "
+            + "FROM Settlement s "
+            + "WHERE s.auction.auctionId = :auctionId")
+    SettlementStatus getSettlementStatusByAuctionId(@Param("auctionId") Long auctionId);
 
+    boolean existsByAuctionAndBidder(Auction auction, Bidder bidder);
 
     @Query("SELECT s FROM Settlement s WHERE s.auction = :auction AND s.bidder = :bidder")
     Optional<Settlement> findByAuctionAndBidder(@Param("auction") Auction auction,
                                                 @Param("bidder") Bidder bidder);
+    @Query("SELECT s "
+            + "FROM Settlement s "
+            + "WHERE s.auction = :auction "
+            + "AND s.status = :status")
+    Optional<Settlement> findPendingSettlementByAuction(
+            @Param("auction") Auction auction,
+            @Param("status") SettlementStatus status
+    );
+
+    @Query("SELECT s "
+            + "FROM Settlement s "
+            + "WHERE s.settlementId = :settlementId "
+            + "AND s.status = :status")
+    Optional<Settlement> findPendingSettlementById(
+            @Param("settlementId") Long settlementId,
+            @Param("status") SettlementStatus status
+    );
 }

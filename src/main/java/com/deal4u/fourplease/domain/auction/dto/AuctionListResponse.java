@@ -1,7 +1,6 @@
 package com.deal4u.fourplease.domain.auction.dto;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
-import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,7 +9,6 @@ public record AuctionListResponse(
         long auctionId,
 
         String thumbnailUrl,
-        // TODO: Category 확인 필요
         CategoryDto category,
         String name,
 
@@ -23,6 +21,7 @@ public record AuctionListResponse(
 
         boolean isWishlist
 ) {
+
     public static AuctionListResponse toAuctionListResponse(
             Auction auction,
             BidSummaryDto bidSummaryDto,

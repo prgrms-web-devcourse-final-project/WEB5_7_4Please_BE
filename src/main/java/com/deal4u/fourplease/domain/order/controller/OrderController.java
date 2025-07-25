@@ -1,5 +1,6 @@
 package com.deal4u.fourplease.domain.order.controller;
 
+import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.order.dto.OrderCreateRequest;
 import com.deal4u.fourplease.domain.order.dto.OrderResponse;
 import com.deal4u.fourplease.domain.order.dto.OrderUpdateRequest;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,9 +38,10 @@ public class OrderController {
     public String createOrder(
             @PathVariable @Positive Long auctionId,
             @PathVariable String type,
-            @RequestBody @Valid OrderCreateRequest orderCreateRequest
+            @RequestBody @Valid OrderCreateRequest orderCreateRequest,
+            @AuthenticationPrincipal Member member
     ) {
-        return orderService.saveOrder(auctionId, type,
+        return orderService.saveOrder(auctionId, type, member.getMemberId(),
                 orderCreateRequest);
     }
 

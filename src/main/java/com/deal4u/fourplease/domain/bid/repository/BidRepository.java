@@ -23,6 +23,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     Optional<Bid> findTopByAuctionAndBidderOrderByPriceDesc(Auction auction, Bidder bidder);
 
+    Optional<Bid> findTopByAuctionOrderByPriceDescBidTimeAsc(Auction auction);
+
     @Query("SELECT b.price "
             + "FROM Bid b "
             + "WHERE b.deleted = false "
@@ -45,6 +47,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     Optional<BigDecimal> findMaxBidPriceByAuctionId(Long auctionId);
 
     Optional<Bid> findByBidIdAndBidder(Long bidId, Bidder bidder);
+
+    Optional<Bid> findByAuctionAndBidder(Auction auction, Bidder bidder);
 
     @SuppressWarnings("checkstyle:MethodName")
     Page<Bid> findByAuctionAndDeletedFalseOrderByPriceDescBidTimeAsc(Auction auction,
@@ -155,4 +159,14 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             @Param("memberId") Long memberId,
             Pageable pageable
     );
+
+    @Query("SELECT b "
+            + "FROM Bid b "
+            + "WHERE b.auction.auctionId = :auctionId "
+            + "AND b.deleted = false "
+            + "AND b.isSuccessfulBidder = false "
+            + "AND b.price < (SELECT MAX(b2.price) FROM Bid b2 "
+            + "WHERE b2.auction.auctionId = :auctionId AND b2.deleted = false) "
+            + "ORDER BY b.price DESC, b.bidTime ASC")
+    Optional<Bid> findSecondHighestBidByAuctionIdForSchedule(@Param("auctionId") Long auctionId);
 }

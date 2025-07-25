@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public record ProductImageListResponse(List<ProductImage> productImageList) {
+
     public List<String> toProductImageUrlList() {
         List<String> imageUrls = new ArrayList<>();
 

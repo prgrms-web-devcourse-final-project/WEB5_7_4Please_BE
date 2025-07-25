@@ -16,6 +16,8 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
+import com.deal4u.fourplease.global.scheduler.AuctionCloseJob;
+import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +47,12 @@ class BidServiceIntegrationTest {
 
     @MockitoBean
     private BidWebSocketHandler bidWebSocketHandler;
+
+    @Autowired
+    AuctionScheduleService auctionScheduleService;
+
+    @Autowired
+    AuctionCloseJob auctionCloseJob;
 
     private final Long memberId1 = 21L;
     private final Long memberId2 = 22L;

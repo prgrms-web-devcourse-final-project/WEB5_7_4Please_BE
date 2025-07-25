@@ -8,7 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.deal4u.fourplease.domain.file.service.SaveData;
+import com.deal4u.fourplease.domain.file.service.SavePath;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.io.IOException;
@@ -40,7 +40,7 @@ class S3FileSaverTest {
         S3FileSaver fileSaver = new S3FileSaver(testFileValidator, testFileUploader);
 
         ThrowableAssert.ThrowingCallable executable = () -> fileSaver.save(
-                new SaveData("/test/test", savedName), file);
+                new SavePath("/test/test", savedName), file);
         assertThatThrownBy(executable).isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.INVALID_FILE.getMessage());
         verify(testFileUploader, times(0)).upload(any(), any(), any());
@@ -59,7 +59,7 @@ class S3FileSaverTest {
         S3FileSaver fileSaver = new S3FileSaver(testFileValidator, testFileUploader);
 
         ThrowableAssert.ThrowingCallable executable = () -> fileSaver.save(
-                new SaveData("/test/test.png", "test"), file);
+                new SavePath("/test/test.png", "test"), file);
         assertThatThrownBy(executable).isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.FILE_SAVE_FAILED.getMessage());
         verify(testFileUploader, times(0)).upload(any(), any(), any());
@@ -78,7 +78,7 @@ class S3FileSaverTest {
 
         S3FileSaver fileSaver = new S3FileSaver(testFileValidator, testFileUploader);
 
-        fileSaver.save(new SaveData("/test/test", "test.png"), file);
+        fileSaver.save(new SavePath("/test/test", "test.png"), file);
 
         S3MetaData s3MetaData = new S3MetaData("image/png", file.getSize());
         verify(testFileUploader).upload(any(InputStream.class), eq("/test/test/test.png"),
