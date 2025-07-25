@@ -53,7 +53,7 @@ public class Auction extends BaseDateEntity {
 
     // 경매 종료
     public void close() {
-        this.status = AuctionStatus.CLOSED;
+        this.status = AuctionStatus.CLOSE;
     }
 
     // 패찰 상태로 변경
@@ -71,23 +71,18 @@ public class Auction extends BaseDateEntity {
         this.status = AuctionStatus.SUCCESS;
     }
 
-    // 결제 완료 상태로 변경
-    public void markPaymentCompleted() {
-        this.status = AuctionStatus.PAYMENT_COMPLETED;
+    // 결제 대기 상태로 변경
+    public void markAsPending() {
+        this.status = AuctionStatus.PENDING;
     }
 
-    // 결제 실패 상태로 변경
-    public void markPaymentFailed() {
-        this.status = AuctionStatus.PAYMENT_FAILED;
+    // 차상위 대기 상태로 변경
+    public void markAsRejected() {
+        this.status = AuctionStatus.REJECTED;
     }
 
-    // 배송 중 상태로 변경
-    public void markShipping() {
-        this.status = AuctionStatus.SHIPPING;
-    }
-
-    // 구매 확정 상태로 변경
-    public void markPurchaseConfirmed() {
-        this.status = AuctionStatus.PURCHASE_CONFIRMED;
+    // 배송 완료 상태로 변경
+    public void markAsInTransit() {
+        this.status = AuctionStatus.INTRANSIT;
     }
 }
