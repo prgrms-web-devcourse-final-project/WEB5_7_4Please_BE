@@ -82,10 +82,10 @@ public class MyPageBidHistoryService {
 
     private String determineStatusBySettlement(String settlementStatus, String shipmentStatus) {
         return switch (settlementStatus) {
-            case "SUCCESS" -> determineStatusByShipment(shipmentStatus);
-            case "PENDING" -> "낙찰";
-            case "REJECTED" -> "결제 실패";
-            default -> "문제 발생";
+          case "SUCCESS" -> determineStatusByShipment(shipmentStatus);
+          case "PENDING" -> "낙찰";
+          case "REJECTED" -> "결제 실패";
+          default -> "문제 발생";
         };
     }
 
@@ -94,18 +94,18 @@ public class MyPageBidHistoryService {
             return "결제 완료";
         }
         return switch (shipmentStatus) {
-            case "DELIVERED" -> "구매확정";
-            case "INTRANSIT" -> "배송중";
-            default -> "결제 완료";
+          case "DELIVERED" -> "구매확정";
+          case "INTRANSIT" -> "배송중";
+          default -> "결제 완료";
         };
     }
 
     private String determineStatusByAuction(AuctionStatus auctionStatus,
             Boolean isSuccessfulBidder) {
         return switch (auctionStatus) {
-            case FAIL -> "패찰";
-            case CLOSE -> Boolean.TRUE.equals(isSuccessfulBidder) ? "낙찰" : "경매 종료";
-            default -> "진행중";
+          case FAIL -> "패찰";
+          case CLOSE -> Boolean.TRUE.equals(isSuccessfulBidder) ? "낙찰" : "경매 종료";
+          default -> "진행중";
         };
     }
 
