@@ -7,6 +7,7 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
 import com.deal4u.fourplease.domain.wishlist.service.WishlistService;
+import com.deal4u.fourplease.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -50,6 +51,10 @@ public class WishlistController {
             @Valid @RequestBody WishlistCreateRequest request,
             @AuthenticationPrincipal Member member
     ) {
+        // TODO: 병합 후 멤버 검증 validator로 변경 필요
+        if (member == null) {
+            throw ErrorCode.FORBIDDEN_RECEIVER.toException();
+        }
         return wishlistService.save(request, member);
     }
 
@@ -66,6 +71,11 @@ public class WishlistController {
             @AuthenticationPrincipal Member member
 
     ) {
+        // TODO: 병합 후 멤버 검증 validator로 변경 필요
+        if (member == null) {
+            throw ErrorCode.FORBIDDEN_RECEIVER.toException();
+        }
+
         Pageable pageable = PageRequest.of(page, size, getSort(order));
 
         return wishlistService.findAll(pageable, member);
