@@ -16,8 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Seller {
 
-    // TODO: 병합 후 cascade = CascadeType.PERSIST 삭제 필요
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     public static Seller create(Member member) {
