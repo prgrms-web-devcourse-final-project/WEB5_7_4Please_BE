@@ -44,8 +44,8 @@ public class MyPageBidHistoryService {
     private MyPageBidHistory convertToMyPageBidHistory(MyPageBidHistoryComplete complete) {
         String status = determineStatus(complete);
         String paymentDeadline = formatPaymentDeadline(complete.paymentDeadline());
-        BigDecimal highestPrice = complete.highestPrice() != null ?
-                complete.highestPrice() : BigDecimal.ZERO;
+        BigDecimal highestPrice =
+                complete.highestPrice() != null ? complete.highestPrice() : BigDecimal.ZERO;
 
         return new MyPageBidHistory(
                 complete.auctionId(),
@@ -101,16 +101,16 @@ public class MyPageBidHistoryService {
     }
 
     private String determineStatusByAuction(AuctionStatus auctionStatus,
-                                            Boolean isSuccessfulBidder) {
+            Boolean isSuccessfulBidder) {
         return switch (auctionStatus) {
             case FAIL -> "패찰";
-            case CLOSED -> Boolean.TRUE.equals(isSuccessfulBidder) ? "낙찰" : "경매 종료";
+            case CLOSE -> Boolean.TRUE.equals(isSuccessfulBidder) ? "낙찰" : "경매 종료";
             default -> "진행중";
         };
     }
 
     private String formatPaymentDeadline(LocalDateTime paymentDeadline) {
-        return paymentDeadline != null ?
-                paymentDeadline.format(PAYMENT_DEADLINE_FORMAT) : "";
+        return paymentDeadline
+                != null ? paymentDeadline.format(PAYMENT_DEADLINE_FORMAT) : "";
     }
 }

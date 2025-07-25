@@ -46,14 +46,22 @@ public class InitProcess implements CommandLineRunner {
     }
 
     private void initBid10000(int threadCount, ExecutorService executorService,
-                              Queue<AuctionPair> pairs, AtomicInteger count)
+            Queue<AuctionPair> pairs, AtomicInteger count)
             throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
         for (int i = 0; i < threadCount; i++) {
             excute(executorService, () -> {
                 jdbcTemplate.batchUpdate(
                         """
-                                insert into bid(auction_id,bidder_member_id,price,BID_TIME,is_successful_bidder,deleted,created_at,updated_at)
+                                insert into bid(
+                                                auction_id, 
+                                                bidder_member_id, 
+                                                price, 
+                                                BID_TIME, 
+                                                is_successful_bidder, 
+                                                deleted, 
+                                                created_at, 
+                                                updated_at)
                                 values (?,?,?,?,?,false,now(),now())
                                 """,
                         new BatchPreparedStatementSetter() {
@@ -73,7 +81,7 @@ public class InitProcess implements CommandLineRunner {
                                     }
                                 }
 
-                                if (AuctionStatus.CLOSED == auctionPair.auctionStatus) {
+                                if (AuctionStatus.CLOSE == auctionPair.auctionStatus) {
                                     ps.setLong(1, auctionPair.auctionId());
                                     ps.setInt(2, (countValue % 20) + 2);
                                     ps.setInt(3, countValue + 10000);
@@ -115,7 +123,15 @@ public class InitProcess implements CommandLineRunner {
         for (int i = 0; i < threadCount; i++) {
             excute(executorService, () -> {
                 jdbcTemplate.batchUpdate("""
-                        insert into auctions(PRODUCT_PRODUCT_ID,starting_price,start_time,end_time,status,DELETED,updated_at,created_at)
+                        insert into auctions(
+                                             PRODUCT_PRODUCT_ID,
+                                             starting_price,
+                                             start_time,
+                                             end_time,
+                                             status,
+                                             DELETED,
+                                             updated_at,
+                                             created_at)
                         values (?,1000,now(),now(),?,false,now(),now())
                         """, new BatchPreparedStatementSetter() {
                     @Override
@@ -149,7 +165,17 @@ public class InitProcess implements CommandLineRunner {
             excute(executorService, () -> {
                 try {
                     jdbcTemplate.batchUpdate("""
-                            insert into products(name,description,thumbnail_url,address,DETAIL_ADDRESS,zip_code,SELLER_MEMBER_ID,CATEGORY_CATEGORY_ID,phone,deleted,created_at,updated_at) 
+                            insert into products(
+                                                 name,
+                                                 description,
+                                                 thumbnail_url,
+                                                 address,
+                                                 DETAIL_ADDRESS,
+                                                 zip_code,
+                                                 SELLER_MEMBER_ID,
+                                                 CATEGORY_CATEGORY_ID,
+                                                 phone,deleted,
+                                                 created_at,updated_at) 
                             values ('testProduct', '', '', '', '', '', 1,1,'',false,now(),now())
                             """, new BatchPreparedStatementSetter() {
                         @Override
@@ -186,7 +212,7 @@ public class InitProcess implements CommandLineRunner {
     }
 
     private void excute(ExecutorService executorService, Runnable runnable,
-                        CountDownLatch countDownLatch) {
+            CountDownLatch countDownLatch) {
         executorService.execute(new InitRunable(runnable, countDownLatch));
     }
 
