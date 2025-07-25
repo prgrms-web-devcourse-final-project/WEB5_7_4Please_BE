@@ -47,7 +47,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/oauth2/**",
                                 "/api/v1/login/**",
-                                "/api/v1/signup/**"
+                                "/api/v1/signup/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET)
                         .permitAll()
@@ -61,6 +63,4 @@ public class SecurityConfig {
                 );
         return http.build();
     }
-
-
 }
