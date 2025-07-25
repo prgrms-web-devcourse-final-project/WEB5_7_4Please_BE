@@ -22,5 +22,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByIdWithAuctionAndProduct(@Param("orderId") Long orderId);
 
     Optional<Order> findByOrdererAndAuctionAndStatus(Orderer orderer, Auction auction,
-            OrderStatus status);
+                                                     OrderStatus status);
+
+
+    @Query("SELECT o FROM Order o WHERE o.orderId.orderId = :orderId")
+    Optional<Order> findByOrderId(@Param("orderId") String orderId);
 }
