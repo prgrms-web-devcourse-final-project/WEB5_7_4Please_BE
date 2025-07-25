@@ -8,6 +8,7 @@ import com.deal4u.fourplease.domain.auction.entity.SaleAuctionStatus;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.domain.shipment.repository.ShipmentRepository;
+import com.deal4u.fourplease.domain.wishlist.service.WishlistService;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuctionSupportService {
 
     private final BidService bidService;
+    private final WishlistService wishlistService;
+
     private final SettlementRepository settlementRepository;
     private final ShipmentRepository shipmentRepository;
 
@@ -31,8 +34,7 @@ public class AuctionSupportService {
                     return AuctionListResponse.toAuctionListResponse(
                             auction,
                             bidSummaryDto,
-                            // TODO: wishlist 개발 후 수정 필요
-                            false
+                            wishlistService.isWishlist(auction)
                     );
                 });
     }

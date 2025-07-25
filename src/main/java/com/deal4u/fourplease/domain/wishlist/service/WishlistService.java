@@ -57,4 +57,8 @@ public class WishlistService {
 
         return PageResponse.fromPage(wishlistResponsePage);
     }
+
+    public boolean isWishlist(Auction auction) {
+        return wishlistRepository.existsByAuctionAndDeletedFalse(auction);
+    }
 }
