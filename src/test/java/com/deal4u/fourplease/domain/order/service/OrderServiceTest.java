@@ -156,7 +156,7 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(member));
 
             // When
-            String orderId = orderService.saveOrder(auctionId, orderType, 1L ,orderCreateRequest);
+            String orderId = orderService.saveOrder(auctionId, orderType, 1L, orderCreateRequest);
 
             // Then
             assertNotNull(orderId);
@@ -189,7 +189,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType,1L ,invalidPriceRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L, invalidPriceRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("요청된 가격이 즉시 입찰가와 일치하지 않습니다.")
                     .extracting("status")
@@ -211,7 +211,8 @@ class OrderServiceTest {
                     .thenReturn(Optional.of(winningBid));
 
             // When
-            String orderId = orderService.saveOrder(auctionId, orderType,1L ,awardOrderCreateRequest);
+            String orderId =
+                    orderService.saveOrder(auctionId, orderType, 1L, awardOrderCreateRequest);
 
             // Then
             assertNotNull(orderId);
@@ -246,7 +247,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, 1L ,invalidPriceRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L, invalidPriceRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("요청된 가격이 낙찰가와 일치하지 않습니다.")
                     .extracting("status")
@@ -267,7 +268,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, 1L ,orderCreateRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L, orderCreateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("해당 경매를 찾을 수 없습니다.")
                     .extracting("status")
@@ -288,7 +289,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, 1L ,awardOrderCreateRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L, awardOrderCreateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("해당 경매를 찾을 수 없습니다.")
                     .extracting("status")
@@ -307,7 +308,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, 1L ,orderCreateRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L, orderCreateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("해당 유저를 찾을 수 없습니다.")
                     .extracting("status")
@@ -330,7 +331,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, 1L ,awardOrderCreateRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L, awardOrderCreateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("해당 사용자는 경매의 낙찰자가 아닙니다.")
                     .extracting("status")
@@ -346,7 +347,7 @@ class OrderServiceTest {
 
             // When, Then
             assertThatThrownBy(
-                    () -> orderService.saveOrder(auctionId, orderType, 1L ,orderCreateRequest))
+                    () -> orderService.saveOrder(auctionId, orderType, 1L, orderCreateRequest))
                     .isInstanceOf(GlobalException.class)
                     .hasMessage("유효하지 않은 주문 타입입니다.")
                     .extracting("status")
@@ -419,7 +420,7 @@ class OrderServiceTest {
         @DisplayName("주문 업데이트가 정상적으로 수행되는 경우")
         void testUpdateOrderSuccessful() {
             // Given
-            Long orderId = 1L;
+            String orderId = "generated-order-uuid-string";
 
             Address originalAddress = new Address(
                     "초가집",
@@ -428,7 +429,7 @@ class OrderServiceTest {
             );
 
             Order orderToUpdate = Order.builder()
-                    .id(orderId)
+                    .id(1L)
                     .orderId(OrderId.generate())
                     .price(new BigDecimal("100.0"))
                     .auction(openAuction)
@@ -439,7 +440,7 @@ class OrderServiceTest {
                     .orderer(orderer)
                     .build();
 
-            when(orderRepository.findByIdWithAuctionAndProduct(orderId))
+            when(orderRepository.findByOrderId(orderId))
                     .thenReturn(Optional.of(orderToUpdate));
 
             // When
@@ -453,16 +454,16 @@ class OrderServiceTest {
             assertThat(orderToUpdate.getContent()).isEqualTo("새로운 요청사항");
             assertThat(orderToUpdate.getReceiver()).isEqualTo("박유한");
 
-            verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
+            verify(orderRepository, times(1)).findByOrderId(orderId); // 메서드명 변경
         }
 
         @Test
         @DisplayName("존재하지 않는 주문을 업데이트하려는 경우 예외 발생")
         void testUpdateOrderOrderNotFound() {
             // Given
-            Long orderId = 999L;
+            String orderId = "non-existent-order-uuid";
 
-            when(orderRepository.findByIdWithAuctionAndProduct(orderId))
+            when(orderRepository.findByOrderId(orderId))
                     .thenReturn(Optional.empty());
 
             // When, Then
@@ -472,7 +473,7 @@ class OrderServiceTest {
                     .extracting("status")
                     .isEqualTo(HttpStatus.NOT_FOUND);
 
-            verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
+            verify(orderRepository, times(1)).findByOrderId(orderId); // 메서드명 변경
         }
     }
 }

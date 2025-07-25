@@ -41,7 +41,7 @@ public class OrderService {
 
     @Transactional
     public String saveOrder(Long auctionId, String orderType, Long memberId,
-            OrderCreateRequest orderCreateRequest) {
+                            OrderCreateRequest orderCreateRequest) {
         OrderType orderTypeEnum = validateOrderType(orderType);
 
         Member member = getMemberOrThrow(memberId);
@@ -65,8 +65,8 @@ public class OrderService {
     }
 
     @Transactional
-    public void updateOrder(Long orderId, OrderUpdateRequest orderUpdateRequest) {
-        Order order = getOrderOrThrow(orderId);
+    public void updateOrder(String orderId, OrderUpdateRequest orderUpdateRequest) {
+        Order order = getOrderByOrderIdOrThrow(orderId);
         order.updateOrder(orderUpdateRequest);
     }
 
@@ -84,7 +84,7 @@ public class OrderService {
     }
 
     private void validateOrderPrice(BigDecimal requestPrice, BigDecimal expectedPrice,
-            OrderType orderType) {
+                                    OrderType orderType) {
         if (requestPrice.compareTo(expectedPrice) != 0) {
             throw getOrderPriceException(orderType);
         }
@@ -105,7 +105,7 @@ public class OrderService {
     }
 
     private Order createOrder(Auction auction, Orderer orderer, OrderId orderId,
-            BigDecimal orderPrice, OrderType orderType) {
+                              BigDecimal orderPrice, OrderType orderType) {
         return Order.builder().orderId(orderId).auction(auction).orderer(orderer).price(orderPrice)
                 .orderStatus(OrderStatus.PENDING).orderType(orderType).build();
     }
@@ -140,6 +140,11 @@ public class OrderService {
 
     private Order getOrderOrThrow(Long orderId) {
         return orderRepository.findByIdWithAuctionAndProduct(orderId)
+                .orElseThrow(ORDER_NOT_FOUND::toException);
+    }
+
+    private Order getOrderByOrderIdOrThrow(String orderId) {
+        return orderRepository.findByOrderId(orderId)
                 .orElseThrow(ORDER_NOT_FOUND::toException);
     }
 }

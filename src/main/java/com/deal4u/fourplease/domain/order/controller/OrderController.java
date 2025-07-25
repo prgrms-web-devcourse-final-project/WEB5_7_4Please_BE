@@ -63,7 +63,7 @@ public class OrderController {
     })
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateOrder(
-            @PathVariable @Positive Long orderId,
+            @PathVariable String orderId,
             @RequestBody @Valid OrderUpdateRequest orderUpdateRequest
     ) {
         orderService.updateOrder(orderId, orderUpdateRequest);
