@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.dto.SignupRequest;
 import com.deal4u.fourplease.domain.member.dto.SignupResponse;
+import com.deal4u.fourplease.domain.member.dto.UpdateMemberRequest;
+import com.deal4u.fourplease.domain.member.dto.UpdateMemberResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
@@ -102,5 +104,24 @@ class MemberTest extends MockMvcBaseAcceptTest {
                 .then()
                 .log().all()
                 .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
+
+    @Test
+    @DisplayName("닉네임을 정상적으로 변경할 수 있다")
+    void updateSuccess() {
+        UpdateMemberRequest request = new UpdateMemberRequest("변경된닉네임");
+
+        UpdateMemberResponse response = authRequest(testMember.getMemberId())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .patch("/api/v1/members")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(UpdateMemberResponse.class);
+
+        assertThat(response.nickName()).isEqualTo("변경된닉네임");
+        assertThat(response.message()).isEqualTo("업데이트 성공");
     }
 }
