@@ -59,7 +59,7 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderResponse getOrder(Long orderId) {
+    public OrderResponse getOrder(String orderId) {
         Order order = getOrderOrThrow(orderId);
         return OrderMapper.toOrderResponse(order);
     }
@@ -138,8 +138,8 @@ public class OrderService {
         return memberRepository.findById(memberId).orElseThrow(USER_NOT_FOUND::toException);
     }
 
-    private Order getOrderOrThrow(Long orderId) {
-        return orderRepository.findByIdWithAuctionAndProduct(orderId)
+    private Order getOrderOrThrow(String orderId) {
+        return orderRepository.findByOrderIdWithAuctionAndProduct(orderId)
                 .orElseThrow(ORDER_NOT_FOUND::toException);
     }
 

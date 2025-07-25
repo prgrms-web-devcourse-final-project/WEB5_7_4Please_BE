@@ -51,7 +51,7 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "주문을 찾을 수 없음"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청")
     })
-    public OrderResponse getOrder(@PathVariable @Positive Long orderId) {
+    public OrderResponse getOrder(@PathVariable String orderId) {
         return orderService.getOrder(orderId);
     }
 
