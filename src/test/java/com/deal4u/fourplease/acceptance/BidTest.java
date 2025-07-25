@@ -25,13 +25,16 @@ class BidTest extends MockMvcBaseAcceptTest {
         BidRequest bidRequest = new BidRequest(1L, 100000);
 
         // when
-        ExtractableResponse<MockMvcResponse> response = authRequest(21L)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(bidRequest)
-                .when()
-                .post("/api/v1/bids")
-                .then()
-                .extract();
+        ExtractableResponse<MockMvcResponse> response =
+                // 맴버 21번의 정보를 취득하여서 `accessToken`을 생성
+                authRequest(21L)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        // `/api/v1/bids` (POST)의 `requestBody(bidRequest)`를 추가
+                        .body(bidRequest)
+                        .when()
+                        .post("/api/v1/bids")
+                        .then()
+                        .extract();
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -99,8 +102,8 @@ class BidTest extends MockMvcBaseAcceptTest {
     @DisplayName("경매별 입찰 목록 조회 성공")
     void getBidsByAuction() {
         // given - 먼저 입찰을 생성
-        BidRequest bidRequest1 = new BidRequest(1L, 100000);
-        BidRequest bidRequest2 = new BidRequest(1L, 120000);
+        BidRequest bidRequest1 = new BidRequest(4L, 100000);
+        BidRequest bidRequest2 = new BidRequest(4L, 120000);
 
         authRequest(21L)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -117,7 +120,7 @@ class BidTest extends MockMvcBaseAcceptTest {
         // when
         ExtractableResponse<MockMvcResponse> response = request()
                 .when()
-                .get("/api/v1/auctions/1/bids?page=0&size=10")
+                .get("/api/v1/auctions/4/bids?page=0&size=10")
                 .then()
                 .extract();
 
@@ -146,18 +149,11 @@ class BidTest extends MockMvcBaseAcceptTest {
     @Test
     @DisplayName("입찰 삭제 성공")
     void deleteBid() {
-        // given - 먼저 입찰을 생성
-        BidRequest bidRequest = new BidRequest(1L, 100000);
-        authRequest(21L)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(bidRequest)
-                .when()
-                .post("/api/v1/bids");
-
+        // Given
         // 생성된 입찰 목록을 조회하여 bidId를 얻음
         ExtractableResponse<MockMvcResponse> getBidsResponse = request()
                 .when()
-                .get("/api/v1/auctions/1/bids?page=0&size=10")
+                .get("/api/v1/auctions/4/bids?page=0&size=10")
                 .then()
                 .extract();
 
@@ -174,9 +170,8 @@ class BidTest extends MockMvcBaseAcceptTest {
                 .delete("/api/v1/bids/" + bidId)
                 .then()
                 .extract();
-
         // then
-        //TODO : 삭제를 진행하기에 너무 어려움 나의 입찰이 들어와야 될듯
+        // 현재 `dev`에서는 `OK`가 아닌, `NO_CONTENT`로 되어 있기 때문에 테스트 코드 수정 시에 수정 예정.
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 

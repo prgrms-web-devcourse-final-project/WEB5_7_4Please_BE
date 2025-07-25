@@ -102,7 +102,11 @@ VALUES ('최신형 노트북', '한 번도 사용하지 않은 최신형 노트�
         'https://example.com/images/galaxyZFlip6.jpg', '서울특별시 마포구 월드컵북로 396', '202호', '04567', 3,
         1,
         '010-3333-4444', false,
-        DATEADD('DAY', -4, CURRENT_TIMESTAMP), DATEADD('DAY', -4, CURRENT_TIMESTAMP));
+        DATEADD('DAY', -4, CURRENT_TIMESTAMP), DATEADD('DAY', -4, CURRENT_TIMESTAMP)),
+       ('삭제를 위한 품목', '삭제 테스트를 위해서 추가한 데이터',
+        'https://example.com/images/delete.jpg', '경기도 평택시 안산로 25번길 21', '100동 102호', '12345', 1, 1,
+        '010-1234-5678', false,
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- 경메 정보
 -- TIMESTAMPADD를 H2 호환 함수인 DATEADD로 변경하고, status 컬럼을 감쌌습니다.
@@ -113,7 +117,9 @@ VALUES (1, 100000, 800000, CURRENT_TIMESTAMP, DATEADD('DAY', 7, CURRENT_TIMESTAM
        (2, 1200000, 1500000, CURRENT_TIMESTAMP, DATEADD('DAY', 7, CURRENT_TIMESTAMP), 'OPEN',
         false, DATEADD('DAY', 1, CURRENT_TIMESTAMP), DATEADD('DAY', 1, CURRENT_TIMESTAMP)),
        (3, 1000, null, DATEADD('DAY', -4, CURRENT_TIMESTAMP), DATEADD('DAY', -1, CURRENT_TIMESTAMP), 'CLOSED',
-        false, DATEADD('DAY', 1, CURRENT_TIMESTAMP), DATEADD('DAY', 1, CURRENT_TIMESTAMP));
+        false, DATEADD('DAY', 1, CURRENT_TIMESTAMP), DATEADD('DAY', 1, CURRENT_TIMESTAMP)),
+       (4, 10000, 800000, CURRENT_TIMESTAMP, DATEADD('DAY', 7, CURRENT_TIMESTAMP), 'OPEN',
+        false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
 -- =================================================================
@@ -167,6 +173,8 @@ VALUES (1, 2, 200000, TIMESTAMPADD(SECOND, -20, CURRENT_TIMESTAMP), false, false
     (3, 2, 1000, TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), false, false,
     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     (3, 3, 2000, TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), true, false,
+    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (4, 21, 20000, TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), true, false,
     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO settlement (
