@@ -4,7 +4,7 @@ import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record MyPageBidHistoryBase(
+public record MyPageBidHistoryComplete(
         Long auctionId,
         Long bidId,
         String thumbnailUrl,
@@ -16,6 +16,10 @@ public record MyPageBidHistoryBase(
         Boolean isSuccessfulBidder,
         LocalDateTime bidTime,
         LocalDateTime createdAt,
-        String sellerNickName
+        String sellerNickName,
+        String settlementStatus,
+        LocalDateTime paymentDeadline,
+        String shipmentStatus,
+        BigDecimal highestPrice
 ) {
 }

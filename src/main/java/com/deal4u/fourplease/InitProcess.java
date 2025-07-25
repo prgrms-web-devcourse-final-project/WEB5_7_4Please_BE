@@ -6,8 +6,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,7 +46,8 @@ public class InitProcess implements CommandLineRunner {
     }
 
     private void initBid10000(int threadCount, ExecutorService executorService,
-            Queue<AuctionPair> pairs, AtomicInteger count) throws InterruptedException {
+                              Queue<AuctionPair> pairs, AtomicInteger count)
+            throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
         for (int i = 0; i < threadCount; i++) {
             excute(executorService, () -> {
@@ -88,7 +89,7 @@ public class InitProcess implements CommandLineRunner {
                                     ps.setInt(3, countValue + 10000);
                                     ps.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
                                     ps.setBoolean(5, false);
-                                }else{
+                                } else {
                                     ps.setLong(1, auctionPair.auctionId());
                                     ps.setInt(2, (countValue % 20) + 2);
                                     ps.setInt(3, countValue + 10000);
@@ -149,7 +150,7 @@ public class InitProcess implements CommandLineRunner {
                 try {
                     jdbcTemplate.batchUpdate("""
                             insert into products(name,description,thumbnail_url,address,DETAIL_ADDRESS,zip_code,SELLER_MEMBER_ID,CATEGORY_CATEGORY_ID,phone,deleted,created_at,updated_at) 
-                            values ('testProduct', '', '', '', '', '', 1,0,'',false,now(),now())
+                            values ('testProduct', '', '', '', '', '', 1,1,'',false,now(),now())
                             """, new BatchPreparedStatementSetter() {
                         @Override
                         public void setValues(PreparedStatement ps, int i)
@@ -175,17 +176,17 @@ public class InitProcess implements CommandLineRunner {
                 + "FROM auctions ";
 
         List<AuctionPair> result = jdbcTemplate.query(sql, (rs, rowNum) -> {
-           Long auctionId = rs.getLong("auction_id");
-           String statusStr = rs.getString("status");
-           AuctionStatus status = AuctionStatus.valueOf(statusStr);
-           return new AuctionPair(auctionId, status);
+            Long auctionId = rs.getLong("auction_id");
+            String statusStr = rs.getString("status");
+            AuctionStatus status = AuctionStatus.valueOf(statusStr);
+            return new AuctionPair(auctionId, status);
         });
 
         return new LinkedList<>(result);
     }
 
     private void excute(ExecutorService executorService, Runnable runnable,
-            CountDownLatch countDownLatch) {
+                        CountDownLatch countDownLatch) {
         executorService.execute(new InitRunable(runnable, countDownLatch));
     }
 
