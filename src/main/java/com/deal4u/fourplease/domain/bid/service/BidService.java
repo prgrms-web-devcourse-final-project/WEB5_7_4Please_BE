@@ -129,7 +129,7 @@ public class BidService {
         }
     }
 
-    // bid maxprice와 bidCount를 반환
+    // bid max price와 bidCount를 반환
     @Transactional(readOnly = true)
     public BidSummaryDto getBidSummaryDto(Long auctionId) {
         List<BigDecimal> bidList = bidRepository.findPricesByAuctionIdOrderByPriceDesc(

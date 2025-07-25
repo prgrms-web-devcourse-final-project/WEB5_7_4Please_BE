@@ -125,13 +125,13 @@ class AuctionServiceTests {
         Auction auction = genAuctionCreateRequest().toEntity(product);
 
         ProductImageListResponse productImageListResponse = mock(ProductImageListResponse.class);
-        List<String> productImageUrlList = List.of("http://example.com/image1.jpg",
+        List<String> productImageUrls = List.of("http://example.com/image1.jpg",
                 "http://example.com/image2.jpg");
 
         when(bidService.getBidSummaryDto(auctionId)).thenReturn(bidSummaryDto);
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
         when(productImageService.getByProduct(product)).thenReturn(productImageListResponse);
-        when(productImageListResponse.toProductImageUrlList()).thenReturn(productImageUrlList);
+        when(productImageListResponse.toProductImageUrls()).thenReturn(productImageUrls);
 
         AuctionDetailResponse actualResp = auctionService.getByAuctionId(auctionId);
 
@@ -144,8 +144,8 @@ class AuctionServiceTests {
         assertThat(actualResp.description()).isEqualTo(product.getDescription());
         assertThat(actualResp.endTime()).isEqualTo(auction.getDuration().getEndTime());
         assertThat(actualResp.thumbnailUrl()).isEqualTo(product.getThumbnailUrl());
-        assertThat(actualResp.imageUrls().getFirst()).isEqualTo(productImageUrlList.getFirst());
-        assertThat(actualResp.imageUrls().getLast()).isEqualTo(productImageUrlList.getLast());
+        assertThat(actualResp.imageUrls().getFirst()).isEqualTo(productImageUrls.getFirst());
+        assertThat(actualResp.imageUrls().getLast()).isEqualTo(productImageUrls.getLast());
 
     }
 

@@ -66,7 +66,7 @@ class ProductImageServiceTests {
                 .thenReturn(productImageList);
 
         ProductImageListResponse actualResp = productImageService.getByProduct(product);
-        List<String> actualImageUrls = actualResp.toProductImageUrlList();
+        List<String> actualImageUrls = actualResp.toProductImageUrls();
 
         assertThat(actualImageUrls).containsExactly(
                 "http://example.com/image1.jpg",

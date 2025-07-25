@@ -5,13 +5,10 @@ import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.SaleAuctionStatus;
-import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.domain.shipment.repository.ShipmentRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
-import java.math.BigDecimal;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -26,9 +23,6 @@ public class AuctionSupportService {
     private final SettlementRepository settlementRepository;
     private final ShipmentRepository shipmentRepository;
 
-    // TODO: bidRepository가 아닌 bidService에서 불러오는 방식으로 수정 필요
-
-
     public Page<AuctionListResponse> getAuctionListResponses(Page<Auction> auctionPage) {
         return auctionPage
                 .map(auction -> {
@@ -37,7 +31,7 @@ public class AuctionSupportService {
                     return AuctionListResponse.toAuctionListResponse(
                             auction,
                             bidSummaryDto,
-                            // TODO: wishList 개발 후 수정 필요
+                            // TODO: wishlist 개발 후 수정 필요
                             false
                     );
                 });

@@ -58,11 +58,11 @@ public class AuctionService {
         Auction auction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
-        List<String> productImageUrlList = getProductImageUrlList(auction.getProduct());
+        List<String> productImageUrls = getProductImageUrls(auction.getProduct());
 
         return AuctionDetailResponse.toAuctionDetailResponse(
                 auction,
-                productImageUrlList,
+                productImageUrls,
                 bidSummaryDto
         );
     }
@@ -103,13 +103,13 @@ public class AuctionService {
             Long sellerId,
             Pageable pageable
     ) {
-        List<Product> productList = productService.getProductListBySellerId(sellerId);
+        List<Product> products = productService.getProductListBySellerId(sellerId);
 
-        List<Long> productIdList = productList.stream()
+        List<Long> productIds = products.stream()
                 .map(Product::getProductId)
                 .toList();
 
-        Page<Auction> auctionPage = auctionRepository.findAllByProductIdIn(productIdList, pageable);
+        Page<Auction> auctionPage = auctionRepository.findAllByProductIdIn(productIds, pageable);
 
         Page<SellerSaleListResponse> sellerSaleListResponsePage = auctionPage
                 .map(auction -> {
@@ -143,9 +143,9 @@ public class AuctionService {
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
     }
 
-    private List<String> getProductImageUrlList(Product product) {
+    private List<String> getProductImageUrls(Product product) {
         return productImageService.getByProduct(product)
-                .toProductImageUrlList();
+                .toProductImageUrls();
     }
 
     private Page<Auction> getAuctionPage(
