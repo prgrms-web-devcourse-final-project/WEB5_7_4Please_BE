@@ -33,9 +33,9 @@ class PaymentTransactionService {
 
     @Transactional
     public Payment savePayment(Order order,
-                               TossPaymentConfirmRequest req,
-                               TossPaymentConfirmResponse resp,
-                               Auction auction
+            TossPaymentConfirmRequest req,
+            TossPaymentConfirmResponse resp,
+            Auction auction
     ) {
         Payment payment = PaymentMapper.toPayment(order, req, resp);
         return paymentRepository.save(payment);
@@ -53,8 +53,10 @@ class PaymentTransactionService {
         if (auction.getStatus().equals(AuctionStatus.OPEN)) {
             auction.close();
         }
+        if (order.isAward()) {
+            settlementService.changeSettlementSuccess(auction);
+        }
         order.success();
         payment.statusSuccess();
-        settlementService.changeSettlementSuccess(auction);
     }
 }
