@@ -106,7 +106,33 @@ VALUES ('최신형 노트북', '한 번도 사용하지 않은 최신형 노트�
        ('삭제를 위한 품목', '삭제 테스트를 위해서 추가한 데이터',
         'https://example.com/images/delete.jpg', '경기도 평택시 안산로 25번길 21', '100동 102호', '12345', 1, 1,
         '010-1234-5678', false,
-        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       ('애플 아이폰 15 프로 맥스',
+        '아이폰 15 프로 맥스 미드나이트 블랙 색상입니다. 박스 개봉만 했으며, 미사용 상태입니다. 직거래만 가능합니다.',
+        'https://example.com/images/iphone15promax.jpg',
+        '부산광역시 해운대구 센텀서로 30',
+        '1501호',
+        '61200',
+        1,
+        0,
+        '010-9999-8888',
+        false,
+        DATEADD('DAY', -4, CURRENT_TIMESTAMP),
+        DATEADD('DAY', -4, CURRENT_TIMESTAMP)
+       ),
+       ('애플 아이폰 1260 프로 맥스',
+        '아이폰 1260 프로 맥스 미드나이트 블랙 색상입니다. 박스 개봉만 했으며, 미사용 상태입니다. 직거래만 가능합니다.',
+        'https://example.com/images/iphone15promax.jpg',
+        '부산광역시 해운대구 센텀서로 30',
+        '1501호',
+        '61200',
+        1,
+        0,
+        '010-9999-8888',
+        false,
+        DATEADD('DAY', -4, CURRENT_TIMESTAMP),
+        DATEADD('DAY', -4, CURRENT_TIMESTAMP)
+       );;
 
 -- 경메 정보
 -- TIMESTAMPADD를 H2 호환 함수인 DATEADD로 변경하고, status 컬럼을 감쌌습니다.
@@ -119,6 +145,10 @@ VALUES (1, 100000, 800000, CURRENT_TIMESTAMP, DATEADD('DAY', 7, CURRENT_TIMESTAM
        (3, 1000, null, DATEADD('DAY', -4, CURRENT_TIMESTAMP), DATEADD('DAY', -1, CURRENT_TIMESTAMP), 'CLOSED',
         false, DATEADD('DAY', 1, CURRENT_TIMESTAMP), DATEADD('DAY', 1, CURRENT_TIMESTAMP)),
        (4, 10000, 800000, CURRENT_TIMESTAMP, DATEADD('DAY', 7, CURRENT_TIMESTAMP), 'OPEN',
+        false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (5, 1000, null, DATEADD('DAY', -4, CURRENT_TIMESTAMP), DATEADD('DAY', -1, CURRENT_TIMESTAMP), 'CLOSED',
+        false, DATEADD('DAY', 1, CURRENT_TIMESTAMP), DATEADD('DAY', 1, CURRENT_TIMESTAMP)),
+       (6, 1000, 50000, CURRENT_TIMESTAMP, DATEADD('DAY', 7, CURRENT_TIMESTAMP), 'OPEN',
         false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
@@ -175,7 +205,11 @@ VALUES (1, 2, 200000, TIMESTAMPADD(SECOND, -20, CURRENT_TIMESTAMP), false, false
     (3, 3, 2000, TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), true, false,
     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     (4, 21, 20000, TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), true, false,
-    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (5, 2, 1000, TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), false, false,
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (5, 3, 2000, TIMESTAMPADD(SECOND, -1, CURRENT_TIMESTAMP), true, false,
+        CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO settlement (
     AUCTION_AUCTION_ID ,
@@ -195,4 +229,46 @@ INSERT INTO settlement (
              NULL,                  -- 결제 완료 시간 없음
              CURRENT_TIMESTAMP,     -- 생성일
              CURRENT_TIMESTAMP      -- 수정일
+         ),
+         (
+             5,                     -- auction_id (참조하는 경매 ID)
+             3,                     -- bidder_id (Bidder 임베디드 필드 안에 들어가는 ID라면 JPA에서는 @Embeddable 처리 필요)
+             'PENDING',             -- status (ENUM)
+             DATEADD('DAY', 3, CURRENT_TIMESTAMP),  -- 결제 마감일: 3일 뒤
+             NULL,                  -- 거절 사유 없음
+             NULL,                  -- 결제 완료 시간 없음
+             CURRENT_TIMESTAMP,     -- 생성일
+             CURRENT_TIMESTAMP      -- 수정일
+         );
+
+INSERT INTO orders (
+    price,
+    auction_auction_id,
+    created_at,
+    member_member_id,
+    updated_at,
+    address,
+    address_detail,
+    content,
+    order_id,
+    phone,
+    receiver,
+    zip_code,
+    order_status,
+    order_type
+) VALUES (
+             2000.00,
+             5,
+             CURRENT_TIMESTAMP,
+             3,
+             CURRENT_TIMESTAMP,
+             '경기도 성남시 분당구 판교로 235',
+             '우림W시티 706호',
+             '빠른 배송 부탁드립니다.',
+             'ORD-20250726-0002',
+             '010-9876-5432',
+             '이영희',
+             '13529',
+             'PENDING',
+             'AWARD'
          );

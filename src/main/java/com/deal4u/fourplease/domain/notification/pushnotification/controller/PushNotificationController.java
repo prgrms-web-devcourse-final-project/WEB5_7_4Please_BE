@@ -1,11 +1,12 @@
 package com.deal4u.fourplease.domain.notification.pushnotification.controller;
 
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.domain.notification.NotificationSender;
 import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationListResponse;
 import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationPageRequest;
-import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationResponse;
+import com.deal4u.fourplease.domain.notification.pushnotification.entity.PushNotification;
 import com.deal4u.fourplease.domain.notification.pushnotification.entity.Receiver;
 import com.deal4u.fourplease.domain.notification.pushnotification.message.PushNotificationMessage;
 import com.deal4u.fourplease.domain.notification.pushnotification.service.PushNotificationService;
@@ -15,8 +16,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,8 +60,8 @@ public class PushNotificationController {
     @ApiResponse(responseCode = "403", description = "권한 없음")
     @ApiResponse(responseCode = "404", description = "찾을 수 없음")
     @GetMapping("/view")
-    Slice<PushNotificationResponse> viewPushNotification(
-            @Valid PushNotificationPageRequest pageRequest) {
+    PageResponse<PushNotification> viewPushNotification(
+            @Valid @ModelAttribute @ParameterObject PushNotificationPageRequest pageRequest) {
         Member first = memberRepository.findAll().getFirst();
         return pushNotificationService.getView(Receiver.of(first.getMemberId()),
                 pageRequest.toPageable());

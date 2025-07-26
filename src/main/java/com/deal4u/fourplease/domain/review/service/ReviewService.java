@@ -108,7 +108,7 @@ public class ReviewService {
     }
 
     private Order getOrder(Orderer orderer, Auction auction) {
-        return orderRepository.findByOrdererAndAuctionAndStatus(orderer, auction,
+        return orderRepository.findByOrdererAndAuctionAndOrderStatus(orderer, auction,
                         OrderStatus.SUCCESS)
                 .orElseThrow(ORDER_NOT_FOUND::toException);
     }

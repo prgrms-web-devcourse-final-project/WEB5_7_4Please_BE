@@ -12,14 +12,14 @@ import org.springframework.data.repository.query.Param;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    Optional<Order> findByOrderId(OrderId orderId);
-
-    Optional<Order> findByOrdererAndAuctionAndStatus(Orderer orderer, Auction auction,
-                                                     OrderStatus status);
-
-
     @Query("SELECT o FROM Order o WHERE o.orderId.orderId = :orderId")
     Optional<Order> findByOrderId(@Param("orderId") String orderId);
+
+    Optional<Order> findByOrderId(OrderId orderId);
+
+    Optional<Order> findByOrdererAndAuctionAndOrderStatus(Orderer orderer, Auction auction,
+            OrderStatus status);
+
 
     @Query("SELECT o FROM Order o "
             + "JOIN FETCH o.auction a "

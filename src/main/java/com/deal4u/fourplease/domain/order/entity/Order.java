@@ -48,8 +48,6 @@ public class Order extends BaseDateEntity {
     private String phone;
     private String content;
     private String receiver;
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
@@ -71,5 +69,9 @@ public class Order extends BaseDateEntity {
 
     public void failed() {
         this.orderStatus = OrderStatus.FAILED;
+    }
+
+    public boolean isAward() {
+        return this.orderType == OrderType.AWARD;
     }
 }

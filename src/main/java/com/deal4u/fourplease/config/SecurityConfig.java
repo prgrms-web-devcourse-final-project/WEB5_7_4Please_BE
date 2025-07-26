@@ -4,6 +4,7 @@ import com.deal4u.fourplease.domain.auth.filter.JwtAuthenticationFilter;
 import com.deal4u.fourplease.domain.auth.handler.Oauth2AuthenticationSuccessHandler;
 import com.deal4u.fourplease.domain.auth.service.CustomOauth2UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Spring Security 설정 클래스.
@@ -21,7 +25,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final Oauth2AuthenticationSuccessHandler oauth2AuthSuccessHandler;
     private final CustomOauth2UserService customOauth2UserService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -49,12 +52,11 @@ public class SecurityConfig {
                                 "/oauth2/**",
                                 "/api/v1/login/**",
                                 "/api/v1/signup/**",
-                                "/swagger-ui/**",
                                 "/v3/api-docs/**",
+                                "/swagger-ui/**",
                                 "/api/v1/auth/reissue/token"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET)
-                        .permitAll()
+                        .requestMatchers(HttpMethod.GET).permitAll()
                         .requestMatchers(
                                 "/api/v1/auth/**"
                         ).authenticated()
@@ -69,5 +71,25 @@ public class SecurityConfig {
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
                 );
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+
+        configuration.setAllowedMethods(
+                Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        configuration.setAllowCredentials(true);
+
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
