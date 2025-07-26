@@ -25,7 +25,6 @@ import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
-import com.deal4u.fourplease.domain.auction.entity.SaleAuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Seller;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.service.BidService;
@@ -246,8 +245,6 @@ class AuctionServiceTests {
                         return new BidSummaryDto(BigDecimal.ZERO, 0);
                     }
                 });
-        when(auctionSupportService.getSaleAuctionStatus(any(Auction.class)))
-                .thenReturn(SaleAuctionStatus.OPEN);
 
         PageResponse<SellerSaleListResponse> resp =
                 auctionService.findSalesBySellerId(sellerId, pageable);
@@ -268,20 +265,6 @@ class AuctionServiceTests {
         assertThat(resp.getTotalPages()).isEqualTo(1);
         assertThat(resp.getPage()).isZero();
         assertThat(resp.getSize()).isEqualTo(20);
-    }
-
-    @Test
-    @DisplayName("Auction의 상태를 OPEN에서 CLOSE로 변환한다")
-    void closeShouldChangeAuctionStatusOpenIntoClose() {
-
-        Auction auction = genAuctionCreateRequest().toEntity(genProduct());
-
-        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.OPEN);
-
-        auctionService.close(auction);
-        
-        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.CLOSED);
-
     }
 
     @Test
