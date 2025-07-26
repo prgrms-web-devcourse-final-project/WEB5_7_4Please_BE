@@ -74,7 +74,7 @@ public class AuctionService {
         auctionScheduleService.cancelAuctionClose(targetAuction.getAuctionId());
 
         productService.deleteProduct(targetAuction.getProduct());
-        auctionStatusService.deleteAuction(targetAuction);
+        targetAuction.delete();
     }
 
     @Transactional(readOnly = true)

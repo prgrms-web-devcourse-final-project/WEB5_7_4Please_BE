@@ -21,12 +21,6 @@ public class AuctionStatusService {
         auction.fail();
     }
 
-    // 삭제 처리
-    @Transactional
-    public void deleteAuction(Auction auction) {
-        auction.delete();
-    }
-
     // 결제 성공 상태로 변경
     @Transactional
     public void markAuctionAsSuccess(Auction auction) {
