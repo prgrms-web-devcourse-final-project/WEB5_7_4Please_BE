@@ -29,7 +29,7 @@ import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class MyPageBidHistoryServiceTest {
-  
+
     @Mock
     private BidRepository bidRepository;
 
@@ -102,7 +102,7 @@ class MyPageBidHistoryServiceTest {
                 now.plusDays(1),
                 BigDecimal.valueOf(20000) // 최고 입찰가
         );
-        Page<MyBidBase> basePage = new PageImpl<>(List.of(myBidBase),pageable, 1);
+        Page<MyBidBase> basePage = new PageImpl<>(List.of(myBidBase), pageable, 1);
 
         given(bidRepository.findMyBidHistory(memberId, pageable)).willReturn(basePage);
 
@@ -129,7 +129,7 @@ class MyPageBidHistoryServiceTest {
                 BigDecimal.valueOf(20000) // 최고 입찰가
         );
 
-        Page<MyBidBase> basePage = new PageImpl<>(List.of(myBidBase),pageable, 1);
+        Page<MyBidBase> basePage = new PageImpl<>(List.of(myBidBase), pageable, 1);
 
         given(bidRepository.findMyBidHistory(memberId, pageable)).willReturn(basePage);
 
@@ -142,76 +142,57 @@ class MyPageBidHistoryServiceTest {
         assertThat(result.getContent().getFirst().status()).isEqualTo("SUCCESS");
     }
 
-//    @Test
-//    @DisplayName("배송중인 경매의 입찰 내역을 조회한다")
-//    void getMyBidHistoryWhenInTransitReturnsShippingStatus() {
-//        // given
-//        MyPageBidHistoryBase base = createBidHistoryBase("CLOSE", true);
-//        Page<MyPageBidHistoryBase> basePage = new PageImpl<>(List.of(base));
-//
-//        SettlementInfo settlement = new SettlementInfo(1L, "SUCCESS", now.plusDays(1), "INTRANSIT");
-//
-//        given(bidRepository.findMyBidHistoryBase(memberId, pageable)).willReturn(basePage);
-//        given(bidRepository.findSettlementInfoByAuctionIds(eq(memberId), any())).willReturn(
-//                List.of(settlement));
-//        given(bidRepository.findHighestBidInfoByAuctionIds(any())).willReturn(
-//                List.of(new HighestBidInfo(1L, 15000.0))
-//        );
-//
-//        // when
-//        PageResponse<MyPageBidHistory> result = myPageBidHistoryService.getMyBidHistory(
-//                Member.builder().memberId(memberId).build(), pageable);
-//
-//        // then
-//        assertThat(result.getContent()).hasSize(1);
-//        assertThat(result.getContent().getFirst().status()).isEqualTo("INTRANSIT");
-//    }
-//
-//    @Test
-//    @DisplayName("패찰된 경매의 입찰 내역을 조회한다")
-//    void getMyBidHistoryWhenFailedBidReturnsFailedStatus() {
-//        // given
-//        MyPageBidHistoryBase base = createBidHistoryBase("CLOSE", false);
-//        Page<MyPageBidHistoryBase> basePage = new PageImpl<>(List.of(base));
-//
-//        given(bidRepository.findMyBidHistoryBase(memberId, pageable)).willReturn(basePage);
-//        given(bidRepository.findSettlementInfoByAuctionIds(eq(memberId), any())).willReturn(
-//                List.of());
-//        given(bidRepository.findHighestBidInfoByAuctionIds(any())).willReturn(
-//                List.of(new HighestBidInfo(1L, 15000.0))
-//        );
-//
-//        // when
-//        PageResponse<MyPageBidHistory> result = myPageBidHistoryService.getMyBidHistory(
-//                Member.builder().memberId(memberId).build(), pageable);
-//
-//        // then
-//        assertThat(result.getContent()).hasSize(1);
-//        assertThat(result.getContent().getFirst().status()).isEqualTo("CLOSE");
-//    }
-//
-//    @Test
-//    @DisplayName("실패한 경매의 입찰 내역을 조회한다")
-//    void getMyBidHistoryWhenAuctionFailedReturnsFailedStatus() {
-//        // given
-//        MyPageBidHistoryBase base = createBidHistoryBase("FAIL", false);
-//        Page<MyPageBidHistoryBase> basePage = new PageImpl<>(List.of(base));
-//
-//        given(bidRepository.findMyBidHistoryBase(memberId, pageable)).willReturn(basePage);
-//        given(bidRepository.findSettlementInfoByAuctionIds(eq(memberId), any())).willReturn(
-//                List.of());
-//        given(bidRepository.findHighestBidInfoByAuctionIds(any())).willReturn(
-//                List.of(new HighestBidInfo(1L, 15000.0))
-//        );
-//
-//        // when
-//        PageResponse<MyPageBidHistory> result = myPageBidHistoryService.getMyBidHistory(
-//                Member.builder().memberId(memberId).build(), pageable);
-//
-//        // then
-//        assertThat(result.getContent()).hasSize(1);
-//        assertThat(result.getContent().getFirst().status()).isEqualTo("FAIL");
-//    }
+    @Test
+    @DisplayName("배송중인 경매의 입찰 내역을 조회한다")
+    void getMyBidHistoryWhenInTransitReturnsShippingStatus() {
+        // given
+        MyBidBase myBidBase = createBidHistoryBase(
+                AuctionStatus.CLOSE,
+                true,
+                SettlementStatus.SUCCESS,
+                ShipmentStatus.INTRANSIT,
+                now.plusDays(1),
+                BigDecimal.valueOf(20000) // 최고 입찰가
+        );
+
+        Page<MyBidBase> basePage = new PageImpl<>(List.of(myBidBase), pageable, 1);
+
+        given(bidRepository.findMyBidHistory(memberId, pageable)).willReturn(basePage);
+
+        // when
+        PageResponse<MyPageBidHistory> result = myPageBidHistoryService.getMyBidHistory(
+                Member.builder().memberId(memberId).build(), pageable);
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().getFirst().status()).isEqualTo("INTRANSIT");
+    }
+
+    @Test
+    @DisplayName("패찰된 경매의 입찰 내역을 조회한다")
+    void getMyBidHistoryWhenFailedBidReturnsFailedStatus() {
+        // given
+        MyBidBase myBidBase = createBidHistoryBase(
+                AuctionStatus.FAIL,
+                false,
+                null,
+                null,
+                null,
+                BigDecimal.valueOf(20000) // 최고 입찰가
+        );
+
+        Page<MyBidBase> basePage = new PageImpl<>(List.of(myBidBase), pageable, 1);
+
+        given(bidRepository.findMyBidHistory(memberId, pageable)).willReturn(basePage);
+
+        // when
+        PageResponse<MyPageBidHistory> result = myPageBidHistoryService.getMyBidHistory(
+                Member.builder().memberId(memberId).build(), pageable);
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().getFirst().status()).isEqualTo("FAIL");
+    }
 
     private MyBidBase createBidHistoryBase(
             AuctionStatus auctionStatus,
