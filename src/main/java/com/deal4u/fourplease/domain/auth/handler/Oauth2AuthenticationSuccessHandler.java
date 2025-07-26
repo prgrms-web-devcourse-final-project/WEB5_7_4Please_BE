@@ -44,6 +44,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
         response.setStatus(HttpServletResponse.SC_OK);
 
+        //httpstauts header 401
         if (member.getStatus() == Status.PENDING) {
             // 아직 닉네임 설정 안했으므로, 프론트 닉네임 설정 페이지로 redirect
             String tempToken = jwtProvider.generateTokenPair(member).accessToken(); // 임시 토큰 발급

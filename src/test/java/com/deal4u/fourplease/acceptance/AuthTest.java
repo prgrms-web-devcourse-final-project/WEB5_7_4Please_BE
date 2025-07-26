@@ -44,8 +44,10 @@ class AuthAcceptanceTest extends MockMvcBaseAcceptTest {
     @Test
     @DisplayName("정상적인 refreshToken으로 accessToken 재발급에 성공한다")
     void refreshAccessToken_success() {
+
+        System.out.println("RefreshToken: " + tokenPair.refreshToken());
         request()
-                .header("Cookie", "refreshToken=" + tokenPair.refreshToken())
+                .cookie("refreshToken", String.valueOf(tokenPair.refreshToken()))
                 .contentType(ContentType.JSON)
                 .when()
                 .post("/api/v1/auth/reissue/token")
@@ -59,7 +61,7 @@ class AuthAcceptanceTest extends MockMvcBaseAcceptTest {
     @DisplayName("정상적인 요청으로 회원 탈퇴에 성공하고 204를 반환한다")
     void deactivateMember_success() {
         authRequest(testMember.getMemberId())
-                .header("Cookie", "refreshToken=" + tokenPair.refreshToken())
+                .cookie("refreshToken", String.valueOf(tokenPair.refreshToken()))
                 .contentType(ContentType.JSON)
                 .when()
                 .delete("/api/v1/auth/members")
