@@ -140,7 +140,7 @@ public class InitProcess implements CommandLineRunner {
                                 int value = atomicInteger.incrementAndGet();
                                 ps.setLong(1, value + 2);
                                 if (value <= 7000) {
-                                    ps.setString(2, "CLOSED");
+                                    ps.setString(2, "CLOSE");
                                 } else if (value <= 9900) {
                                     ps.setString(2, "OPEN");
                                 } else {

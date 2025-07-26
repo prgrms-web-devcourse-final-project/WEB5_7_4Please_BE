@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final Oauth2AuthenticationSuccessHandler oauth2AuthSuccessHandler;
     private final CustomOauth2UserService customOauth2UserService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -44,7 +45,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/oauth2/**",
                                 "/api/v1/login/**",
-                                "/api/v1/signup/**"
+                                "/api/v1/signup/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/v1/auth/**"

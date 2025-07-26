@@ -14,9 +14,9 @@ public record MyPageBidHistory(
         BigDecimal instantBidPrice,
         BigDecimal myBidPrice,
         LocalDateTime bidTime,
-        LocalDateTime createdAt,
         String paymentDeadline,
         String sellerNickName
 ) {
+
 }
 
