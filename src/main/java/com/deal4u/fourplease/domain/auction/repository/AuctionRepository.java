@@ -138,7 +138,9 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             Pageable pageable
     );
 
-    @Query("SELECT COUNT(a) FROM Auction a WHERE a.product.seller.member.memberId = :sellerId AND a.status = :status")
+    @Query("SELECT COUNT(a) FROM Auction a "
+            + "WHERE a.product.seller.member.memberId = :sellerId "
+            + "AND a.status = :status")
     Integer countBySellerIdAndStatus(@Param("sellerId") Long sellerId,
                                      @Param("status") AuctionStatus status);
 }

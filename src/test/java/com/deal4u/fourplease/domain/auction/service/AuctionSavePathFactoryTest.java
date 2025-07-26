@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class AuctionSavePathFactoryTest {
 
     @Test
-    void 경로생성() {
+    void createPath() {
         AuctionSaveDataFactory auctionSaveDataFactory = new AuctionSaveDataFactory(
                 value -> "/test",
                 () -> "name"
