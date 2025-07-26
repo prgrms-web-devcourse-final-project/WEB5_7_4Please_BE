@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    private static final String SIGNUP_REDIRECT_URL = "/signup";
+    private static final String SIGNUP_REDIRECT_URL = "api/v1/signup";
     private static final String MAIN_REDIRECT_URL = "/";
     private final JwtProvider jwtProvider;
     private final AuthService authService;
