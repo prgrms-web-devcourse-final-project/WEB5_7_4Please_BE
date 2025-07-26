@@ -166,9 +166,11 @@ public class BidService {
     }
 
     public Map<Long, BidSummaryDto> getBidSummaryDtoMap(List<Long> auctionIds) {
+        // IN으로 한번에 가져오기
         Map<Long, List<BigDecimal>> auctionBidPricesMap =
                 bidRepository.findPricesByAuctionIdsGrouped(auctionIds);
 
+        // BudSummaryDto로 변환
         Map<Long, BidSummaryDto> bidSummaryDtoMap = new HashMap<>();
         for (Map.Entry<Long, List<BigDecimal>> entry : auctionBidPricesMap.entrySet()) {
             Long auctionId = entry.getKey();
