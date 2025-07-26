@@ -42,7 +42,7 @@ public class OrderService {
 
     @Transactional
     public String saveOrder(Long auctionId, String orderType, Long memberId,
-                            OrderCreateRequest orderCreateRequest) {
+            OrderCreateRequest orderCreateRequest) {
         OrderType orderTypeEnum = validateOrderType(orderType);
 
         Member member = getMemberOrThrow(memberId);
@@ -85,7 +85,7 @@ public class OrderService {
     }
 
     private void validateOrderPrice(BigDecimal requestPrice, BigDecimal expectedPrice,
-                                    OrderType orderType) {
+            OrderType orderType) {
         if (requestPrice.compareTo(expectedPrice) != 0) {
             throw getOrderPriceException(orderType);
         }
@@ -106,9 +106,10 @@ public class OrderService {
     }
 
     private Order createOrder(Auction auction, Orderer orderer, OrderId orderId,
-                              BigDecimal orderPrice, OrderType orderType) {
+            BigDecimal orderPrice, OrderType orderType) {
         return Order.builder().orderId(orderId).auction(auction).orderer(orderer).price(orderPrice)
-                .orderStatus(OrderStatus.PENDING).orderType(orderType).address(Address.empty()).build();
+                .orderStatus(OrderStatus.PENDING).orderType(orderType).address(Address.empty())
+                .build();
     }
 
     private Auction getAuctionForOrder(Long auctionId, OrderType orderTypeEnum) {
