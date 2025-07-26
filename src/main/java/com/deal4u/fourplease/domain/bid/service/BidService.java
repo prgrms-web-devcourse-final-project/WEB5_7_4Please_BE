@@ -19,8 +19,13 @@ import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.lock.NamedLock;
 import com.deal4u.fourplease.global.lock.NamedLockProvider;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -160,4 +165,19 @@ public class BidService {
         return Bidder.createBidder(member);
     }
 
+    public Map<Long, BidSummaryDto> getBidSummaryDtoMap(List<Long> auctionIds) {
+        Map<Long, List<BigDecimal>> auctionBidPricesMap =
+                bidRepository.findPricesByAuctionIdsGrouped(auctionIds);
+
+        Map<Long, BidSummaryDto> bidSummaryDtoMap = new HashMap<>();
+        for (Map.Entry<Long, List<BigDecimal>> entry : auctionBidPricesMap.entrySet()) {
+            Long auctionId = entry.getKey();
+            List<BigDecimal> bidPrices = entry.getValue();
+
+            BidSummaryDto bidSummaryDto = BidSummaryDto.toBidSummaryDto(bidPrices);
+            bidSummaryDtoMap.put(auctionId, bidSummaryDto);
+        }
+
+        return bidSummaryDtoMap;
+    }
 }

@@ -61,6 +61,7 @@ public class WishlistService {
         return PageResponse.fromPage(wishlistResponsePage);
     }
 
+    // TODO: 멤버 일치 여부 확인 필요
     public boolean isWishlist(Auction auction) {
         return wishlistRepository.existsByAuctionAndDeletedFalse(auction);
     }
