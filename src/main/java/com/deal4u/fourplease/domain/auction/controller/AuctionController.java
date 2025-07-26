@@ -97,8 +97,9 @@ public class AuctionController {
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/images")
     public AuctionImageUrlResponse readAuctionImageUrl(
-            @RequestParam(name = "image") MultipartFile image) {
-        return saveAuctionImageService.upload(memberRepository.findAll().getFirst(), image);
+            @RequestParam(name = "image") MultipartFile image,
+            @AuthenticationPrincipal Member member) {
+        return saveAuctionImageService.upload(member, image);
     }
 
 }
