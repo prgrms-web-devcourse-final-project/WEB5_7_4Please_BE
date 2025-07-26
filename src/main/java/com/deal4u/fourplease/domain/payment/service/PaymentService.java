@@ -60,14 +60,8 @@ public class PaymentService {
             validatePaymentSuccessOrToFailed(response, payment, order);
 
             paymentTransactionService.paymentStatusSuccess(payment, order, auction);
-
-
-            try {
-                paymentSuccessNotifier.send(payment, order, auction);
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-                // 알림은 결제 프로세스를 롤백 시키지 않는다.
-            }
+            
+            paymentSuccessNotifier.send(payment, order, auction);
         } finally {
             lock.unlock();
         }
