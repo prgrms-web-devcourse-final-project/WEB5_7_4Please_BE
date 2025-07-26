@@ -37,7 +37,7 @@ class BidTest extends MockMvcBaseAcceptTest {
                         .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     @Test
@@ -172,7 +172,7 @@ class BidTest extends MockMvcBaseAcceptTest {
                 .extract();
         // then
         // 현재 `dev`에서는 `OK`가 아닌, `NO_CONTENT`로 되어 있기 때문에 테스트 코드 수정 시에 수정 예정.
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -225,7 +225,7 @@ class BidTest extends MockMvcBaseAcceptTest {
                 .extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
     @Test
@@ -289,9 +289,9 @@ class BidTest extends MockMvcBaseAcceptTest {
                 .extract();
 
         // then
-        assertThat(response1.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response2.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response3.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response1.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response2.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        assertThat(response3.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // 입찰 목록 조회하여 검증
         ExtractableResponse<MockMvcResponse> getBidsResponse = request()

@@ -1,6 +1,9 @@
 package com.deal4u.fourplease.domain.wishlist.service;
 
 import static com.deal4u.fourplease.testutil.TestUtils.genAuction;
+import static com.deal4u.fourplease.testutil.TestUtils.genMember;
+import static com.deal4u.fourplease.testutil.TestUtils.genMemberById;
+import static com.deal4u.fourplease.testutil.TestUtils.genWishlist;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -9,8 +12,8 @@ import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
-import com.deal4u.fourplease.domain.auction.service.AuctionService;
-import com.deal4u.fourplease.domain.auction.service.AuctionSupportService;
+import com.deal4u.fourplease.domain.auction.service.AuctionReaderImpl;
+import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
@@ -20,6 +23,7 @@ import com.deal4u.fourplease.domain.wishlist.repository.WishlistRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +35,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class WishlistServiceTests {
 
@@ -41,10 +46,10 @@ class WishlistServiceTests {
     private WishlistRepository wishlistRepository;
 
     @Mock
-    private AuctionService auctionService;
+    private AuctionReaderImpl auctionReaderImpl;
 
     @Mock
-    private AuctionSupportService auctionSupportService;
+    private BidService bidService;
 
     @Test
     @DisplayName("위시리스트를 등록할 수 있다")
@@ -57,7 +62,7 @@ class WishlistServiceTests {
         Wishlist wishlist = mock(Wishlist.class);
 
         when(req.auctionId()).thenReturn(1L);
-        when(auctionService.getAuctionByAuctionId(1L)).thenReturn(auction);
+        when(auctionReaderImpl.getAuctionByAuctionId(1L)).thenReturn(auction);
         when(req.toEntity(member, auction)).thenReturn(wishlist);
         when(wishlist.getWishlistId()).thenReturn(1L);
         when(wishlistRepository.save(wishlist)).thenReturn(wishlist);
@@ -73,12 +78,16 @@ class WishlistServiceTests {
     void deleteShouldDeleteWishlistByWishlistId() {
 
         Long wishlistId = 1L;
-        Wishlist wishlist = mock(Wishlist.class);
+        Member member = Member.builder()
+                .memberId(1L)
+                .build();
+        Wishlist wishlist = genWishlist(member.getMemberId());
 
         when(wishlistRepository.findById(wishlistId)).thenReturn(Optional.of(wishlist));
 
-        wishlistService.deleteByWishlistId(wishlistId);
-        verify(wishlist).delete();
+        wishlistService.deleteByWishlistId(wishlistId, member);
+
+        assertThat(wishlist.isDeleted()).isTrue();
 
     }
 
@@ -90,9 +99,26 @@ class WishlistServiceTests {
 
         assertThatThrownBy(
                 () -> {
-                    wishlistService.deleteByWishlistId(1L);
+                    wishlistService.deleteByWishlistId(1L, genMember());
                 }
         ).isInstanceOf(GlobalException.class).hasMessage("해당 위시리스트를 찾을 수 없습니다.");
+
+    }
+
+    @Test
+    @DisplayName("일치하지 않는 사용자가 위시리스트 삭제를 시도하면 예외가 발생한다")
+    void throwsIfTryToDeleteWishlistByDifferentMember() {
+
+        Long wishlistId = 1L;
+        Wishlist wishlist = genWishlist(99L);
+
+        when(wishlistRepository.findById(wishlistId)).thenReturn(Optional.of(wishlist));
+
+        assertThatThrownBy(
+                () -> {
+                    wishlistService.deleteByWishlistId(wishlistId, genMemberById(2L));
+                }
+        ).isInstanceOf(GlobalException.class).hasMessage("권한이 없습니다.");
 
     }
 
@@ -114,7 +140,7 @@ class WishlistServiceTests {
 
         when(member.getMemberId()).thenReturn(1L);
         when(wishlistRepository.findAll(pageable, 1L)).thenReturn(wishlistPage);
-        when(auctionSupportService.getBidSummaryDto(auction.getAuctionId()))
+        when(bidService.getBidSummaryDto(auction.getAuctionId()))
                 .thenReturn(bidSummaryDto);
 
         PageResponse<WishlistResponse> resp = wishlistService.findAll(pageable, member);

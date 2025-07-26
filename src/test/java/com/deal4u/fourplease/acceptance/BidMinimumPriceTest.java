@@ -28,7 +28,7 @@ class BidMinimumPriceTest extends MockMvcBaseAcceptTest {
                 .when()
                 .post("/api/v1/bids")
                 .then()
-                .statusCode(HttpStatus.OK.value());
+                .statusCode(HttpStatus.CREATED.value());
 
         // when - 동일 사용자가 더 낮은 금액으로 재입찰 시도 (100,000원)
         BidRequest lowerBidRequest = new BidRequest(1L, 100000);
@@ -55,7 +55,7 @@ class BidMinimumPriceTest extends MockMvcBaseAcceptTest {
                 .when()
                 .post("/api/v1/bids")
                 .then()
-                .statusCode(HttpStatus.OK.value());
+                .statusCode(HttpStatus.CREATED.value());
 
         // when - 동일 사용자가 더 높은 금액으로 재입찰 (150,000원)
         BidRequest higherBidRequest = new BidRequest(1L, 150000);
@@ -68,7 +68,7 @@ class BidMinimumPriceTest extends MockMvcBaseAcceptTest {
                 .extract();
 
         // then - 입찰 성공
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         // 입찰 목록 조회하여 최고 입찰가 확인
         ExtractableResponse<MockMvcResponse> getBidsResponse = request()

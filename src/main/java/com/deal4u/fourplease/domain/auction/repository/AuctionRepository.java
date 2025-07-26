@@ -37,10 +37,10 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "FROM Auction a "
             + "JOIN FETCH a.product p "
             + "WHERE a.deleted = false "
-            + "AND p.productId in :productIdList "
+            + "AND p.productId in :productIds "
             + "ORDER BY a.createdAt DESC")
     Page<Auction> findAllByProductIdIn(
-            @Param("productIdList") List<Long> productIdList,
+            @Param("productIds") List<Long> productIds,
             Pageable pageable
     );
 

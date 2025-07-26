@@ -19,6 +19,7 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
+import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,6 +45,18 @@ public class TestUtils {
         // TODO: Member 추후 확인 필요
         return Member.builder()
                 .memberId(1L)
+                .email("user1@user.com")
+                .nickName("유저1")
+                .role(Role.USER)
+                .status(Status.ACTIVE)
+                .provider("provider")
+                .build();
+    }
+
+    public static Member genMemberById(Long id) {
+        // TODO: Member 추후 확인 필요
+        return Member.builder()
+                .memberId(id)
                 .email("user1@user.com")
                 .nickName("유저1")
                 .role(Role.USER)
@@ -363,6 +376,15 @@ public class TestUtils {
                 .totalPages(1)
                 .page(0)
                 .size(20)
+                .build();
+    }
+
+
+    public static Wishlist genWishlist(Long memberId) {
+        return Wishlist.builder()
+                .memberId(1L)
+                .auction(genAuction())
+                .deleted(false)
                 .build();
     }
 }
