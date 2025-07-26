@@ -46,11 +46,10 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             // 로그인 실패
             // 아직 닉네임 설정 안했으므로, 프론트 닉네임 설정 페이지로 redirect
             String token = jwtProvider.generateTokenPair(member).accessToken();
-            String redirectUrl = SIGNUP_REDIRECT_URL + "/" + token;
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(String.format("{\"redirect\":\"%s\"}", redirectUrl));
+            response.getWriter().write(String.format("{\"token\":\"%s\"}", token));
             response.getWriter().flush();
             return;
         }
@@ -59,7 +58,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         TokenPair tokenPair = authService.createTokenPair(member);
         response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
         ResponseCookie refreshCookie = ResponseCookie
-                .from("refreshToken", tokenPair.refreshToken())
+                .from("", tokenPair.refreshToken())
                 .httpOnly(true)
                 .secure(false) // 운영 환경에서는 true
                 .path("/")
