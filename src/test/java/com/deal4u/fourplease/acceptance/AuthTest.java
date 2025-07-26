@@ -33,7 +33,7 @@ class AuthAcceptanceTest extends MockMvcBaseAcceptTest {
         testMember = Member.builder()
                 .email("test@example.com")
                 .status(Status.ACTIVE)
-                .provider("kakao")
+                .provider("google")
                 .role(com.deal4u.fourplease.domain.member.entity.Role.USER)
                 .build();
 
@@ -45,10 +45,10 @@ class AuthAcceptanceTest extends MockMvcBaseAcceptTest {
     @DisplayName("정상적인 refreshToken으로 accessToken 재발급에 성공한다")
     void refreshAccessToken_success() {
         request()
-                .cookie("refreshToken", tokenPair.refreshToken())
+                .header("Cookie", "refreshToken=" + tokenPair.refreshToken())
                 .contentType(ContentType.JSON)
                 .when()
-                .post("/api/v1/reissue/token")
+                .post("/api/v1/auth/reissue/token")
                 .then()
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
@@ -59,9 +59,10 @@ class AuthAcceptanceTest extends MockMvcBaseAcceptTest {
     @DisplayName("정상적인 요청으로 회원 탈퇴에 성공하고 204를 반환한다")
     void deactivateMember_success() {
         authRequest(testMember.getMemberId())
-                .cookie("refreshToken", tokenPair.refreshToken())
+                .header("Cookie", "refreshToken=" + tokenPair.refreshToken())
+                .contentType(ContentType.JSON)
                 .when()
-                .delete("/api/v1/members")
+                .delete("/api/v1/auth/members")
                 .then()
                 .log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
