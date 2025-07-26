@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private static final String SIGNUP_REDIRECT_URL = "api/v1/signup";
-    private static final String MAIN_REDIRECT_URL = "/";
     private final JwtProvider jwtProvider;
     private final AuthService authService;
     private final MemberService memberService;
@@ -53,6 +52,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(String.format("{\"redirect\":\"%s\"}", redirectUrl));
             response.getWriter().flush();
+            return;
         }
         // 로그인 성공
         // 새로운 JWT 발급
