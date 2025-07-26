@@ -1,9 +1,8 @@
 package com.deal4u.fourplease.domain.auction.controller;
 
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionCreateRequest;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionDetailResponse;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionListResponsePageResponse;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
+import static com.deal4u.fourplease.testutil.TestUtils.genAuctionCreateRequest;
+import static com.deal4u.fourplease.testutil.TestUtils.genAuctionDetailResponse;
+import static com.deal4u.fourplease.testutil.TestUtils.genAuctionListResponsePageResponse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;

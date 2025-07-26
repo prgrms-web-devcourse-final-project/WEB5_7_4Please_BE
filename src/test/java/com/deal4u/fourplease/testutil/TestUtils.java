@@ -53,6 +53,18 @@ public class TestUtils {
                 .build();
     }
 
+    public static Member genMemberById(Long id) {
+        // TODO: Member 추후 확인 필요
+        return Member.builder()
+                .memberId(id)
+                .email("user1@user.com")
+                .nickName("유저1")
+                .role(Role.USER)
+                .status(Status.ACTIVE)
+                .provider("provider")
+                .build();
+    }
+
     public static Product genProduct() {
         return Product.builder()
                 .name("칫솔")

@@ -3,6 +3,7 @@ package com.deal4u.fourplease.domain.auction.service;
 import static com.deal4u.fourplease.testutil.TestUtils.genAuctionCreateRequest;
 import static com.deal4u.fourplease.testutil.TestUtils.genAuctionList;
 import static com.deal4u.fourplease.testutil.TestUtils.genMember;
+import static com.deal4u.fourplease.testutil.TestUtils.genMemberById;
 import static com.deal4u.fourplease.testutil.TestUtils.genProduct;
 import static com.deal4u.fourplease.testutil.TestUtils.genProductList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -209,7 +210,7 @@ class AuctionServiceTests {
 
 
         assertThatThrownBy(() -> {
-            auctionService.deleteByAuctionId(auctionId, genMember());
+            auctionService.deleteByAuctionId(auctionId, genMemberById(2L));
         }).isInstanceOf(GlobalException.class).hasMessage("권한이 없습니다.");
 
     }

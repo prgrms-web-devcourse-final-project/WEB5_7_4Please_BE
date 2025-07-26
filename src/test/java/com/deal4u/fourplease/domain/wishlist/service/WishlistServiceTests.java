@@ -1,12 +1,11 @@
 package com.deal4u.fourplease.domain.wishlist.service;
 
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuction;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genWishlist;
+import static com.deal4u.fourplease.testutil.TestUtils.genAuction;
+import static com.deal4u.fourplease.testutil.TestUtils.genMember;
+import static com.deal4u.fourplease.testutil.TestUtils.genMemberById;
+import static com.deal4u.fourplease.testutil.TestUtils.genWishlist;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,13 +13,9 @@ import static org.mockito.Mockito.when;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.service.AuctionReaderImpl;
-import com.deal4u.fourplease.domain.auction.service.AuctionService;
-import com.deal4u.fourplease.domain.auction.service.AuctionSupportService;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
-import com.deal4u.fourplease.domain.member.entity.Role;
-import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
 import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
@@ -121,7 +116,7 @@ class WishlistServiceTests {
 
         assertThatThrownBy(
                 () -> {
-                    wishlistService.deleteByWishlistId(wishlistId, genMember());
+                    wishlistService.deleteByWishlistId(wishlistId, genMemberById(2L));
                 }
         ).isInstanceOf(GlobalException.class).hasMessage("권한이 없습니다.");
 
