@@ -23,8 +23,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    private static final String SIGNUP_REDIRECT_URL = "/signup";
-    private static final String MAIN_REDIRECT_URL = "/";
+    private static final String SIGNUP_REDIRECT_URL = "api/v1/signup";
     private final JwtProvider jwtProvider;
     private final AuthService authService;
     private final MemberService memberService;
@@ -42,35 +41,32 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         log.info("멤버 이메일: " + member.getEmail());
         log.info("멤버 상태: " + member.getStatus());
 
-        response.setStatus(HttpServletResponse.SC_OK);
 
         if (member.getStatus() == Status.PENDING) {
+            // 로그인 실패
             // 아직 닉네임 설정 안했으므로, 프론트 닉네임 설정 페이지로 redirect
-            String tempToken = jwtProvider.generateTokenPair(member).accessToken(); // 임시 토큰 발급
-            log.info("임시 token: " + tempToken);
-            response.setHeader("Authorization", "Bearer " + tempToken);
-            response.setHeader("X-Redirect-Url", SIGNUP_REDIRECT_URL);
-        } else {
-            // 새로운 JWT 발급
-            TokenPair tokenPair = authService.createTokenPair(member);
-            response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
-            ResponseCookie refreshCookie = ResponseCookie
-                    .from("refreshToken", tokenPair.refreshToken())
-                    .httpOnly(true)
-                    .secure(false) // 운영 환경에서는 true
-                    .path("/")
-                    .sameSite("Lax") // 운영 환경에서는 Strict
-                    .maxAge(Duration.ofHours(1))
-                    .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-            log.info("Access token: " + tokenPair.accessToken());
-            log.info("RefreshToken 쿠키 설정 완료: {}", refreshCookie);
-
-            response.setHeader("X-Redirect-Url", MAIN_REDIRECT_URL);
+            String token = jwtProvider.generateTokenPair(member).accessToken();
+            String redirectUrl = SIGNUP_REDIRECT_URL + "/" + token;
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(String.format("{\"redirect\":\"%s\"}", redirectUrl));
+            response.getWriter().flush();
+            return;
         }
-
-        response.getWriter().write("{\"status\":\"ok\"}");
-        response.getWriter().flush();
-
+        // 로그인 성공
+        // 새로운 JWT 발급
+        TokenPair tokenPair = authService.createTokenPair(member);
+        response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
+        ResponseCookie refreshCookie = ResponseCookie
+                .from("refreshToken", tokenPair.refreshToken())
+                .httpOnly(true)
+                .secure(false) // 운영 환경에서는 true
+                .path("/")
+                .sameSite("Lax") // 운영 환경에서는 Strict
+                .maxAge(Duration.ofHours(1))
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }
