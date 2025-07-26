@@ -5,12 +5,11 @@ import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.SaleAuctionStatus;
-import com.deal4u.fourplease.domain.bid.repository.BidRepository;
+import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
 import com.deal4u.fourplease.domain.shipment.repository.ShipmentRepository;
+import com.deal4u.fourplease.domain.wishlist.service.WishlistService;
 import com.deal4u.fourplease.global.exception.ErrorCode;
-import java.math.BigDecimal;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -21,28 +20,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AuctionSupportService {
 
-    private final BidRepository bidRepository;
+    private final BidService bidService;
+    private final WishlistService wishlistService;
+
     private final SettlementRepository settlementRepository;
     private final ShipmentRepository shipmentRepository;
-
-    // TODO: bidRepository가 아닌 bidService에서 불러오는 방식으로 수정 필요
-    @Transactional(readOnly = true)
-    public BidSummaryDto getBidSummaryDto(Long auctionId) {
-        List<BigDecimal> bidList = bidRepository.findPricesByAuctionIdOrderByPriceDesc(
-                auctionId
-        );
-        return BidSummaryDto.toBidSummaryDto(bidList);
-    }
 
     public Page<AuctionListResponse> getAuctionListResponses(Page<Auction> auctionPage) {
         return auctionPage
                 .map(auction -> {
-                    BidSummaryDto bidSummaryDto = getBidSummaryDto(auction.getAuctionId());
+                    BidSummaryDto bidSummaryDto = bidService
+                            .getBidSummaryDto(auction.getAuctionId());
                     return AuctionListResponse.toAuctionListResponse(
                             auction,
                             bidSummaryDto,
-                            // TODO: wishList 개발 후 수정 필요
-                            false
+                            wishlistService.isWishlist(auction)
                     );
                 });
     }
