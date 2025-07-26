@@ -1,5 +1,7 @@
 package com.deal4u.fourplease.domain.auction.service;
 
+import static com.deal4u.fourplease.domain.auction.validator.Validator.validateSeller;
+
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
@@ -9,7 +11,9 @@ import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
+import com.deal4u.fourplease.domain.auction.reader.AuctionReader;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.global.exception.ErrorCode;
@@ -33,6 +37,8 @@ public class AuctionService {
     private final ProductImageService productImageService;
     private final AuctionScheduleService auctionScheduleService;
 
+    private final BidService bidService;
+
     private final AuctionSupportService auctionSupportService;
     private final AuctionStatusService auctionStatusService;
 
@@ -51,24 +57,29 @@ public class AuctionService {
 
     @Transactional(readOnly = true)
     public AuctionDetailResponse getByAuctionId(Long auctionId) {
-        BidSummaryDto bidSummaryDto = auctionSupportService.getBidSummaryDto(auctionId);
+        BidSummaryDto bidSummaryDto = bidService.getBidSummaryDto(auctionId);
 
         Auction auction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
-        List<String> productImageUrlList = getProductImageUrlList(auction.getProduct());
+        List<String> productImageUrls = getProductImageUrls(auction.getProduct());
 
         return AuctionDetailResponse.toAuctionDetailResponse(
                 auction,
-                productImageUrlList,
+                productImageUrls,
                 bidSummaryDto
         );
     }
 
     @Transactional
-    public void deleteByAuctionId(Long auctionId) {
+    public void deleteByAuctionId(Long auctionId, Member member) {
         Auction targetAuction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
+
+        // TODO: Auction status 업데이트 후 낙찰된 경매는 취소 불가 기능 추가
+
+        // Seller가 member와 일치하지 않으면 403 예외 발생
+        validateSeller(targetAuction.getProduct().getSeller(), member);
 
         // 경매 스케쥴 취소
         auctionScheduleService.cancelAuctionClose(targetAuction.getAuctionId());
@@ -98,17 +109,17 @@ public class AuctionService {
             Long sellerId,
             Pageable pageable
     ) {
-        List<Product> productList = productService.getProductListBySellerId(sellerId);
+        List<Product> products = productService.getProductListBySellerId(sellerId);
 
-        List<Long> productIdList = productList.stream()
+        List<Long> productIds = products.stream()
                 .map(Product::getProductId)
                 .toList();
 
-        Page<Auction> auctionPage = auctionRepository.findAllByProductIdIn(productIdList, pageable);
+        Page<Auction> auctionPage = auctionRepository.findAllByProductIdIn(productIds, pageable);
 
         Page<SellerSaleListResponse> sellerSaleListResponsePage = auctionPage
                 .map(auction -> {
-                    BidSummaryDto bidSummaryDto = auctionSupportService
+                    BidSummaryDto bidSummaryDto = bidService
                             .getBidSummaryDto(auction.getAuctionId());
                     return SellerSaleListResponse.toSellerSaleListResponse(
                             auction,
@@ -126,9 +137,9 @@ public class AuctionService {
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
     }
 
-    private List<String> getProductImageUrlList(Product product) {
+    private List<String> getProductImageUrls(Product product) {
         return productImageService.getByProduct(product)
-                .toProductImageUrlList();
+                .toProductImageUrls();
     }
 
     private Page<Auction> getAuctionPage(
@@ -176,5 +187,4 @@ public class AuctionService {
         }
         return Sort.by(Sort.Direction.DESC, "createdAt");
     }
-
 }

@@ -1,9 +1,11 @@
 package com.deal4u.fourplease.domain.wishlist.service;
 
+import static com.deal4u.fourplease.domain.wishlist.validator.Validator.validateMember;
+
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
-import com.deal4u.fourplease.domain.auction.service.AuctionService;
-import com.deal4u.fourplease.domain.auction.service.AuctionSupportService;
+import com.deal4u.fourplease.domain.auction.service.AuctionReaderImpl;
+import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistCreateRequest;
@@ -22,21 +24,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
-    private final AuctionService auctionService;
-    private final AuctionSupportService auctionSupportService;
+    private final AuctionReaderImpl auctionReaderImpl;
+    private final BidService bidService;
 
     @Transactional
     public Long save(WishlistCreateRequest request, Member member) {
-        Auction auction = auctionService.getAuctionByAuctionId(request.auctionId());
+        Auction auction = auctionReaderImpl.getAuctionByAuctionId(request.auctionId());
         Wishlist wishlist = request.toEntity(member, auction);
 
         return wishlistRepository.save(wishlist).getWishlistId();
     }
 
     @Transactional
-    public void deleteByWishlistId(Long wishlistId) {
+    public void deleteByWishlistId(Long wishlistId, Member member) {
         Wishlist targetWishlist = wishlistRepository.findById(wishlistId)
                 .orElseThrow(ErrorCode.WISHLIST_NOT_FOUND::toException);
+
+        validateMember(targetWishlist, member);
 
         targetWishlist.delete();
     }
@@ -48,12 +52,16 @@ public class WishlistService {
         Page<WishlistResponse> wishlistResponsePage = wishlistPage
                 .map(wishlist -> {
                     BidSummaryDto bidSummaryDto =
-                            auctionSupportService.getBidSummaryDto(
+                            bidService.getBidSummaryDto(
                                     wishlist.getAuction().getAuctionId()
                             );
                     return WishlistResponse.toWishlistResponse(wishlist, bidSummaryDto);
                 });
 
         return PageResponse.fromPage(wishlistResponsePage);
+    }
+
+    public boolean isWishlist(Auction auction) {
+        return wishlistRepository.existsByAuctionAndDeletedFalse(auction);
     }
 }
