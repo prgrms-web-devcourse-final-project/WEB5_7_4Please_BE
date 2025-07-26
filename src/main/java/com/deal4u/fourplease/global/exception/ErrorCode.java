@@ -90,6 +90,8 @@ public enum ErrorCode {
     PUSH_NOTIFICATION_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,
             "푸시 알림을 전송하는 데 실패했습니다."),
     EMAIL_SEND_FAILED_TO_PAYMENT_SUCCESS(HttpStatus.INTERNAL_SERVER_ERROR, "결제 성공 이메일 발송에 실패했습니다."),
+    EMAIL_SEND_FAILED_TO_HIGHEST_BIDDER(HttpStatus.INTERNAL_SERVER_ERROR,
+            "최상위 입찰자에게 이메일을 전송하는 데 실패했습니다."),
 
     DOES_MODIFIED_URL(HttpStatus.INTERNAL_SERVER_ERROR, "알수없는 에러입니다.");
 

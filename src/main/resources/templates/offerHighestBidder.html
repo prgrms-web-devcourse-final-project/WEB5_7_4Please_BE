@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deal4U - 경매 낙찰 안내</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .header-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .winner-message {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border: 2px solid #ff9800;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .winner-message::before {
+            content: '🎉';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        .winner-message::after {
+            content: '🎉';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            font-size: 30px;
+            animation: bounce 2s infinite 0.5s;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .winner-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .winner-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+
+        .winner-subtext {
+            color: #f57c00;
+            font-size: 16px;
+        }
+
+        .auction-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .auction-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ff6b6b;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .bid-amount {
+            font-size: 24px;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .payment-deadline {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border: 2px solid #f44336;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .deadline-icon {
+            font-size: 36px;
+            color: #f44336;
+            margin-bottom: 10px;
+        }
+
+        .deadline-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #c62828;
+            margin-bottom: 8px;
+        }
+
+        .deadline-time {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-bottom: 5px;
+        }
+
+        .deadline-warning {
+            font-size: 14px;
+            color: #c62828;
+        }
+
+        .next-steps {
+            margin: 30px 0;
+        }
+
+        .steps-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            background-color: #ff6b6b;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            color: white;
+            text-decoration: none;
+            padding: 18px 35px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            margin: 20px 0;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .contact-info {
+            color: #999;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                box-shadow: none;
+            }
+
+            .header, .content, .footer {
+                padding: 20px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .detail-value {
+                font-size: 16px;
+            }
+
+            .winner-message::before,
+            .winner-message::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">Deal4U</div>
+        <div class="header-subtitle">경매 낙찰 안내</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="greeting">
+            축하합니다, <strong>${bidderName}</strong>님! 🎊
+        </div>
+
+        <!-- Winner Message -->
+        <div class="winner-message">
+            <div class="winner-icon">🏆</div>
+            <div class="winner-text">낙찰되었습니다!</div>
+            <div class="winner-subtext">경매에서 최고가 입찰자로 선정되셨습니다.</div>
+        </div>
+
+        <!-- Auction Details -->
+        <div class="auction-details">
+            <div class="auction-title">🛍️ 낙찰 상품 정보</div>
+
+            <div class="detail-row">
+                <span class="detail-label">상품명</span>
+                <span class="detail-value">${auctionTitle}</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">낙찰 금액</span>
+                <span class="detail-value bid-amount">${bidAmount}원</span>
+            </div>
+        </div>
+
+        <!-- Payment Deadline -->
+        <div class="payment-deadline">
+            <div class="deadline-icon">⏰</div>
+            <div class="deadline-title">결제 기한 안내</div>
+            <div class="deadline-time">${paymentDeadline}</div>
+            <div class="deadline-warning">기한 내 결제하지 않으면 낙찰이 취소될 수 있습니다.</div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="next-steps">
+            <div class="steps-title">📋 진행 절차</div>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">
+                    <strong>결제 진행</strong><br>
+                    기한 내에 결제를 완료해 주세요.
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">
+                    <strong>배송 정보 입력</strong><br>
+                    결제 완료 후 배송지 정보를 확인해 주세요.
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Button -->
+        <div class="button-container">
+            <a href="${paymentUrl}" class="cta-button">
+                💳 지금 결제하기
+            </a>
+        </div>
+
+        <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
+            <div style="color: #856404; font-size: 14px;">
+                <strong>⚠️ 중요 안내</strong><br>
+                • 결제 기한을 꼭 확인해 주세요.<br>
+                • 기한 내 결제하지 않으면 자동으로 낙찰이 취소됩니다.<br>
+                • 문의사항이 있으시면 고객센터로 연락해 주세요.
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-text">
+            Deal4U에서 좋은 상품을 낙찰받으셨네요! 🎉
+        </div>
+        <div class="contact-info">
+            고객센터: 1588-0000 | 이메일: support@deal4u.com<br>
+            서울특별시 강남구 테헤란로 427 (우) 06158
+        </div>
+    </div>
+</div>
+</body>
+</html>
