@@ -15,8 +15,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,7 +61,7 @@ public class PushNotificationController {
     @ApiResponse(responseCode = "404", description = "찾을 수 없음")
     @GetMapping("/view")
     Slice<PushNotificationResponse> viewPushNotification(
-            @Valid PushNotificationPageRequest pageRequest) {
+            @Valid @ModelAttribute @ParameterObject PushNotificationPageRequest pageRequest) {
         Member first = memberRepository.findAll().getFirst();
         return pushNotificationService.getView(Receiver.of(first.getMemberId()),
                 pageRequest.toPageable());
