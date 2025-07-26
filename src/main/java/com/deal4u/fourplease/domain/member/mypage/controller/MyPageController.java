@@ -42,7 +42,8 @@ public class MyPageController {
 
     @GetMapping("/auctions")
     public PageResponse<MyPageAuctionHistory> getMyAuctionHistory(
+            @AuthenticationPrincipal Member member,
             @PageableDefault Pageable pageable) {
-        return myPageAuctionHistoryService.getMyAuctionHistory(pageable);
+        return myPageAuctionHistoryService.getMyAuctionHistory(member, pageable);
     }
 }

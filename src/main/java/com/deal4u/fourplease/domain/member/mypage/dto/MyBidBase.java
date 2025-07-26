@@ -7,7 +7,6 @@ import com.deal4u.fourplease.domain.shipment.entity.ShipmentStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-// 사용할 DTO
 public record MyBidBase(
 
         // Auction
