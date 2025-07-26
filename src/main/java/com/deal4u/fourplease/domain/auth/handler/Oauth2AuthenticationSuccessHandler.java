@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    private static final String SIGNUP_REDIRECT_URL = "/signup";
+    private static final String SIGNUP_REDIRECT_URL = "api/v1/signup";
     private static final String MAIN_REDIRECT_URL = "/";
     private final JwtProvider jwtProvider;
     private final AuthService authService;
@@ -39,21 +39,27 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         Member member = oauth2User.getMember();
 
         memberService.validateMember(member);
-        log.info("멤버 이메일: " + member.getEmail());
-        log.info("멤버 상태: " + member.getStatus());
+        log.info("멤버 이메일: {}", member.getEmail());
+        log.info("멤버 상태: {}", member.getStatus());
 
         response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String redirectUrl;
+        String accessToken;
+        String jsonResponse;
 
         if (member.getStatus() == Status.PENDING) {
             // 아직 닉네임 설정 안했으므로, 프론트 닉네임 설정 페이지로 redirect
-            String tempToken = jwtProvider.generateTokenPair(member).accessToken(); // 임시 토큰 발급
-            log.info("임시 token: " + tempToken);
-            response.setHeader("Authorization", "Bearer " + tempToken);
-            response.setHeader("X-Redirect-Url", SIGNUP_REDIRECT_URL);
+            accessToken = jwtProvider.generateTokenPair(member).accessToken(); // 임시 토큰 발급
+            redirectUrl = SIGNUP_REDIRECT_URL;
         } else {
             // 새로운 JWT 발급
             TokenPair tokenPair = authService.createTokenPair(member);
-            response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
+            accessToken = tokenPair.accessToken();
+            redirectUrl = MAIN_REDIRECT_URL;
+
             ResponseCookie refreshCookie = ResponseCookie
                     .from("refreshToken", tokenPair.refreshToken())
                     .httpOnly(true)
@@ -63,14 +69,15 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
                     .maxAge(Duration.ofHours(1))
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-            log.info("Access token: " + tokenPair.accessToken());
-            log.info("RefreshToken 쿠키 설정 완료: {}", refreshCookie);
-
-            response.setHeader("X-Redirect-Url", MAIN_REDIRECT_URL);
         }
 
-        response.getWriter().write("{\"status\":\"ok\"}");
-        response.getWriter().flush();
+        jsonResponse = String.format(
+                "{\"status\":\"ok\", \"redirectUrl\":\"%s\", \"accessToken\":\"%s\"}",
+                redirectUrl,
+                accessToken
+        );
 
+        response.getWriter().write(jsonResponse);
+        response.getWriter().flush();
     }
 }
