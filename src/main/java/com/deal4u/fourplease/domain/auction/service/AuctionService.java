@@ -11,7 +11,6 @@ import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
-import com.deal4u.fourplease.domain.auction.reader.AuctionReader;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
@@ -129,19 +128,7 @@ public class AuctionService {
 
         return PageResponse.fromPage(sellerSaleListResponsePage);
     }
-
-    // TODO: auction 상태를 CLOSED로 변경하는 메서드로 대체 필요
-    @Transactional
-    public void close(Auction auction) {
-        auction.close();
-    }
-
-    // TODO: auction 상태를 FAIL로 변경하는 메서드로 대체 필요
-    @Transactional
-    public void fail(Auction auction) {
-        auction.fail();
-    }
-
+    
     private List<String> getProductImageUrls(Product product) {
         return productImageService.getByProduct(product)
                 .toProductImageUrls();

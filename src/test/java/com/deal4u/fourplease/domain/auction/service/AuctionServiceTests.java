@@ -74,6 +74,9 @@ class AuctionServiceTests {
     @Mock
     private AuctionScheduleService auctionScheduleService;
 
+    @Mock
+    private AuctionStatusService auctionStatusService;
+
     @Test
     @DisplayName("경매를 등록할 수 있다")
     void saveShouldSaveAuction() {
@@ -278,9 +281,9 @@ class AuctionServiceTests {
 
         assertThat(auction.getStatus()).isEqualTo(AuctionStatus.OPEN);
 
-        auctionService.close(auction);
-        
-        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.CLOSED);
+        auctionStatusService.closeAuction(auction);
+
+        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.CLOSE);
 
     }
 
