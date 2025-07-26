@@ -1,11 +1,12 @@
 package com.deal4u.fourplease.domain.notification.pushnotification.controller;
 
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.domain.notification.NotificationSender;
 import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationListResponse;
 import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationPageRequest;
-import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationResponse;
+import com.deal4u.fourplease.domain.notification.pushnotification.entity.PushNotification;
 import com.deal4u.fourplease.domain.notification.pushnotification.entity.Receiver;
 import com.deal4u.fourplease.domain.notification.pushnotification.message.PushNotificationMessage;
 import com.deal4u.fourplease.domain.notification.pushnotification.service.PushNotificationService;
@@ -60,6 +61,8 @@ public class PushNotificationController {
     @ApiResponse(responseCode = "403", description = "권한 없음")
     @ApiResponse(responseCode = "404", description = "찾을 수 없음")
     @GetMapping("/view")
+    PageResponse<PushNotification> viewPushNotification(
+            @Valid PushNotificationPageRequest pageRequest) {
     Slice<PushNotificationResponse> viewPushNotification(
             @Valid @ModelAttribute @ParameterObject PushNotificationPageRequest pageRequest) {
         Member first = memberRepository.findAll().getFirst();

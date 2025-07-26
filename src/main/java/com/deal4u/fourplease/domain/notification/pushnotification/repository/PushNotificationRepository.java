@@ -3,8 +3,8 @@ package com.deal4u.fourplease.domain.notification.pushnotification.repository;
 import com.deal4u.fourplease.domain.notification.pushnotification.entity.PushNotification;
 import com.deal4u.fourplease.domain.notification.pushnotification.entity.Receiver;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,5 +17,5 @@ public interface PushNotificationRepository extends JpaRepository<PushNotificati
             """)
     List<PushNotification> findAllByReceiverAndUnClicked(Receiver receiver, Pageable pageable);
 
-    Slice<PushNotification> findAllByReceiver(Receiver receiver, Pageable pageable);
+    Page<PushNotification> findAllByReceiver(Receiver receiver, Pageable pageable);
 }

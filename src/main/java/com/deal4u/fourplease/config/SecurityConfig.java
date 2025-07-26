@@ -3,13 +3,20 @@ package com.deal4u.fourplease.config;
 import com.deal4u.fourplease.domain.auth.filter.JwtAuthenticationFilter;
 import com.deal4u.fourplease.domain.auth.handler.Oauth2AuthenticationSuccessHandler;
 import com.deal4u.fourplease.domain.auth.service.CustomOauth2UserService;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Spring Security 설정 클래스.
@@ -28,7 +35,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .oauth2Login(oauth2 ->
                         oauth2.authorizationEndpoint(
                                         authorization -> authorization.baseUri("/api/v1/login/page")
@@ -44,12 +52,20 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/oauth2/**",
                                 "/api/v1/login/**",
-                                "/api/v1/signup/**"
+                                "/api/v1/signup/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET).permitAll()
                         .requestMatchers(
                                 "/api/v1/auth/**"
                         ).authenticated()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(
+                        exceptions -> exceptions.authenticationEntryPoint(
+                                (request, response, authException) -> response.sendError(
+                                        HttpServletResponse.SC_FORBIDDEN))
                 )
                 .addFilterBefore(
                         jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
@@ -57,5 +73,23 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
 
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+
+        configuration.setAllowedMethods(
+                Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        configuration.setAllowCredentials(true);
+
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

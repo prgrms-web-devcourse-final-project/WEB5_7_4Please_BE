@@ -1,7 +1,7 @@
 package com.deal4u.fourplease.domain.auction.service;
 
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProduct;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProductImageList;
+import static com.deal4u.fourplease.testutil.TestUtils.genProduct;
+import static com.deal4u.fourplease.testutil.TestUtils.genProductImageList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
