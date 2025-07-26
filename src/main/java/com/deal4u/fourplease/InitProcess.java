@@ -46,14 +46,22 @@ public class InitProcess implements CommandLineRunner {
     }
 
     private void initBid10000(int threadCount, ExecutorService executorService,
-                              Queue<AuctionPair> pairs, AtomicInteger count)
+            Queue<AuctionPair> pairs, AtomicInteger count)
             throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
         for (int i = 0; i < threadCount; i++) {
             excute(executorService, () -> {
                 jdbcTemplate.batchUpdate(
                         """
-                                insert into bid(auction_id,bidder_member_id,price,BID_TIME,is_successful_bidder,deleted,created_at,updated_at)
+                                insert into bid(
+                                                auction_id, 
+                                                bidder_member_id, 
+                                                price, 
+                                                BID_TIME, 
+                                                is_successful_bidder, 
+                                                deleted, 
+                                                created_at, 
+                                                updated_at)
                                 values (?,?,?,?,?,false,now(),now())
                                 """,
                         new BatchPreparedStatementSetter() {
@@ -115,27 +123,36 @@ public class InitProcess implements CommandLineRunner {
         for (int i = 0; i < threadCount; i++) {
             excute(executorService, () -> {
                 jdbcTemplate.batchUpdate("""
-                        insert into auctions(PRODUCT_PRODUCT_ID,starting_price,start_time,end_time,status,DELETED,updated_at,created_at)
-                        values (?,1000,now(),now(),?,false,now(),now())
-                        """, new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        int value = atomicInteger.incrementAndGet();
-                        ps.setLong(1, value + 2);
-                        if (value <= 7000) {
-                            ps.setString(2, "CLOSED");
-                        } else if (value <= 9900) {
-                            ps.setString(2, "OPEN");
-                        } else {
-                            ps.setString(2, "FAIL");
-                        }
-                    }
+                                insert into auctions(
+                                                     PRODUCT_PRODUCT_ID,
+                                                     starting_price,
+                                                     start_time,
+                                                     end_time,
+                                                     status,
+                                                     DELETED,
+                                                     updated_at,
+                                                     created_at)
+                                values (?,1000,now(),now(),?,false,now(),now())
+                                """,
+                        new BatchPreparedStatementSetter() {
+                            @Override
+                            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                                int value = atomicInteger.incrementAndGet();
+                                ps.setLong(1, value + 2);
+                                if (value <= 7000) {
+                                    ps.setString(2, "CLOSED");
+                                } else if (value <= 9900) {
+                                    ps.setString(2, "OPEN");
+                                } else {
+                                    ps.setString(2, "FAIL");
+                                }
+                            }
 
-                    @Override
-                    public int getBatchSize() {
-                        return 2500;
-                    }
-                });
+                            @Override
+                            public int getBatchSize() {
+                                return 2500;
+                            }
+                        });
             }, countDownLatch);
         }
         countDownLatch.await();
@@ -149,20 +166,43 @@ public class InitProcess implements CommandLineRunner {
             excute(executorService, () -> {
                 try {
                     jdbcTemplate.batchUpdate("""
-                            insert into products(name,description,thumbnail_url,address,DETAIL_ADDRESS,zip_code,SELLER_MEMBER_ID,CATEGORY_CATEGORY_ID,phone,deleted,created_at,updated_at) 
-                            values ('testProduct', '', '', '', '', '', 1,1,'',false,now(),now())
-                            """, new BatchPreparedStatementSetter() {
-                        @Override
-                        public void setValues(PreparedStatement ps, int i)
-                                throws SQLException {
-                        }
+                                    insert into products(
+                                                         name,
+                                                         description,
+                                                         thumbnail_url,
+                                                         address,
+                                                         DETAIL_ADDRESS,
+                                                         zip_code,
+                                                         SELLER_MEMBER_ID,
+                                                         CATEGORY_CATEGORY_ID,
+                                                         phone,deleted,
+                                                         created_at,updated_at) 
+                                    values (
+                                            'testProduct', 
+                                            '', 
+                                            '', 
+                                            '', 
+                                            '', 
+                                            '', 
+                                            1,
+                                            1,
+                                            '',
+                                            false,
+                                            now(),
+                                            now())
+                                    """,
+                            new BatchPreparedStatementSetter() {
+                                @Override
+                                public void setValues(PreparedStatement ps, int i)
+                                        throws SQLException {
+                                }
 
-                        @Override
-                        public int getBatchSize() {
-                            return 2500;
-                        }
+                                @Override
+                                public int getBatchSize() {
+                                    return 2500;
+                                }
 
-                    });
+                            });
                 } catch (Exception throwables) {
                     throwables.printStackTrace();
                 }
@@ -186,7 +226,7 @@ public class InitProcess implements CommandLineRunner {
     }
 
     private void excute(ExecutorService executorService, Runnable runnable,
-                        CountDownLatch countDownLatch) {
+            CountDownLatch countDownLatch) {
         executorService.execute(new InitRunable(runnable, countDownLatch));
     }
 

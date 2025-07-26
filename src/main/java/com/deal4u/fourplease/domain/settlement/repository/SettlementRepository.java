@@ -20,7 +20,8 @@ public interface SettlementRepository extends CrudRepository<Settlement, Long> {
 
     @Query("SELECT s FROM Settlement s WHERE s.auction = :auction AND s.bidder = :bidder")
     Optional<Settlement> findByAuctionAndBidder(@Param("auction") Auction auction,
-                                                @Param("bidder") Bidder bidder);
+            @Param("bidder") Bidder bidder);
+
     @Query("SELECT s "
             + "FROM Settlement s "
             + "WHERE s.auction = :auction "
