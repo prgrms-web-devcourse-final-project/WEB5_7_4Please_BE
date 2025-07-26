@@ -63,9 +63,11 @@ class AuctionControllerTests extends BaseTokenTest {
     @MockitoBean
     private SaveAuctionImageService saveAuctionImageService;
 
+    private Member member;
+
     @BeforeEach
     void setUp() {
-        Member member = Member.builder()
+        member = Member.builder()
                 .memberId(1L)
                 .email("test@nave.com")
                 .role(Role.USER)
@@ -133,9 +135,6 @@ class AuctionControllerTests extends BaseTokenTest {
                 new byte[]{1, 2, 3, 4}
         );
 
-        Member member = Mockito.mock(Member.class);
-        when(member.getNickName()).thenReturn("test");
-        when(memberRepository.findAll()).thenReturn(List.of(member));
         when(saveAuctionImageService.upload(member, file)).thenReturn(
                 new AuctionImageUrlResponse("test.com")
         );
@@ -155,9 +154,6 @@ class AuctionControllerTests extends BaseTokenTest {
                 new byte[]{1, 2, 3, 4}
         );
 
-        Member member = Mockito.mock(Member.class);
-        when(member.getNickName()).thenReturn("test");
-        when(memberRepository.findAll()).thenReturn(List.of(member));
         when(saveAuctionImageService.upload(member, file)).thenThrow(
                 ErrorCode.INVALID_IMAGE_TYPE.toException()
         );
@@ -177,9 +173,6 @@ class AuctionControllerTests extends BaseTokenTest {
                 new byte[]{1, 2, 3, 4}
         );
 
-        Member member = Mockito.mock(Member.class);
-        when(member.getNickName()).thenReturn("test");
-        when(memberRepository.findAll()).thenReturn(List.of(member));
         when(saveAuctionImageService.upload(member, file)).thenThrow(
                 ErrorCode.INVALID_FILE.toException()
         );
