@@ -11,7 +11,6 @@ import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.Product;
-import com.deal4u.fourplease.domain.auction.reader.AuctionReader;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
@@ -40,7 +39,6 @@ public class AuctionService {
     private final BidService bidService;
 
     private final AuctionSupportService auctionSupportService;
-    private final AuctionStatusService auctionStatusService;
 
     @Transactional
     public void save(AuctionCreateRequest request, Member member) {
@@ -130,13 +128,7 @@ public class AuctionService {
 
         return PageResponse.fromPage(sellerSaleListResponsePage);
     }
-
-    @Transactional(readOnly = true)
-    public Auction getAuctionByAuctionId(Long auctionId) {
-        return auctionRepository.findByIdWithProduct(auctionId)
-                .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
-    }
-
+    
     private List<String> getProductImageUrls(Product product) {
         return productImageService.getByProduct(product)
                 .toProductImageUrls();
