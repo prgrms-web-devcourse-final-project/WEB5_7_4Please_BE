@@ -169,7 +169,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                 JOIN a.product p
                 JOIN b.bidder bd
                 JOIN bd.member m
-                LEFT JOIN Settlement s ON s.auction.auctionId = a.auctionId AND s.bidder.member.memberId = :memberId
+                LEFT JOIN Settlement s ON s.auction.auctionId = a.auctionId 
+                            AND s.bidder.member.memberId = :memberId
                 LEFT JOIN Shipment sh ON sh.auction.auctionId = a.auctionId
                 LEFT JOIN (
                         SELECT ba.auctionId AS auctionId, MAX(bb.price) AS highestBid

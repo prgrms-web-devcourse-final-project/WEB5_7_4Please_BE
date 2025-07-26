@@ -1,9 +1,6 @@
 package com.deal4u.fourplease.domain.member.mypage.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.set;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
@@ -11,11 +8,8 @@ import com.deal4u.fourplease.domain.auction.entity.Seller;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
-import com.deal4u.fourplease.domain.member.mypage.dto.HighestBidInfo;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyBidBase;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyPageBidHistory;
-import com.deal4u.fourplease.domain.member.mypage.dto.MyPageBidHistoryBase;
-import com.deal4u.fourplease.domain.member.mypage.dto.SettlementInfo;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
 import com.deal4u.fourplease.domain.shipment.entity.ShipmentStatus;
 import java.math.BigDecimal;
@@ -25,7 +19,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class MyPageBidHistoryServiceTest {
