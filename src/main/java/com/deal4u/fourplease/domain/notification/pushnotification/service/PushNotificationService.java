@@ -1,7 +1,7 @@
 package com.deal4u.fourplease.domain.notification.pushnotification.service;
 
+import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationListResponse;
-import com.deal4u.fourplease.domain.notification.pushnotification.dto.PushNotificationResponse;
 import com.deal4u.fourplease.domain.notification.pushnotification.entity.PushNotification;
 import com.deal4u.fourplease.domain.notification.pushnotification.entity.Receiver;
 import com.deal4u.fourplease.domain.notification.pushnotification.mapper.PushNotificationMapper;
@@ -13,7 +13,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -47,8 +46,8 @@ public class PushNotificationService {
         return PushNotificationMapper.toPushNotificationListResponse(pushNotifications);
     }
 
-    public Slice<PushNotificationResponse> getView(Receiver receiver, Pageable pageable) {
-        return pushNotificationRepository.findAllByReceiver(receiver, pageable)
-                .map(PushNotificationMapper::toPushNotificationResponse);
+    public PageResponse<PushNotification> getView(Receiver receiver, Pageable pageable) {
+        return PageResponse.fromPage(pushNotificationRepository.findAllByReceiver(
+                receiver, pageable));
     }
 }
