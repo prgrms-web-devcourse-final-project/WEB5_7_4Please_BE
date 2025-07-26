@@ -112,7 +112,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "ORDER BY b.price DESC, b.bidTime ASC")
     Optional<Bid> findSecondHighestBidByAuctionIdForSchedule(@Param("auctionId") Long auctionId);
 
-
     // 결제/배송 상태 조회
     @Query("""
                 SELECT new com.deal4u.fourplease.domain

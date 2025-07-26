@@ -8,7 +8,7 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.SETTLEMENT_NOT_FO
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
-import com.deal4u.fourplease.domain.auction.service.AuctionService;
+import com.deal4u.fourplease.domain.auction.service.AuctionStatusService;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
@@ -30,11 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class SettlementService {
 
     private final SettlementRepository settlementRepository;
+    private final SettlementStatusService settlementStatusService;
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
     private final SettlementScheduleService settlementScheduleService;
     private final FailedSettlementScheduleService scheduleService;
     private final SecondBidderNotifier secondBidderNotifier;
+    private final AuctionStatusService auctionStatusService;
 
     @Transactional
     public void save(Long auctionId, int days) {
@@ -47,7 +49,7 @@ public class SettlementService {
         // 3. 입찰자가 존재하지 않는 경우 스케쥴러 등록하지 않고 종료
         // 해당 부분은 추후 고도화 시에 method 형식으로 수정할 수 있습니다.
         if (bidder == null) {
-            auction.fail();
+            auctionStatusService.failAuction(auction);
             return;
         }
 
@@ -69,7 +71,7 @@ public class SettlementService {
         // 1. 경매 검증
         Auction auction = getAuction(auctionId);
         // 2. 경매 종료
-        auction.close();
+        auctionStatusService.closeAuction(auction);
         return auction;
     }
 
@@ -110,24 +112,22 @@ public class SettlementService {
     @Transactional
     public void handleFailedSettlement(Long settlementId) {
         Settlement settlement = getSettlementOrThrow(settlementId);
-        settlement.updateStatus(
-                SettlementStatus.REJECTED,
-                LocalDateTime.now(),
-                "차상위 입찰자가 결제 기한 내에 결제를 완료하지 않았습니다."
-        );
+        settlementStatusService.markSettlementAsRejected(settlement,
+                "결제 기한 내에 결제를 완료하지 않았습니다.");
+        auctionStatusService.failAuction(settlement.getAuction());
     }
 
     public void changeSettlementSuccess(Auction auction) {
         Settlement settlement = getSettlementOrThrow(auction);
-        settlement.updateStatus(SettlementStatus.SUCCESS, LocalDateTime.now(), null);
+        settlementStatusService.markSettlementAsSuccess(settlement);
+        auctionStatusService.markAuctionAsSuccess(auction);
 
         scheduleService.cancelFailedSettlement(settlement.getSettlementId());
     }
 
     public void changeSettlementFailure(Auction auction) {
         Settlement settlement = getSettlementOrThrow(auction);
-        settlement.updateStatus(SettlementStatus.REJECTED, LocalDateTime.now(),
-                "결제 기간이 만료되어서 정산이 취소되었습니다.");
+        settlementStatusService.markSettlementAsRejected(settlement, "결제가 실패되었습니다.");
 
         scheduleService.cancelFailedSettlement(settlement.getSettlementId());
     }
@@ -144,7 +144,7 @@ public class SettlementService {
     }
 
     private Settlement createSettlementForSecondBidder(Bid secondHighestBid, Auction auction,
-            LocalDateTime paymentDeadline) {
+                                                       LocalDateTime paymentDeadline) {
         Settlement settlement = Settlement.builder()
                 .auction(auction)
                 .bidder(secondHighestBid.getBidder())
@@ -185,7 +185,8 @@ public class SettlementService {
         Settlement settlement = getSettlementOrThrow(settlementId);
 
         // 2. 정산 상태를 `REJECTED`로 변경
-        settlement.updateStatus(SettlementStatus.REJECTED, null, "결제 기간이 만료되어서 정산이 취소되었습니다.");
+        settlementStatusService.markSettlementAsRejected(settlement, "결제 기간이 만료되어서 정산이 취소되었습니다.");
+        auctionStatusService.markAuctionAsRejected(settlement.getAuction());
 
         // 3. 해당 입찰의 낙찰을 무효 처리
         invalidateBid(settlement);

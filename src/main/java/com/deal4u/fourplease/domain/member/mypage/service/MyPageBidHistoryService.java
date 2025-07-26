@@ -1,7 +1,5 @@
 package com.deal4u.fourplease.domain.member.mypage.service;
 
-import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
-import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyBidBase;
@@ -13,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,5 +112,9 @@ public class MyPageBidHistoryService {
     private String formatPaymentDeadline(LocalDateTime paymentDeadline) {
         return paymentDeadline
                 != null ? paymentDeadline.format(PAYMENT_DEADLINE_FORMAT) : "";
+    }
+    @Transactional(readOnly = true)
+    public PageResponse<MyPageBidHistory> getMyBidHistory(Pageable pageable) {
+        return null;
     }
 }

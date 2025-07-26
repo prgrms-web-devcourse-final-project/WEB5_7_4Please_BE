@@ -5,6 +5,7 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.SHIPMENT_NOT_FOUN
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.auction.service.AuctionStatusService;
 import com.deal4u.fourplease.domain.shipment.dto.TrackingNumberRequest;
 import com.deal4u.fourplease.domain.shipment.entity.Shipment;
 import com.deal4u.fourplease.domain.shipment.mapper.ShipmentMapper;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ShipmentService {
 
+    private final AuctionStatusService auctionStatusService;
     private final ShipmentRepository shipmentRepository;
     private final AuctionRepository auctionRepository;
 
@@ -26,6 +28,8 @@ public class ShipmentService {
         Shipment shipment = ShipmentMapper.toEntity(auction, trackingNumberRequest);
 
         shipmentRepository.save(shipment);
+
+        auctionStatusService.markAuctionAsInTransit(auction);
     }
 
     @Transactional
@@ -35,6 +39,8 @@ public class ShipmentService {
         Shipment shipment = getShipmentOrThrow(auction);
 
         shipment.updateStatusToDelivered();
+
+        auctionStatusService.markAuctionAsDelivered(auction);
     }
 
     private Shipment getShipmentOrThrow(Auction auction) {

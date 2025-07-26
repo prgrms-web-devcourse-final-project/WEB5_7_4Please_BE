@@ -142,5 +142,5 @@ class SettlementScheduleServiceTest {
                 .isInstanceOf(GlobalException.class)
                 .hasMessageContaining("해당 경매를 찾을 수 없습니다.");
     }
-    
+
 }
