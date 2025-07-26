@@ -88,7 +88,8 @@ public enum ErrorCode {
             "2순위 입찰자에게 이메일을 전송하는 데 실패했습니다."),
     FAILED_SETTLEMENT_SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "예약된 실패한 정산 작업이 존재하지 않습니다."),
     PUSH_NOTIFICATION_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,
-            "차상위 입찰자에게 푸시 알림을 전송하는 데 실패했습니다."),
+            "푸시 알림을 전송하는 데 실패했습니다."),
+    EMAIL_SEND_FAILED_TO_PAYMENT_SUCCESS(HttpStatus.INTERNAL_SERVER_ERROR, "결제 성공 이메일 발송에 실패했습니다."),
 
     DOES_MODIFIED_URL(HttpStatus.INTERNAL_SERVER_ERROR, "알수없는 에러입니다.");
 

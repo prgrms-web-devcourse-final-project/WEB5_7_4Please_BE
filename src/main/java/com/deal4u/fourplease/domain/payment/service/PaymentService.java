@@ -36,6 +36,7 @@ public class PaymentService {
     private final PaymentTransactionService paymentTransactionService;
     private final BidRepository bidRepository;
     private final OrderService orderService;
+    private final PaymentSuccessNotifier paymentSuccessNotifier;
 
     public void paymentConfirm(TossPaymentConfirmRequest tossPaymentConfirmRequest) {
         OrderId orderId = OrderId.create(tossPaymentConfirmRequest.orderId());
@@ -61,6 +62,12 @@ public class PaymentService {
             paymentTransactionService.paymentStatusSuccess(payment, order, auction);
 
 
+            try {
+                paymentSuccessNotifier.send(payment, order, auction);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                // 알림은 결제 프로세스를 롤백 시키지 않는다.
+            }
         } finally {
             lock.unlock();
         }
@@ -99,8 +106,8 @@ public class PaymentService {
     }
 
     private void validatePaymentSuccessOrToFailed(TossPaymentConfirmResponse response,
-            Payment payment,
-            Order order
+                                                  Payment payment,
+                                                  Order order
     ) {
         if (!PAYMENT_SUCCESS.equals(response.status())) {
             log.warn("결제 승인 실패. 상태: {}", response.status());
@@ -110,7 +117,7 @@ public class PaymentService {
     }
 
     private void validateInstancePriceAndOrderFailed(Order order, Auction auction,
-            BigDecimal currentMaxBidPrice) {
+                                                     BigDecimal currentMaxBidPrice) {
         if (auction.getInstantBidPrice().compareTo(currentMaxBidPrice) < 0) {
             orderFailed(order);
             throw INVALID_PRICE_NOT_UPPER.toException();
