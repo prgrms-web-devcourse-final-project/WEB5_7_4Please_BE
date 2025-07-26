@@ -19,6 +19,7 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
+import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -363,6 +364,15 @@ public class TestUtils {
                 .totalPages(1)
                 .page(0)
                 .size(20)
+                .build();
+    }
+
+
+    public static Wishlist genWishlist(Long memberId) {
+        return Wishlist.builder()
+                .memberId(1L)
+                .auction(genAuction())
+                .deleted(false)
                 .build();
     }
 }

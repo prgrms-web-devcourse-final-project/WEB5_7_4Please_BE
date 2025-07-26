@@ -25,7 +25,6 @@ public record AuctionListResponse(
     public static AuctionListResponse toAuctionListResponse(
             Auction auction,
             BidSummaryDto bidSummaryDto,
-            // TODO: wishlist 개발 후 수정 필요
             boolean isWishlist
     ) {
         Product product = auction.getProduct();
