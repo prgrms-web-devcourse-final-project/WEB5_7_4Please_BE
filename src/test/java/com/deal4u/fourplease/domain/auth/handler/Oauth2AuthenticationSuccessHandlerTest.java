@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,10 +74,11 @@ class Oauth2AuthenticationSuccessHandlerTest {
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
         // then
-        verify(response).setHeader("Authorization", "Bearer " + tempToken);
-        verify(response).setHeader("X-Redirect-Url", "/signup");
         verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertThat(outputStream.toString()).contains("{\"status\":\"ok\"}");
+        assertThat(outputStream.toString())
+                .contains("\"status\":\"ok\"")
+                .contains("\"accessToken\":\"" + tempToken + "\"")
+                .contains("\"redirectUrl\":\"api/v1/signup\"");
     }
 
     @Test
@@ -94,10 +96,11 @@ class Oauth2AuthenticationSuccessHandlerTest {
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
         // then
-        verify(response).setHeader("Authorization", "Bearer " + accessToken);
-        verify(response).addHeader(eq("Set-Cookie"), contains("refreshToken=")); // 쿠키 확인
-        verify(response).setHeader("X-Redirect-Url", "/");
+        verify(response).addHeader(eq(HttpHeaders.SET_COOKIE), contains("refreshToken="));
         verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertThat(outputStream.toString()).contains("{\"status\":\"ok\"}");
+        assertThat(outputStream.toString())
+                .contains("\"status\":\"ok\"")
+                .contains("\"accessToken\":\"" + accessToken + "\"")
+                .contains("\"redirectUrl\":\"/\"");
     }
 }
