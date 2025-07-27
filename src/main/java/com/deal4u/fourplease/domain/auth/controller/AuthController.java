@@ -48,7 +48,7 @@ public class AuthController {
                 .secure(false) // 운영 환경에서는 true
                 .path("/")
                 .sameSite("None") // 운영 환경에서는 Strict
-                .maxAge(Duration.ofHours(1))
+                .maxAge(Duration.ofDays(7))
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         return ResponseEntity.ok().build(); // 바디 없이 OK 응답

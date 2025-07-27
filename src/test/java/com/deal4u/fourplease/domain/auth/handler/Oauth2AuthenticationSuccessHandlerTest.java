@@ -74,7 +74,7 @@ class Oauth2AuthenticationSuccessHandlerTest {
 
         // then
         verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        String expectedRedirectJson = String.format("{\"redirect\":\"api/v1/signup/%s\"}", tempToken);
+        String expectedRedirectJson = String.format("{\"token\":\"%s\"}", tempToken);
         assertThat(outputStream.toString()).contains(expectedRedirectJson);
     }
 

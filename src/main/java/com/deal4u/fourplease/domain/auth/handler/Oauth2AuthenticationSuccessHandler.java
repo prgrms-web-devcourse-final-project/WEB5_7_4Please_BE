@@ -63,7 +63,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 .secure(false) // 운영 환경에서는 true
                 .path("/")
                 .sameSite("Lax") // 운영 환경에서는 Strict
-                .maxAge(Duration.ofHours(1))
+                .maxAge(Duration.ofDays(7))
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         response.setStatus(HttpServletResponse.SC_OK);
