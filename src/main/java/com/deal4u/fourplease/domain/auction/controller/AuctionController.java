@@ -5,18 +5,17 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionSearchRequest;
-import com.deal4u.fourplease.domain.auction.dto.SellerInfoResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
-import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
@@ -42,7 +41,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class AuctionController {
 
     private final AuctionService auctionService;
-    private final MemberRepository memberRepository;
     private final SaveAuctionImageService saveAuctionImageService;
 
     @Operation(summary = "전체 경매 조회")
@@ -98,17 +96,9 @@ public class AuctionController {
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/images")
     public AuctionImageUrlResponse readAuctionImageUrl(
-            @RequestParam(name = "image") MultipartFile image) {
-        return saveAuctionImageService.upload(memberRepository.findAll().getFirst(), image);
+            @RequestParam(name = "image") List<MultipartFile> image,
+            @AuthenticationPrincipal Member member) {
+        return saveAuctionImageService.upload(member, image);
     }
 
-    @Operation(summary = "특정 상품의 판매자 정보 조회")
-    @ApiResponse(responseCode = "200", description = "판매자 정보 반환 성공")
-    @ApiResponse(responseCode = "404", description = "경매나 판매자 정보를 찾을 수 없음")
-    @GetMapping("/{auctionId}/seller")
-    @ResponseStatus(HttpStatus.OK)
-    public SellerInfoResponse getSellerInfo(
-            @PathVariable(name = "auctionId") @Positive Long auctionId) {
-        return auctionService.getSellerInfo(auctionId);
-    }
 }
