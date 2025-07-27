@@ -16,5 +16,13 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
             + "AND w.memberId = :memberId")
     Page<Wishlist> findAll(Pageable pageable, @Param("memberId") Long memberId);
 
-    boolean existsByAuctionAndDeletedFalse(Auction auction);
+    @Query("SELECT COUNT(w) > 0 "
+            + "FROM Wishlist w "
+            + "WHERE w.auction = :auction "
+            + "AND w.memberId = :memberId "
+            + "AND w.deleted = false")
+    boolean existsByAuctionAndMemberIdAndDeletedFalse(
+            @Param("auction") Auction auction,
+            @Param("memberId") Long memberId
+    );
 }

@@ -87,7 +87,7 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<AuctionListResponse> findAll(AuctionSearchRequest request) {
+    public PageResponse<AuctionListResponse> findAll(AuctionSearchRequest request, Member member) {
         Page<Auction> auctionPage = getAuctionPage(
                 request.page(),
                 request.size(),
@@ -97,7 +97,7 @@ public class AuctionService {
         );
 
         Page<AuctionListResponse> auctionListResponsePage =
-                auctionSupportService.getAuctionListResponses(auctionPage);
+                auctionSupportService.getAuctionListResponses(auctionPage, member);
 
         return PageResponse.fromPage(auctionListResponsePage);
     }

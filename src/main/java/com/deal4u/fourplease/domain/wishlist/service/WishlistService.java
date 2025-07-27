@@ -73,8 +73,7 @@ public class WishlistService {
                 });
     }
 
-    // TODO: 멤버 일치 여부 확인 필요
-    public boolean isWishlist(Auction auction) {
-        return wishlistRepository.existsByAuctionAndDeletedFalse(auction);
+    public boolean isWishlist(Auction auction, Long memberId) {
+        return wishlistRepository.existsByAuctionAndMemberIdAndDeletedFalse(auction, memberId);
     }
 }

@@ -271,6 +271,8 @@ class AuctionServiceTests {
     @DisplayName("전체 경매 목록에서 검색어로 필터랑하고 최신순으로 정렬한다")
     void findAllShouldFillerByKeywordAndOrderByLatest() {
 
+        Member member = genMember();
+
         AuctionSearchRequest req = new AuctionSearchRequest(
                 0,
                 20,
@@ -307,11 +309,11 @@ class AuctionServiceTests {
         );
 
         when(auctionRepository.findByKeyword(req.keyword(), pageable)).thenReturn(auctionPage);
-        when(auctionSupportService.getAuctionListResponses(auctionPage))
+        when(auctionSupportService.getAuctionListResponses(auctionPage, member))
                 .thenReturn(auctionListResponsePage);
 
         PageResponse<AuctionListResponse> resp =
-                auctionService.findAll(req);
+                auctionService.findAll(req, member);
 
         assertThat(resp.getContent().getFirst().name()).isEqualTo("축구공");
         assertThat(resp.getTotalElements()).isEqualTo(auctionListResponseList.size());
@@ -321,6 +323,8 @@ class AuctionServiceTests {
     @Test
     @DisplayName("전체 경매 목록에서 카테고리로 필터링하고 입찰순으로 필터링한다")
     void findAllShouldFilterByCategoryAndOrderByBidCount() {
+
+        Member member = genMember();
 
         AuctionSearchRequest req = new AuctionSearchRequest(
                 0,
@@ -365,10 +369,10 @@ class AuctionServiceTests {
 
         when(auctionRepository.findByCategoryIdOrderByBidCount(req.categoryId(), pageable))
                 .thenReturn(auctionPage);
-        when(auctionSupportService.getAuctionListResponses(auctionPage))
+        when(auctionSupportService.getAuctionListResponses(auctionPage, member))
                 .thenReturn(auctionListResponsePage);
 
-        PageResponse<AuctionListResponse> resp = auctionService.findAll(req);
+        PageResponse<AuctionListResponse> resp = auctionService.findAll(req, member);
 
         assertThat(resp.getContent().getFirst().bidCount()).isEqualTo(40);
         assertThat(resp.getContent().getLast().bidCount()).isEqualTo(20);

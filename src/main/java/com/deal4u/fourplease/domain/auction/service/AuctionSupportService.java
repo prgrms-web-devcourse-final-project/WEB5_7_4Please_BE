@@ -4,6 +4,7 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.bid.service.BidService;
+import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.wishlist.service.WishlistService;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,10 @@ public class AuctionSupportService {
     private final BidService bidService;
     private final WishlistService wishlistService;
 
-    public Page<AuctionListResponse> getAuctionListResponses(Page<Auction> auctionPage) {
+    public Page<AuctionListResponse> getAuctionListResponses(
+            Page<Auction> auctionPage,
+            Member member
+    ) {
         List<Long> auctionIds = new ArrayList<>();
         auctionPage.getContent().forEach(auction -> {
             auctionIds.add(auction.getAuctionId());
@@ -35,7 +39,7 @@ public class AuctionSupportService {
             return AuctionListResponse.toAuctionListResponse(
                     auction,
                     bidSummaryDto,
-                    wishlistService.isWishlist(auction)
+                    wishlistService.isWishlist(auction, member.getMemberId())
             );
         });
     }
