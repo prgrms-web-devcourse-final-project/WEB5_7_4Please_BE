@@ -39,7 +39,6 @@ public class AuthController {
         TokenPair tokenPair = authService.refreshAccessToken(refreshToken);
 
         // access token → 헤더
-        response.setHeader("Access-Control-Expose-Headers", "Authorization");
         response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
 
         // refresh token → 쿠키

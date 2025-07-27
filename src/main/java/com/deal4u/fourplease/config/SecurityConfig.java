@@ -95,7 +95,12 @@ public class SecurityConfig {
 
         configuration.setAllowedHeaders(Arrays.asList("*"));
 
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization",
+                "Access-Control-Allow-Headers",
+                "Access-Control-Allow-Origin",
+                "Access-Control-Allow-Credentials"
+        ));
 
         configuration.setAllowCredentials(true);
 
