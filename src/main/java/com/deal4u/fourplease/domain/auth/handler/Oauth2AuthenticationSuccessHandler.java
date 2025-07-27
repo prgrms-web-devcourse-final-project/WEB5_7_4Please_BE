@@ -56,6 +56,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         // 로그인 성공
         // 새로운 JWT 발급
         TokenPair tokenPair = authService.createTokenPair(member);
+        response.setHeader("Access-Control-Expose-Headers", "Authorization");
         response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
         ResponseCookie refreshCookie = ResponseCookie
                 .from("refreshToken", tokenPair.refreshToken())
