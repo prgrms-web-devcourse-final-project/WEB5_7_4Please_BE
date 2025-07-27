@@ -36,6 +36,7 @@ public class SecurityConfig {
     private final Oauth2AuthenticationSuccessHandler oauth2AuthSuccessHandler;
     private final CustomOauth2UserService customOauth2UserService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
     /**
      * SecurityFilterChain Bean 등록.
@@ -111,14 +112,13 @@ public class SecurityConfig {
         return source;
     }
 
-    private final ClientRegistrationRepository clientRegistrationRepository;
-
     public class CustomAuthorizationRequestRepository implements
             AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
 
-        private final DefaultOAuth2AuthorizationRequestResolver resolver = new DefaultOAuth2AuthorizationRequestResolver(
-                clientRegistrationRepository, "/api/v1/login"
-        );
+        private final DefaultOAuth2AuthorizationRequestResolver resolver =
+                new DefaultOAuth2AuthorizationRequestResolver(
+                        clientRegistrationRepository, "/api/v1/login"
+                );
 
         @Override
         public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
@@ -127,16 +127,18 @@ public class SecurityConfig {
 
         @Override
         public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest,
-                HttpServletRequest request, HttpServletResponse response) {
+                                             HttpServletRequest request,
+                                             HttpServletResponse response) {
 
         }
 
         @Override
         public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request,
-                HttpServletResponse response) {
+                                                                     HttpServletResponse response) {
             log.info("removeAuthorizationRequest");
             OAuth2AuthorizationRequest resolve = resolver.resolve(request);
-            return OAuth2AuthorizationRequest.from(resolve).state(request.getParameter("state")).build();
+            return OAuth2AuthorizationRequest.from(resolve).state(request.getParameter("state"))
+                    .build();
         }
     }
 }

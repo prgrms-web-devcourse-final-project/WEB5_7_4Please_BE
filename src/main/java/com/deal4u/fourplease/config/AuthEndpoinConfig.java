@@ -62,14 +62,24 @@ public class AuthEndpoinConfig {
                                                                     "JWT Access Token. 응답 헤더에 포함됨.")
                                                             .schema(new StringSchema()
                                                                     .example(
-                                                                            "Bearer 136157784067-ho9n4t7vqf8hijq3mc97l3r2vjuaaoo7")
+                                                                            "Bearer 136157784067-"
+                                                                          + "ho9n4t7vqf8hijq3"
+                                                                          + "mc97l3r2vjuaaoo7"
+                                                                    )
                                                             ),
                                                     "Set-Cookie", new Header()
                                                             .description(
-                                                                    "Refresh Token. HttpOnly 쿠키로 전달됨.")
+                                                                    "Refresh Token. "
+                                                                  + "HttpOnly 쿠키로 전달됨."
+                                                            )
                                                             .schema(new StringSchema()
                                                                     .example(
-                                                                            "refreshToken=abc.def.ghi; Path=/; HttpOnly; Max-Age=3600; SameSite=Lax")
+                                                                            "refreshToken"
+                                                                          + "=abc.def.ghi; "
+                                                                          + "Path=/; HttpOnly; "
+                                                                          + "Max-Age=3600; "
+                                                                          + "SameSite=Lax"
+                                                                    )
                                                             )
                                             )))
                                     .addApiResponse("401", new ApiResponse()

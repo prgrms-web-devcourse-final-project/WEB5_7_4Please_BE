@@ -41,11 +41,10 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         log.info("멤버 이메일: " + member.getEmail());
         log.info("멤버 상태: " + member.getStatus());
 
-
+        // 로그인 실패
+        // 아직 닉네임 설정 안했으므로, 프론트 닉네임 설정 페이지로 redirect
         if (member.getStatus() == Status.PENDING) {
-            // 로그인 실패
-            // 아직 닉네임 설정 안했으므로, 프론트 닉네임 설정 페이지로 redirect
-            String token = jwtProvider.generateTokenPair(member).accessToken();
+            final String token = jwtProvider.generateTokenPair(member).accessToken();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
