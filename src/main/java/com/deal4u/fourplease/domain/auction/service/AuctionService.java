@@ -1,6 +1,8 @@
 package com.deal4u.fourplease.domain.auction.service;
 
+import static com.deal4u.fourplease.domain.auction.validator.Validator.validateAuctionStatus;
 import static com.deal4u.fourplease.domain.auction.validator.Validator.validateSeller;
+import static com.deal4u.fourplease.global.exception.ErrorCode.AUCTION_CAN_NOT_DELETE;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
@@ -10,6 +12,7 @@ import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.service.BidService;
@@ -74,7 +77,9 @@ public class AuctionService {
         Auction targetAuction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
 
-        // TODO: Auction status 업데이트 후 낙찰된 경매는 취소 불가 기능 추가
+        // Auction status 업데이트 후 낙찰된 경매는 취소 불가 기능 추가
+        String status = targetAuction.getStatus().toString();
+        validateAuctionStatus(status);
 
         // Seller가 member와 일치하지 않으면 403 예외 발생
         validateSeller(targetAuction.getProduct().getSeller(), member);
