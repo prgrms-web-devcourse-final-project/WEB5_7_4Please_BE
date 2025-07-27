@@ -5,6 +5,7 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionImageUrlResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionSearchRequest;
+import com.deal4u.fourplease.domain.auction.dto.SellerInfoResponse;
 import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
 import com.deal4u.fourplease.domain.common.PageResponse;
@@ -102,4 +103,13 @@ public class AuctionController {
         return saveAuctionImageService.upload(memberRepository.findAll().getFirst(), image);
     }
 
+    @Operation(summary = "특정 상품의 판매자 정보 조회")
+    @ApiResponse(responseCode = "200", description = "판매자 정보 반환 성공")
+    @ApiResponse(responseCode = "404", description = "경매나 판매자 정보를 찾을 수 없음")
+    @GetMapping("/{auctionId}/seller")
+    @ResponseStatus(HttpStatus.OK)
+    public SellerInfoResponse getSellerInfo(
+            @PathVariable(name = "auctionId") @Positive Long auctionId) {
+        return auctionService.getSellerInfo(auctionId);
+    }
 }
