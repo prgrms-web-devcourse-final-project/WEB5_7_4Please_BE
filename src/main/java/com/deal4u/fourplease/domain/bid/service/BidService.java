@@ -165,19 +165,28 @@ public class BidService {
         return Bidder.createBidder(member);
     }
 
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public Map<Long, BidSummaryDto> getBidSummaryDtoMap(List<Long> auctionIds) {
-        // IN으로 한번에 가져오기
-        Map<Long, List<BigDecimal>> auctionBidPricesMap =
-                bidRepository.findPricesByAuctionIdsGrouped(auctionIds);
-
-        // BudSummaryDto로 변환
+        // 개수가 많은 경우를 대비하여 batch 처리
+        final int BATCH_SIZE = 500;
         Map<Long, BidSummaryDto> bidSummaryDtoMap = new HashMap<>();
-        for (Map.Entry<Long, List<BigDecimal>> entry : auctionBidPricesMap.entrySet()) {
-            Long auctionId = entry.getKey();
-            List<BigDecimal> bidPrices = entry.getValue();
 
-            BidSummaryDto bidSummaryDto = BidSummaryDto.toBidSummaryDto(bidPrices);
-            bidSummaryDtoMap.put(auctionId, bidSummaryDto);
+        for (int i = 0; i < auctionIds.size(); i += BATCH_SIZE) {
+            int min = Math.min(i + BATCH_SIZE, auctionIds.size());
+            List<Long> batch = auctionIds.subList(i, min);
+
+            // IN으로 한번에 가져오기
+            Map<Long, List<BigDecimal>> auctionBidPricesMap =
+                    bidRepository.findPricesByAuctionIdsGrouped(batch);
+
+            // BudSummaryDto로 변환
+            for (Map.Entry<Long, List<BigDecimal>> entry : auctionBidPricesMap.entrySet()) {
+                Long auctionId = entry.getKey();
+                List<BigDecimal> bidPrices = entry.getValue();
+
+                BidSummaryDto bidSummaryDto = BidSummaryDto.toBidSummaryDto(bidPrices);
+                bidSummaryDtoMap.put(auctionId, bidSummaryDto);
+            }
         }
 
         return bidSummaryDtoMap;
