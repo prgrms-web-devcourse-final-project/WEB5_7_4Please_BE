@@ -140,40 +140,40 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
                     p.thumbnailUrl,
                     p.category,
                     successfulBid.bidId,
+                    successfulBidMember.nickName,
                     successfulBid.price,
                     bidCountInfo.totalBidCount,
                     maxBid.highestPrice,
-                    s.status,
-                    sh.status
+                    s.paymentDeadline,
+                    a.createdAt
                 )
-              FROM Auction a
-              JOIN a.product p
-              JOIN p.seller seller
-              JOIN seller.member m
-              LEFT JOIN Bid successfulBid ON successfulBid.auction.auctionId = a.auctionId
+                FROM Auction a
+                JOIN a.product p
+                JOIN p.seller seller
+                JOIN seller.member m
+                LEFT JOIN Bid successfulBid ON successfulBid.auction.auctionId = a.auctionId
                     AND successfulBid.isSuccessfulBidder = TRUE
                     AND successfulBid.deleted = FALSE
-              LEFT JOIN successfulBid.bidder successfulBidderBd ON successfulBid.bidder = successfulBidderBd
-              LEFT JOIN (
+                LEFT JOIN successfulBid.bidder successfulBidderBd ON successfulBid.bidder = successfulBidderBd
+                LEFT JOIN successfulBidderBd.member successfulBidMember
+                LEFT JOIN (
                          SELECT innerBid.auction.auctionId AS auctionId,
                             MAX(innerBid.price) AS highestPrice
                          FROM Bid innerBid
                          WHERE innerBid.deleted = FALSE
                          GROUP BY innerBid.auction.auctionId
                          ) maxBid On maxBid.auctionId = a.auctionId
-              LEFT JOIN (
+                LEFT JOIN (
                         SELECT innerBidCount.auction.auctionId AS auctionId,
                                COUNT(innerBidCount.bidId) AS totalBidCount
                            FROM Bid innerBidCount
                            WHERE innerBidCount.deleted = FALSE
                            GROUP BY innerBidCount.auction.auctionId
                       ) bidCountInfo On bidCountInfo.auctionId = a.auctionId
-             LEFT JOIN Settlement s ON s.auction.auctionId = a.auctionId AND s.bidder = successfulBidderBd
-             LEFT JOIN Shipment sh ON sh.auction.auctionId = a.auctionId
-             WHERE m.memberId = :memberId
-             AND a.deleted = FALSE
-             ORDER BY a.createdAt DESC
-            
+                LEFT JOIN Settlement s ON s.auction.auctionId = a.auctionId AND s.bidder = successfulBidderBd
+                WHERE m.memberId = :memberId
+                AND a.deleted = FALSE
+                ORDER BY a.createdAt DESC
             """)
     Page<MyAuctionBase> findMyAuctionHistory(Long memberId, Pageable pageable);
 }

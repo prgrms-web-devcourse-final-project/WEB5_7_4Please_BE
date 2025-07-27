@@ -5,6 +5,8 @@ import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyAuctionBase;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyPageAuctionHistory;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +24,6 @@ public class MyPageAuctionHistoryService {
 
     public PageResponse<MyPageAuctionHistory> getMyAuctionHistory(Member member,
             Pageable pageable) {
-
         // 1. 경매 정보 조회
         Page<MyAuctionBase> myAuctionsPage = auctionRepository.findMyAuctionHistory(
                 member.getMemberId(), pageable);
@@ -32,6 +33,28 @@ public class MyPageAuctionHistoryService {
     }
 
     private MyPageAuctionHistory mapToMyPageAuctionHistory(MyAuctionBase myAuctionBase) {
-        return null;
+        String paymentDeadline = formatPaymentDeadline(myAuctionBase.paymentDeadline());
+        BigDecimal highestPrice = myAuctionBase.currentHighestBidPrice() != null
+                ? myAuctionBase.currentHighestBidPrice() : BigDecimal.ZERO;
+
+        return new MyPageAuctionHistory(
+                myAuctionBase.auctionId(),
+                myAuctionBase.thumbnailUrl(),
+                myAuctionBase.category(),
+                myAuctionBase.name(),
+                highestPrice,
+                myAuctionBase.instantPrice(),
+                myAuctionBase.bidCount(),
+                myAuctionBase.endTime(),
+                myAuctionBase.bidderName(),
+                paymentDeadline,
+                myAuctionBase.createdAt(),
+                myAuctionBase.status()
+        );
+    }
+
+    private String formatPaymentDeadline(LocalDateTime paymentDeadline) {
+        return paymentDeadline
+                != null ? paymentDeadline.format(PAYMENT_DEADLINE_FORMAT) : "";
     }
 }
