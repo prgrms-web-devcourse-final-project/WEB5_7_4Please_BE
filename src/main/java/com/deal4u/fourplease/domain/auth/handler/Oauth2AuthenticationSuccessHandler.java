@@ -58,7 +58,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         TokenPair tokenPair = authService.createTokenPair(member);
         response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
         ResponseCookie refreshCookie = ResponseCookie
-                .from("", tokenPair.refreshToken())
+                .from("refreshToken", tokenPair.refreshToken())
                 .httpOnly(true)
                 .secure(false) // 운영 환경에서는 true
                 .path("/")
