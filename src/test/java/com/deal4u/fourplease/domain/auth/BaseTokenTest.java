@@ -21,12 +21,12 @@ public abstract class BaseTokenTest {
     private JwtProvider jwtProvider;
 
     @MockitoBean
-    private AuthMemberReader  authMemberReader;
+    private AuthMemberReader authMemberReader;
 
     @MockitoBean
     private TokenExtraction tokenExtraction;
 
-    public void init(Member member){
+    public void init(Member member) {
         TokenPair tokenPair = jwtProvider.generateTokenPair(member);
         when(tokenExtraction.extract(any())).thenReturn(
                 Optional.of(tokenPair.accessToken())

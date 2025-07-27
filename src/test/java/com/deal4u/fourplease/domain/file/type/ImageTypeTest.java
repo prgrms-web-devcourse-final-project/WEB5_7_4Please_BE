@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 class ImageTypeTest {
 
     @Test
-    void 이미지검색() {
+    void imageSearch() {
         Optional<ImageType> typeByStr = ImageType.findTypeByStr("test.jpg");
         assertThat(typeByStr).isPresent().contains(ImageType.JPG);
     }
