@@ -91,7 +91,10 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     List<HighestBid> findHighestBidsForAuctionIds(@Param("auctionIds") List<Long> auctionIds);
 
     @Query("""
-            SELECT b.bidTime as bidTime, b.auction.auctionId as auctionId
+            SELECT b.bidTime as bidTime,
+                   b.auction.auctionId as auctionId,
+                   b.bidId as bidId,
+                   b.price as myBidPrice
             FROM Bid b
             WHERE b.bidder.member.memberId = :memberId
             ORDER BY b.bidTime DESC

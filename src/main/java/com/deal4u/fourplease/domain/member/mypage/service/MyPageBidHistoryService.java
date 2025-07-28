@@ -39,10 +39,10 @@ public class MyPageBidHistoryService {
     @Transactional(readOnly = true)
     public PageResponse<MyPageBidHistory> getMyBidHistory(Member member, Pageable pageable) {
 
-        // 1. 사용자의 모든 입찰 정보를 최신 입찰 시간 기준으로 조회
-        Page<Tuple> tuples = bidRepository.findAllBidHistoryByMemberId(2L, pageable);
 
-        // 2. 중복 제거를 위해 경매 ID 목록 추출
+        Page<Tuple> tuples =
+                bidRepository.findAllBidHistoryByMemberId(member.getMemberId(), pageable);
+
         Set<Long> uniqueAuctionIds = tuples.getContent().stream()
                 .map(t -> (Long) t.get("auctionId"))
                 .collect(Collectors.toSet());
@@ -65,15 +65,16 @@ public class MyPageBidHistoryService {
 
         // 5. 결제/배송 정보 조회
         List<SettlementInfo> settlementInfos =
-                bidRepository.findSettlementInfoByAuctionIds(2L, auctionIds);
+                bidRepository.findSettlementInfoByAuctionIds(member.getMemberId(), auctionIds);
         Map<Long, SettlementInfo> settlementMap = settlementInfos.stream()
                 .collect(Collectors.toMap(SettlementInfo::auctionId, info -> info));
 
         List<MyPageBidHistory> bidHistories = tuples.getContent().stream()
                 .map(tuple -> {
                     Long auctionId = (Long) tuple.get("auctionId");
-                    LocalDateTime bidTime =
-                            (LocalDateTime) tuple.get("bidTime");
+                    LocalDateTime bidTime = (LocalDateTime) tuple.get("bidTime");
+                    Long bidId = (Long) tuple.get("bidId");
+                    BigDecimal myBidPrice = (BigDecimal) tuple.get("myBidPrice");
 
                     Auction auction = auctionMap.get(auctionId);
                     if (auction == null) {
@@ -85,10 +86,8 @@ public class MyPageBidHistoryService {
                             highestBidMap.getOrDefault(auctionId, BigDecimal.ZERO);
                     SettlementInfo settlementInfo = settlementMap.get(auctionId);
 
-
                     String displayStatus =
                             determineDisplayStatus(auction, settlementInfo);
-
 
                     String paymentDeadline =
                             settlementInfo != null && settlementInfo.paymentDeadline() != null
@@ -98,14 +97,14 @@ public class MyPageBidHistoryService {
 
                     return new MyPageBidHistory(
                             auction.getAuctionId(),
-                            null,
+                            bidId,  // 실제 bidId 사용
                             auction.getProduct().getThumbnailUrl(),
                             auction.getProduct().getName(),
                             displayStatus,
                             auction.getStartingPrice(),
                             highestPrice,
                             auction.getInstantBidPrice(),
-                            null,
+                            myBidPrice,
                             bidTime,
                             paymentDeadline,
                             auction.getProduct().getSeller() != null &&
@@ -124,41 +123,23 @@ public class MyPageBidHistoryService {
     private String determineDisplayStatus(Auction auction, SettlementInfo settlementInfo) {
         AuctionStatus auctionStatus = auction.getStatus();
 
-        switch (auctionStatus) {
-            case OPEN:
-                return "OPEN";
-
-            case FAIL:
-                return "FAIL";
-
-            case CLOSE:
-                if (settlementInfo == null) {
-                    return "FAIL";
-                }
-
-                return determineStatusBySettlement(settlementInfo);
-
-            default:
-                return "FAIL";
-        }
+        return switch (auctionStatus) {
+            case OPEN -> "OPEN";
+            case CLOSE ->
+                    settlementInfo == null ? "FAIL" : determineStatusBySettlement(settlementInfo);
+            case FAIL -> "FAIL";
+            default -> "문제";
+        };
     }
 
     private String determineStatusBySettlement(SettlementInfo settlementInfo) {
         SettlementStatus settlementStatus = settlementInfo.settlementStatus();
 
-        switch (settlementStatus) {
-            case PENDING:
-                return "PENDING";
-
-            case SUCCESS:
-                return determineStatusByShipment(settlementInfo.shipmentStatus());
-
-            case REJECTED:
-                return "REJECTED";
-
-            default:
-                return "FAIL";
-        }
+        return switch (settlementStatus) {
+            case PENDING -> "PENDING";
+            case SUCCESS -> determineStatusByShipment(settlementInfo.shipmentStatus());
+            case REJECTED -> "REJECTED";
+        };
     }
 
     private String determineStatusByShipment(ShipmentStatus shipmentStatus) {
@@ -166,15 +147,9 @@ public class MyPageBidHistoryService {
             return "SUCCESS";
         }
 
-        switch (shipmentStatus) {
-            case INTRANSIT:
-                return "INTRANSIT"; // 배송 중
-
-            case DELIVERED:
-                return "DELIVERED"; // 구매 확정
-
-            default:
-                return "SUCCESS"; // 결제 완료
-        }
+        return switch (shipmentStatus) {
+            case INTRANSIT -> "INTRANSIT"; // 배송 중
+            case DELIVERED -> "DELIVERED"; // 구매 확정
+        };
     }
 }
