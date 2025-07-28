@@ -52,9 +52,10 @@ public class AuctionController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<AuctionListResponse> readAllAuctions(
-            @Valid @ModelAttribute @ParameterObject AuctionSearchRequest request
+            @Valid @ModelAttribute @ParameterObject AuctionSearchRequest request,
+            @AuthenticationPrincipal Member member
     ) {
-        return auctionService.findAll(request);
+        return auctionService.findAll(request, member);
     }
 
     @Operation(summary = "경매등록")

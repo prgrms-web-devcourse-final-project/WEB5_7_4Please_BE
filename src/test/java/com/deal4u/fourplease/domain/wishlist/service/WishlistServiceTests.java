@@ -4,6 +4,8 @@ import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuction;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -11,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.service.AuctionReaderImpl;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
@@ -20,7 +23,9 @@ import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
 import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
 import com.deal4u.fourplease.domain.wishlist.repository.WishlistRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -150,27 +155,73 @@ class WishlistServiceTests {
     void findAllShouldReturnWishlistPageResponse() {
 
         Member member = mock(Member.class);
-        Auction auction = genAuction();
-        Wishlist wishlist = Wishlist.builder()
+        Pageable pageable = PageRequest.of(0, 20);
+
+        Auction auction1 = Auction.builder()
+                .auctionId(1L)
+                .product(Product.builder()
+                        .name("목도리")
+                        .thumbnailUrl("http://example.com/thumbnail1.jpg")
+                        .build()
+                )
+                .startingPrice(BigDecimal.valueOf(1000000))
+                .build();
+
+        Auction auction2 = Auction.builder()
+                .auctionId(2L)
+                .product(Product.builder()
+                        .name("축구공")
+                        .thumbnailUrl("http://example.com/thumbnail2.jpg")
+                        .build()
+                )
+                .startingPrice(BigDecimal.valueOf(5000000))
+                .build();
+
+        Wishlist wishlist1 = Wishlist.builder()
+                .auction(auction1)
                 .memberId(1L)
-                .auction(auction)
                 .deleted(false)
                 .build();
-        BidSummaryDto bidSummaryDto = mock(BidSummaryDto.class);
 
-        Pageable pageable = PageRequest.of(0, 20);
-        Page<Wishlist> wishlistPage = new PageImpl<>(List.of(wishlist));
+        Wishlist wishlist2 = Wishlist.builder()
+                .auction(auction2)
+                .memberId(1L)
+                .deleted(false)
+                .build();
+
+        List<Wishlist> wishlistList = List.of(wishlist1, wishlist2);
+        Page<Wishlist> wishlistPage = new PageImpl<>(wishlistList, pageable, wishlistList.size());
+
+        Map<Long, BidSummaryDto> bidSummaryDtoMap = Map.of(
+                1L, new BidSummaryDto(BigDecimal.valueOf(2000000), 5),
+                2L, new BidSummaryDto(BigDecimal.valueOf(10000000), 20)
+        );
 
         when(member.getMemberId()).thenReturn(1L);
         when(wishlistRepository.findAll(pageable, 1L)).thenReturn(wishlistPage);
-        when(bidService.getBidSummaryDto(auction.getAuctionId()))
-                .thenReturn(bidSummaryDto);
+        when(bidService.getBidSummaryDtoMap(List.of(1L, 2L))).thenReturn(bidSummaryDtoMap);
 
-        PageResponse<WishlistResponse> resp = wishlistService.findAll(pageable, member);
+        PageResponse<WishlistResponse> response = wishlistService.findAll(pageable, member);
 
-        assertThat(resp.getContent()).hasSize(1);
-        assertThat(resp.getContent().getFirst().name()).isEqualTo("칫솔");
+        assertThat(response).isNotNull();
+        assertThat(response.getContent()).hasSize(2);
 
+        WishlistResponse first = response.getContent().get(0);
+        assertThat(first.name()).isEqualTo("목도리");
+        assertThat(first.thumbnailUrl()).isEqualTo("http://example.com/thumbnail1.jpg");
+        assertThat(first.maxPrice()).isEqualTo(BigDecimal.valueOf(2000000));
+        assertThat(first.bidCount()).isEqualTo(5);
+
+        WishlistResponse second = response.getContent().get(1);
+        assertThat(second.name()).isEqualTo("축구공");
+        assertThat(second.thumbnailUrl()).isEqualTo("http://example.com/thumbnail2.jpg");
+        assertThat(second.maxPrice()).isEqualTo(BigDecimal.valueOf(10000000));
+        assertThat(second.bidCount()).isEqualTo(20);
+
+        assertThat(response.getPage()).isZero();
+        assertThat(response.getSize()).isEqualTo(20);
+        assertThat(response.getTotalElements()).isEqualTo(2);
+        assertThat(response.getTotalPages()).isEqualTo(1);
     }
 
 }
