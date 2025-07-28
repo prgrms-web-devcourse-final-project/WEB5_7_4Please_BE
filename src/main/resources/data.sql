@@ -212,7 +212,7 @@ VALUES (1, 2, 200000, TIMESTAMPADD(SECOND, -20, CURRENT_TIMESTAMP), false, false
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO settlement (
-    AUCTION_AUCTION_ID ,
+    auction_id ,
     bidder_member_id,
     status,
     payment_deadline,
