@@ -2,6 +2,8 @@ package com.deal4u.fourplease.domain.wishlist.repository;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
+import java.util.Optional;
+import javax.swing.text.html.Option;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +19,12 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
     Page<Wishlist> findAll(Pageable pageable, @Param("memberId") Long memberId);
 
     boolean existsByAuctionAndDeletedFalse(Auction auction);
+
+    @Query("SELECT w "
+            + "FROM Wishlist w "
+            + "WHERE w.deleted = false "
+            + "AND w.auction = :auction "
+            + "AND w.memberId = :memberId")
+    Optional<Wishlist> findWishlist(@Param("auction") Auction auction,
+            @Param("memberId") Long memberId);
 }

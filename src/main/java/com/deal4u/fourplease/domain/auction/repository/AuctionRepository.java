@@ -195,6 +195,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
                 ORDER BY a.createdAt DESC
             """)
     Page<MyAuctionBase> findMyAuctionHistory(Long memberId, Pageable pageable);
+
     @EntityGraph(attributePaths = {"product"})
     List<Auction> findByAuctionIdIn(List<Long> auctionIds);
 }
