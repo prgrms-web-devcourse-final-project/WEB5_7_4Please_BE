@@ -39,7 +39,7 @@ public class AuthService {
         }
 
         if (blacklistedTokenRepository.existsByToken(refreshToken)) {
-            throw ErrorCode.INVALID_REFRESH_TOKEN.toException();
+            throw ErrorCode.TOKEN_ALREADY_BLACKLISTED.toException();
         }
 
         // 4. 토큰에서 사용자 이메일 추출

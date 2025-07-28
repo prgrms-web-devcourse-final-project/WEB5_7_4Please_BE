@@ -91,7 +91,7 @@ class AuthServiceTest {
         // when & then
         assertThatThrownBy(() -> authService.refreshAccessToken(refreshToken))
                 .isInstanceOf(GlobalException.class)
-                .hasMessage(ErrorCode.INVALID_REFRESH_TOKEN.getMessage());
+                .hasMessage(ErrorCode.TOKEN_ALREADY_BLACKLISTED.getMessage());
     }
 
 

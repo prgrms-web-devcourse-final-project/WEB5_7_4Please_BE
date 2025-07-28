@@ -237,7 +237,7 @@ class WishlistTest extends MockMvcBaseAcceptTest {
                 .when()
                 .post("/api/v1/wishlist")
                 .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
 
         // 위시리스트 조회
         request()
@@ -251,6 +251,6 @@ class WishlistTest extends MockMvcBaseAcceptTest {
                 .when()
                 .delete("/api/v1/wishlist/{wishlistId}", 1L)
                 .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 }
