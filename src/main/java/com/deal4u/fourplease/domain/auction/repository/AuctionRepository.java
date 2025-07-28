@@ -148,21 +148,21 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @Query("""
                 SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyAuctionBase (
-                    a.auctionId,
-                    a.duration.startTime,
-                    a.duration.endTime,
-                    a.instantBidPrice,
-                    a.status,
-                    p.name,
-                    p.thumbnailUrl,
-                    p.category,
-                    successfulBid.bidId,
-                    successfulBidMember.nickName,
-                    successfulBid.price,
-                    bidCountInfo.totalBidCount,
-                    maxBid.highestPrice,
-                    s.paymentDeadline,
-                    a.createdAt
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null 
                 )
                 FROM Auction a
                 JOIN a.product p

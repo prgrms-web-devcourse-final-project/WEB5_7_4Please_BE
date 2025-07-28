@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.auction.service.AuctionStatusService;
 import com.deal4u.fourplease.domain.shipment.dto.TrackingNumberRequest;
 import com.deal4u.fourplease.domain.shipment.entity.Shipment;
 import com.deal4u.fourplease.domain.shipment.entity.ShipmentStatus;
@@ -33,6 +34,9 @@ class ShipmentServiceTest {
 
     @Mock
     private AuctionRepository auctionRepository;
+
+    @Mock
+    private AuctionStatusService auctionStatusService;
 
     @InjectMocks
     private ShipmentService shipmentService;

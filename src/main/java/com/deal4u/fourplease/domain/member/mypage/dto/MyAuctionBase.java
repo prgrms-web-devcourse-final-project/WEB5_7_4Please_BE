@@ -5,6 +5,7 @@ import com.deal4u.fourplease.domain.auction.entity.Category;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+
 public record MyAuctionBase(
 
         // Auction
@@ -33,5 +34,4 @@ public record MyAuctionBase(
         LocalDateTime createdAt
 
 ) {
-
 }

@@ -104,21 +104,21 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     @Query("""
                 SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyBidBase(
-                    a.auctionId,
-                    a.startingPrice,
-                    a.instantBidPrice,
-                    a.status,
-                    p.seller,
-                    p.name,
-                    p.thumbnailUrl,
-                    b.bidId,
-                    b.price,
-                    b.bidTime,
-                    b.isSuccessfulBidder,
-                    s.status,
-                    s.paymentDeadline,
-                    sh.status,
-                    maxBid.highestBid
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null ,
+                    null 
                 )
                 FROM Bid b
                 JOIN b.auction a

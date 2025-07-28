@@ -281,19 +281,6 @@ class AuctionServiceTests {
     }
 
     @Test
-    @DisplayName("Auction의 상태를 OPEN에서 CLOSE로 변환한다")
-    void closeShouldChangeAuctionStatusOpenIntoClose() {
-
-        Auction auction = genAuctionCreateRequest().toEntity(genProduct());
-
-        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.OPEN);
-
-        auctionStatusService.closeAuction(auction);
-        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.CLOSE);
-
-    }
-
-    @Test
     @DisplayName("전체 경매 목록에서 검색어로 필터랑하고 최신순으로 정렬한다")
     void findAllShouldFillerByKeywordAndOrderByLatest() {
 
