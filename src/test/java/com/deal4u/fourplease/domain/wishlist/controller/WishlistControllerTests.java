@@ -1,6 +1,5 @@
 package com.deal4u.fourplease.domain.wishlist.controller;
 
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genWishlistResponsePageResponse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -115,16 +114,16 @@ class WishlistControllerTests extends BaseTokenTest {
 
 
     @Test
-    @DisplayName("DELETE /api/v1/wishlist/{wishlistId}가 성공하면 wishlist를 삭제하고 204를 반환한다")
+    @DisplayName("DELETE /api/v1/wishlist/{auctionId}가 성공하면 wishlist를 삭제하고 204를 반환한다")
     void deleteWishlistShouldReturn204() throws Exception {
 
-        Long wishlistId = 1L;
+        Long auctionId = 1L;
 
         mockMvc.perform(
-                        delete("/api/v1/wishlist/{wishlistId}", wishlistId)
+                        delete("/api/v1/wishlist/{auctionId}", auctionId)
                 ).andExpect(status().isNoContent())
                 .andDo(print());
 
-        verify(wishlistService).deleteByWishlistId(eq(wishlistId), any(Member.class));
+        verify(wishlistService).deleteByWishlistId(eq(auctionId), any(Member.class));
     }
 }
