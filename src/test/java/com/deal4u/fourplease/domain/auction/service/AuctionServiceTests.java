@@ -425,7 +425,7 @@ class AuctionServiceTests {
         when(reviewRepository.countBySellerMemberId(sellerId)).thenReturn(totalReviews);
         when(reviewRepository.getAverageRatingBySellerMemberId(sellerId)).thenReturn(
                 averageRating);
-        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSED))
+        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE))
                 .thenReturn(completedDeals);
 
         // When
