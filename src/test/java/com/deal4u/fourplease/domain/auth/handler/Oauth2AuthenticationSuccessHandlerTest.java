@@ -55,7 +55,6 @@ class Oauth2AuthenticationSuccessHandlerTest {
 
         when(authentication.getPrincipal()).thenReturn(customOauth2User);
         when(customOauth2User.getMember()).thenReturn(member);
-        when(response.getWriter()).thenReturn(new PrintWriter(outputStream, true));
     }
 
     @Test
@@ -63,6 +62,7 @@ class Oauth2AuthenticationSuccessHandlerTest {
     void onAuthenticationSuccessPendingStatusReturnsTempTokenAndRedirectToSignup()
             throws Exception {
         // given
+        when(response.getWriter()).thenReturn(new PrintWriter(outputStream, true));
         String tempToken = "temp.jwt.token";
         when(member.getStatus()).thenReturn(Status.PENDING);
         when(jwtProvider.generateTokenPair(member)).thenReturn(
@@ -73,10 +73,9 @@ class Oauth2AuthenticationSuccessHandlerTest {
         successHandler.onAuthenticationSuccess(request, response, authentication);
 
         // then
-        verify(response).setHeader("Authorization", "Bearer " + tempToken);
-        verify(response).setHeader("X-Redirect-Url", "/signup");
-        verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertThat(outputStream.toString()).contains("{\"status\":\"ok\"}");
+        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        String expectedRedirectJson = String.format("{\"token\":\"%s\"}", tempToken);
+        assertThat(outputStream.toString()).contains(expectedRedirectJson);
     }
 
     @Test
@@ -96,8 +95,7 @@ class Oauth2AuthenticationSuccessHandlerTest {
         // then
         verify(response).setHeader("Authorization", "Bearer " + accessToken);
         verify(response).addHeader(eq("Set-Cookie"), contains("refreshToken=")); // 쿠키 확인
-        verify(response).setHeader("X-Redirect-Url", "/");
         verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertThat(outputStream.toString()).contains("{\"status\":\"ok\"}");
+        assertThat(outputStream.toString()).isBlank();
     }
 }

@@ -23,7 +23,6 @@ import com.deal4u.fourplease.domain.order.entity.OrderStatus;
 import com.deal4u.fourplease.domain.order.entity.Orderer;
 import com.deal4u.fourplease.domain.order.repository.OrderRepository;
 import com.deal4u.fourplease.domain.payment.entity.Payment;
-import com.deal4u.fourplease.domain.payment.entity.PaymentStatus;
 import com.deal4u.fourplease.domain.payment.repository.PaymentRepository;
 import com.deal4u.fourplease.domain.review.dto.ReviewRequest;
 import com.deal4u.fourplease.domain.review.dto.ReviewResponse;
@@ -116,14 +115,12 @@ class ReviewServiceTests {
                 .orderId(OrderId.generate())
                 .auction(auction)
                 .orderer(Orderer.createOrderer(buyer))
-                .status(OrderStatus.SUCCESS)
                 .price(new BigDecimal("300000"))
                 .build();
 
         this.payment = Payment.builder()
                 .paymentId(1L)
                 .amount(order.getPrice())
-                .status(PaymentStatus.SUCCESS)
                 .orderId(order.getOrderId())
                 .build();
 
@@ -141,7 +138,7 @@ class ReviewServiceTests {
         when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(
                 auction.getAuctionId())).thenReturn(Optional.of(auction));
         when(memberRepository.findById(buyerId)).thenReturn(Optional.of(buyer));
-        when(orderRepository.findByOrdererAndAuctionAndStatus(any(Orderer.class),
+        when(orderRepository.findByOrdererAndAuctionAndOrderStatus(any(Orderer.class),
                 any(Auction.class), any(OrderStatus.class))).thenReturn(Optional.of(order));
         when(paymentRepository.findByOrderId(order.getOrderId())).thenReturn(Optional.of(payment));
         when(reviewRepository.findByAuctionAndReviewer(any(Auction.class),
@@ -198,7 +195,7 @@ class ReviewServiceTests {
         when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(
                 auction.getAuctionId())).thenReturn(Optional.of(auction));
         when(memberRepository.findById(buyerId)).thenReturn(Optional.of(buyer));
-        when(orderRepository.findByOrdererAndAuctionAndStatus(any(Orderer.class),
+        when(orderRepository.findByOrdererAndAuctionAndOrderStatus(any(Orderer.class),
                 any(Auction.class), any(OrderStatus.class))).thenReturn(Optional.empty());
 
         // When & Then
@@ -217,7 +214,7 @@ class ReviewServiceTests {
         when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(
                 auction.getAuctionId())).thenReturn(Optional.of(auction));
         when(memberRepository.findById(buyerId)).thenReturn(Optional.of(buyer));
-        when(orderRepository.findByOrdererAndAuctionAndStatus(any(Orderer.class),
+        when(orderRepository.findByOrdererAndAuctionAndOrderStatus(any(Orderer.class),
                 any(Auction.class), any(OrderStatus.class))).thenReturn(Optional.of(order));
         when(paymentRepository.findByOrderId(order.getOrderId())).thenReturn(Optional.empty());
 
@@ -239,7 +236,7 @@ class ReviewServiceTests {
         when(auctionRepository.findByAuctionIdAndDeletedFalseAndStatusClosed(
                 auction.getAuctionId())).thenReturn(Optional.of(auction));
         when(memberRepository.findById(buyerId)).thenReturn(Optional.of(buyer));
-        when(orderRepository.findByOrdererAndAuctionAndStatus(any(Orderer.class),
+        when(orderRepository.findByOrdererAndAuctionAndOrderStatus(any(Orderer.class),
                 any(Auction.class), any(OrderStatus.class))).thenReturn(Optional.of(order));
         when(paymentRepository.findByOrderId(order.getOrderId())).thenReturn(Optional.of(payment));
         when(reviewRepository.findByAuctionAndReviewer(any(Auction.class),

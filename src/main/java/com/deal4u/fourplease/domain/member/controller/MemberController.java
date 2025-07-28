@@ -42,7 +42,6 @@ public class MemberController {
         return memberService.signup(token, request);
     }
 
-
     @PatchMapping("/members")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원 정보 수정 성공"),

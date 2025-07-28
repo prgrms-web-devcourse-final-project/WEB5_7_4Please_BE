@@ -53,16 +53,16 @@ public class ReviewController {
     @ApiResponse(responseCode = "200", description = "판매자 리뷰 목록 조회 성공")
     @ApiResponse(responseCode = "400", description = "허용되지 않은 정렬 기준")
     @ApiResponse(responseCode = "404", description = "판매자를 찾을 수 없음")
-    @GetMapping("/reviews")
+    @GetMapping("/reviews/{memberId}")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<ReviewResponse> getReviews(
-            @AuthenticationPrincipal Member member,
+            @PathVariable Long memberId,
             @Valid @ModelAttribute @ParameterObject ReviewListRequest request) {
 
         // 1. Pageable 검증 및 변환
         Pageable pageable = request.toPageable();
 
         // 2. 리뷰 내역 조회 호출
-        return reviewService.getReviewListFor(member.getMemberId(), pageable);
+        return reviewService.getReviewListFor(memberId, pageable);
     }
 }

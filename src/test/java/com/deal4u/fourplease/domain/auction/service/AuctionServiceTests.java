@@ -1,10 +1,11 @@
 package com.deal4u.fourplease.domain.auction.service;
 
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionCreateRequest;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionList;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProduct;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genProductList;
+import static com.deal4u.fourplease.testutil.TestUtils.genAuctionCreateRequest;
+import static com.deal4u.fourplease.testutil.TestUtils.genAuctionList;
+import static com.deal4u.fourplease.testutil.TestUtils.genMember;
+import static com.deal4u.fourplease.testutil.TestUtils.genMemberById;
+import static com.deal4u.fourplease.testutil.TestUtils.genProduct;
+import static com.deal4u.fourplease.testutil.TestUtils.genProductList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -220,7 +221,7 @@ class AuctionServiceTests {
 
 
         assertThatThrownBy(() -> {
-            auctionService.deleteByAuctionId(auctionId, genMember());
+            auctionService.deleteByAuctionId(auctionId, genMemberById(2L));
         }).isInstanceOf(GlobalException.class).hasMessage("권한이 없습니다.");
 
     }

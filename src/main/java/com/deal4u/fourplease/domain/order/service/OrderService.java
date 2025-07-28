@@ -8,6 +8,7 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.INVALID_ORDER_TYP
 import static com.deal4u.fourplease.global.exception.ErrorCode.ORDER_NOT_FOUND;
 import static com.deal4u.fourplease.global.exception.ErrorCode.USER_NOT_FOUND;
 
+import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
@@ -59,14 +60,14 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderResponse getOrder(Long orderId) {
+    public OrderResponse getOrder(String orderId) {
         Order order = getOrderOrThrow(orderId);
         return OrderMapper.toOrderResponse(order);
     }
 
     @Transactional
-    public void updateOrder(Long orderId, OrderUpdateRequest orderUpdateRequest) {
-        Order order = getOrderOrThrow(orderId);
+    public void updateOrder(String orderId, OrderUpdateRequest orderUpdateRequest) {
+        Order order = getOrderByOrderIdOrThrow(orderId);
         order.updateOrder(orderUpdateRequest);
     }
 
@@ -107,7 +108,8 @@ public class OrderService {
     private Order createOrder(Auction auction, Orderer orderer, OrderId orderId,
             BigDecimal orderPrice, OrderType orderType) {
         return Order.builder().orderId(orderId).auction(auction).orderer(orderer).price(orderPrice)
-                .orderStatus(OrderStatus.PENDING).orderType(orderType).build();
+                .orderStatus(OrderStatus.PENDING).orderType(orderType).address(Address.empty())
+                .build();
     }
 
     private Auction getAuctionForOrder(Long auctionId, OrderType orderTypeEnum) {
@@ -138,8 +140,13 @@ public class OrderService {
         return memberRepository.findById(memberId).orElseThrow(USER_NOT_FOUND::toException);
     }
 
-    private Order getOrderOrThrow(Long orderId) {
-        return orderRepository.findByIdWithAuctionAndProduct(orderId)
+    private Order getOrderOrThrow(String orderId) {
+        return orderRepository.findByOrderIdWithAuctionAndProduct(orderId)
+                .orElseThrow(ORDER_NOT_FOUND::toException);
+    }
+
+    private Order getOrderByOrderIdOrThrow(String orderId) {
+        return orderRepository.findByOrderId(orderId)
                 .orElseThrow(ORDER_NOT_FOUND::toException);
     }
 }

@@ -355,6 +355,7 @@ class OrderServiceTest {
         }
     }
 
+
     @Nested
     class GetOrderTests {
 
@@ -362,7 +363,8 @@ class OrderServiceTest {
         @DisplayName("주문 조회가 정상적으로 수행되는 경우")
         void testGetOrderSuccessful() {
             // Given
-            Long orderId = 1L;
+            String orderId = "test-order-uuid-123";
+            OrderId orderIdObj = OrderId.generate();
 
             Auction auctionWithProduct = Auction.builder()
                     .auctionId(1L)
@@ -370,15 +372,15 @@ class OrderServiceTest {
                     .build();
 
             Order orderWithProduct = Order.builder()
-                    .id(orderId)
-                    .orderId(OrderId.generate())
+                    .id(1L) // DB ID는 여전히 Long
+                    .orderId(orderIdObj) // UUID 기반 OrderId 객체
                     .price(new BigDecimal("100.0"))
                     .auction(auctionWithProduct)
                     .address(address)
                     .orderer(orderer)
                     .build();
 
-            when(orderRepository.findByIdWithAuctionAndProduct(orderId))
+            when(orderRepository.findByOrderIdWithAuctionAndProduct(orderId))
                     .thenReturn(Optional.of(orderWithProduct));
 
             // When
@@ -392,16 +394,16 @@ class OrderServiceTest {
             assertThat(result.imageUrl()).isEqualTo(
                     orderWithProduct.getAuction().getProduct().getThumbnailUrl());
 
-            verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
+            verify(orderRepository, times(1)).findByOrderIdWithAuctionAndProduct(orderId);
         }
 
         @Test
         @DisplayName("존재하지 않는 주문을 조회하는 경우 예외 발생")
         void testGetOrderOrderNotFound() {
             // Given
-            Long orderId = 999L;
+            String orderId = "non-existent-order-uuid";
 
-            when(orderRepository.findByIdWithAuctionAndProduct(orderId))
+            when(orderRepository.findByOrderIdWithAuctionAndProduct(orderId))
                     .thenReturn(Optional.empty());
 
             // When, Then
@@ -420,7 +422,7 @@ class OrderServiceTest {
         @DisplayName("주문 업데이트가 정상적으로 수행되는 경우")
         void testUpdateOrderSuccessful() {
             // Given
-            Long orderId = 1L;
+            String orderId = "generated-order-uuid-string";
 
             Address originalAddress = new Address(
                     "초가집",
@@ -429,7 +431,7 @@ class OrderServiceTest {
             );
 
             Order orderToUpdate = Order.builder()
-                    .id(orderId)
+                    .id(1L)
                     .orderId(OrderId.generate())
                     .price(new BigDecimal("100.0"))
                     .auction(openAuction)
@@ -440,7 +442,7 @@ class OrderServiceTest {
                     .orderer(orderer)
                     .build();
 
-            when(orderRepository.findByIdWithAuctionAndProduct(orderId))
+            when(orderRepository.findByOrderId(orderId))
                     .thenReturn(Optional.of(orderToUpdate));
 
             // When
@@ -454,16 +456,16 @@ class OrderServiceTest {
             assertThat(orderToUpdate.getContent()).isEqualTo("새로운 요청사항");
             assertThat(orderToUpdate.getReceiver()).isEqualTo("박유한");
 
-            verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
+            verify(orderRepository, times(1)).findByOrderId(orderId); // 메서드명 변경
         }
 
         @Test
         @DisplayName("존재하지 않는 주문을 업데이트하려는 경우 예외 발생")
         void testUpdateOrderOrderNotFound() {
             // Given
-            Long orderId = 999L;
+            String orderId = "non-existent-order-uuid";
 
-            when(orderRepository.findByIdWithAuctionAndProduct(orderId))
+            when(orderRepository.findByOrderId(orderId))
                     .thenReturn(Optional.empty());
 
             // When, Then
@@ -473,7 +475,7 @@ class OrderServiceTest {
                     .extracting("status")
                     .isEqualTo(HttpStatus.NOT_FOUND);
 
-            verify(orderRepository, times(1)).findByIdWithAuctionAndProduct(orderId);
+            verify(orderRepository, times(1)).findByOrderId(orderId); // 메서드명 변경
         }
     }
 }
