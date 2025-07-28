@@ -4,9 +4,11 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.ORDER_NOT_FOUND;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
+import com.deal4u.fourplease.domain.auction.service.AuctionStatusService;
 import com.deal4u.fourplease.domain.order.entity.Order;
 import com.deal4u.fourplease.domain.order.entity.OrderId;
 import com.deal4u.fourplease.domain.order.repository.OrderRepository;
+import com.deal4u.fourplease.domain.order.service.OrderStatusService;
 import com.deal4u.fourplease.domain.payment.dto.TossPaymentConfirmRequest;
 import com.deal4u.fourplease.domain.payment.dto.TossPaymentConfirmResponse;
 import com.deal4u.fourplease.domain.payment.entity.Payment;
@@ -21,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 class PaymentTransactionService {
 
+    private final AuctionStatusService auctionStatusService;
+    private final PaymentStatusService paymentStatusService;
+    private final OrderStatusService orderStatusService;
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final SettlementService settlementService;
@@ -38,13 +43,14 @@ class PaymentTransactionService {
             Auction auction
     ) {
         Payment payment = PaymentMapper.toPayment(order, req, resp);
+        auctionStatusService.markAuctionAsPending(auction);
         return paymentRepository.save(payment);
     }
 
     @Transactional
     public void updatePaymentStatusToFailed(Payment payment, Order order) {
-        payment.statusFailed();
-        order.failed();
+        paymentStatusService.markPaymentAsFailed(payment);
+        orderStatusService.markOrderAsFailed(order);
         settlementService.changeSettlementFailure(order.getAuction());
     }
 
@@ -56,7 +62,7 @@ class PaymentTransactionService {
         if (order.isAward()) {
             settlementService.changeSettlementSuccess(auction);
         }
-        order.success();
-        payment.statusSuccess();
+        orderStatusService.markOrderAsSuccess(order);
+        paymentStatusService.markPaymentAsSuccess(payment);
     }
 }

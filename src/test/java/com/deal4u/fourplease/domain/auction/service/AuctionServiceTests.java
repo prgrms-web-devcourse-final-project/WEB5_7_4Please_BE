@@ -83,6 +83,9 @@ class AuctionServiceTests {
     @Mock
     private AuctionScheduleService auctionScheduleService;
 
+    @Mock
+    private AuctionStatusService auctionStatusService;
+
     @Test
     @DisplayName("경매를 등록할 수 있다")
     void saveShouldSaveAuction() {

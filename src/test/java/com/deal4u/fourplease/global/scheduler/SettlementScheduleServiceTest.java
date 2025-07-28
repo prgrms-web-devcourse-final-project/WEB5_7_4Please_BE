@@ -14,6 +14,7 @@ import com.deal4u.fourplease.domain.auction.entity.AuctionDuration;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.auction.service.AuctionStatusService;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
@@ -50,6 +51,9 @@ class SettlementScheduleServiceTest {
 
     @Mock
     private HighestBidderNotifier highestBidderNotifier;
+
+    @Mock
+    private AuctionStatusService auctionStatusService;
 
     @Mock
     private SettlementScheduleService settlementScheduleService;

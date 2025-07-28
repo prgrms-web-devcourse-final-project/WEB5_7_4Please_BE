@@ -148,7 +148,7 @@ class ReviewServiceTests {
                 auction.getAuctionId(),
                 5,
                 "사장님이 맛있고, 음식이 친절해요.");
-      
+
         // When
         reviewService.createReview(request, buyerId);
 

@@ -4,12 +4,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.service.AuctionStatusService;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
@@ -28,6 +30,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
@@ -46,6 +49,12 @@ class SettlementServiceTest {
     @Mock
     private SecondBidderNotifier secondBidderNotifier;
 
+    @Mock
+    private SettlementStatusService settlementStatusService;
+
+    @Mock
+    private AuctionStatusService auctionStatusService;
+
     @InjectMocks
     private SettlementService settlementService;
 
@@ -61,6 +70,17 @@ class SettlementServiceTest {
                 SettlementStatus.PENDING))
                 .willReturn(Optional.of(settlement));
 
+        Mockito.doAnswer(input -> {
+                    Settlement inputSettelment = input.getArgument(0);
+                    inputSettelment.updateStatus(SettlementStatus.SUCCESS, LocalDateTime.now(), null);
+                    return null;
+                }).when(settlementStatusService)
+                .markSettlementAsSuccess(settlement);
+        Mockito.doAnswer(input -> {
+            Auction argument = input.getArgument(0);
+            argument.markAsSuccess();
+            return null;
+        }).when(auctionStatusService).markAuctionAsSuccess(auction);
         // when
         settlementService.changeSettlementSuccess(auction);
 
@@ -190,6 +210,18 @@ class SettlementServiceTest {
 
         given(settlementRepository.findById(settlementId))
                 .willReturn(Optional.of(settlement));
+        Mockito.doAnswer(input -> {
+                    Settlement inputSettelment = input.getArgument(0);
+                    String rejectedReason = input.getArgument(1);
+                    inputSettelment.updateStatus(SettlementStatus.REJECTED, null, rejectedReason);
+                    return null;
+                }).when(settlementStatusService)
+                .markSettlementAsRejected(eq(settlement), anyString());
+        Mockito.doAnswer(input -> {
+            Auction argument = input.getArgument(0);
+            argument.fail();
+            return null;
+        }).when(auctionStatusService).failAuction(auction);
 
         // when
         settlementService.handleFailedSettlement(settlementId);
@@ -200,7 +232,7 @@ class SettlementServiceTest {
         assertAll(
                 () -> assertThat(settlement.getStatus()).isEqualTo(SettlementStatus.REJECTED),
                 () -> assertThat(settlement.getRejectedReason()).isEqualTo(
-                        "차상위 입찰자가 결제 기한 내에 결제를 완료하지 않았습니다.")
+                        "결제 기한 내에 결제를 완료하지 않았습니다.")
         );
     }
 
