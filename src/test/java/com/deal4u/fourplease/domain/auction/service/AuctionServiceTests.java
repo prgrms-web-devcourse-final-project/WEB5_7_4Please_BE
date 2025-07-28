@@ -9,8 +9,6 @@ import static com.deal4u.fourplease.testutil.TestUtils.genProductList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,12 +32,13 @@ import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.review.repository.ReviewRepository;
+import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
+import com.deal4u.fourplease.domain.wishlist.repository.WishlistRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -76,6 +75,9 @@ class AuctionServiceTests {
 
     @Mock
     private ReviewRepository reviewRepository;
+
+    @Mock
+    private WishlistRepository wishlistRepository;
 
     @Mock
     private BidService bidService;
@@ -146,7 +148,7 @@ class AuctionServiceTests {
         when(productImageService.getByProduct(product)).thenReturn(productImageListResponse);
         when(productImageListResponse.toProductImageUrls()).thenReturn(productImageUrls);
 
-        AuctionDetailResponse actualResp = auctionService.getByAuctionId(auctionId);
+        AuctionDetailResponse actualResp = auctionService.getByAuctionId(auctionId, null);
 
         assertThat(actualResp.highestBidPrice()).isEqualTo(bidSummaryDto.maxPrice());
         assertThat(actualResp.instantBidPrice()).isEqualTo(auction.getInstantBidPrice());
@@ -170,7 +172,7 @@ class AuctionServiceTests {
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> {
-            auctionService.getByAuctionId(auctionId);
+            auctionService.getByAuctionId(auctionId, null);
         }).isInstanceOf(GlobalException.class).hasMessage("해당 경매를 찾을 수 없습니다.");
 
     }
@@ -555,5 +557,76 @@ class AuctionServiceTests {
                 .hasMessage("해당 경매를 찾을 수 없습니다.")
                 .extracting("status")
                 .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("로그인한 사용자가 찜한 경매 상품 상세 조회 시 isWishList는 true를 반환한다")
+    void getByAuctionIdWithLoggedInMemberShouldReturnIsWishListTrue() {
+        // Given
+        Long auctionId = 1L;
+        Member member = genMember(); // 로그인한 사용자
+        Product product = genProduct();
+        Auction auction = genAuctionCreateRequest().toEntity(product);
+
+        Wishlist wishlist = Wishlist.builder()
+                .wishlistId(10L)
+                .memberId(member.getMemberId())
+                .auction(auction)
+                .build();
+
+        BidSummaryDto bidSummaryDto = new BidSummaryDto(
+                BigDecimal.valueOf(2000000L),
+                3
+        );
+        List<String> productImageUrls = List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg");
+
+        ProductImageListResponse productImageListResponse = mock(ProductImageListResponse.class);
+
+        when(bidService.getBidSummaryDto(auctionId)).thenReturn(bidSummaryDto);
+        when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
+
+        when(productImageService.getByProduct(product)).thenReturn(productImageListResponse);
+        when(productImageListResponse.toProductImageUrls()).thenReturn(productImageUrls);
+
+        when(wishlistRepository.findWishlist(auction, member.getMemberId())).thenReturn(Optional.of(wishlist));
+
+        // When
+        AuctionDetailResponse actualResp = auctionService.getByAuctionId(auctionId, member);
+
+        // Then
+        assertThat(actualResp.isWishList()).isTrue();
+        assertThat(actualResp.productName()).isEqualTo(product.getName());
+        assertThat(actualResp.highestBidPrice()).isEqualTo(bidSummaryDto.maxPrice());
+        assertThat(actualResp.imageUrls()).isEqualTo(productImageUrls);
+    }
+
+    @Test
+    @DisplayName("로그인하지 않은 사용자가 경매 상품 상세 조회 시 isWishList는 false를 반환한다")
+    void getByAuctionIdWithNoMemberShouldReturnIsWishListFalse() {
+        // Given
+        Long auctionId = 1L;
+        Product product = genProduct();
+        Auction auction = genAuctionCreateRequest().toEntity(product);
+
+        BidSummaryDto bidSummaryDto = new BidSummaryDto(
+                BigDecimal.valueOf(2000000L),
+                3
+        );
+        List<String> productImageUrls = List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg");
+        ProductImageListResponse productImageListResponse = mock(ProductImageListResponse.class);
+
+        // Mocking 설정
+        when(bidService.getBidSummaryDto(auctionId)).thenReturn(bidSummaryDto);
+        when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
+        when(productImageService.getByProduct(product)).thenReturn(productImageListResponse);
+        when(productImageListResponse.toProductImageUrls()).thenReturn(productImageUrls);
+
+        // When
+        // member 파라미터에 null을 전달하여 비로그인 상태를 시뮬레이션
+        AuctionDetailResponse actualResp = auctionService.getByAuctionId(auctionId, null);
+
+        // Then
+        assertThat(actualResp.isWishList()).isFalse(); // isWishList가 false인지 확인
+        assertThat(actualResp.productName()).isEqualTo(product.getName());
     }
 }

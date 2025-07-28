@@ -101,13 +101,14 @@ class AuctionControllerTests extends BaseTokenTest {
         Long auctionId = 1L;
         AuctionDetailResponse resp = genAuctionDetailResponse();
 
-        when(auctionService.getByAuctionId(auctionId)).thenReturn(resp);
+        when(auctionService.getByAuctionId(eq(auctionId), any(Member.class))).thenReturn(resp);
 
         mockMvc.perform(
                         get("/api/v1/auctions/{auctionId}/description", auctionId)
                 ).andExpect(status().isOk())
                 .andExpect(jsonPath("$.productName").value(resp.productName()))
                 .andExpect(jsonPath("$.description").value(resp.description()))
+                .andExpect(jsonPath("$.isWishList").value(resp.isWishList()))
                 .andDo(print());
 
     }
