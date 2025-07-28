@@ -12,6 +12,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,13 +36,17 @@ public class SaveAuctionImageService {
         this.hostUrl = hostUrl;
     }
 
-    public AuctionImageUrlResponse upload(Member member, MultipartFile file) {
-        ImageType imageType = ImageType.findTypeByStr(file.getOriginalFilename()).orElseThrow(
-                ErrorCode.INVALID_IMAGE_TYPE::toException);
-        SavePath savePath = auctionSaveDataFactory.create(member.getNickName(), imageType);
-        URL url = fileSaver.save(savePath, file);
+    public AuctionImageUrlResponse upload(Member member, List<MultipartFile> files) {
+        List<String> urls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            ImageType imageType = ImageType.findTypeByStr(file.getOriginalFilename()).orElseThrow(
+                    ErrorCode.INVALID_IMAGE_TYPE::toException);
+            SavePath savePath = auctionSaveDataFactory.create(member.getNickName(), imageType);
+            URL url = fileSaver.save(savePath, file);
+            urls.add(changeHostUrl(url).toString());
+        }
 
-        return AutionImageUrlMapper.toImageUrlResponse(changeHostUrl(url));
+        return AutionImageUrlMapper.toImageUrlResponse(urls);
     }
 
     private URL changeHostUrl(URL url) {

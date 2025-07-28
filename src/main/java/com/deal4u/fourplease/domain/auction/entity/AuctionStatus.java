@@ -8,5 +8,5 @@ public enum AuctionStatus {
     REJECTED,        // 차상위 대기
     INTRANSIT,       // 배송 중
     DELIVERED,       // 구매 확정
-    CLOSE,           // 경매 종료
+    CLOSE           // 경매 종료
 }

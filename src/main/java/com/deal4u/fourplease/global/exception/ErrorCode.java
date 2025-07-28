@@ -73,6 +73,7 @@ public enum ErrorCode {
     PAYMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 처리된 결제입니다"),
     SETTLEMENT_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 차상위 입찰자에 대한 정산이 존재합니다."),
     AUCTION_SCHEDULE_ALREADY_EXISTS(HttpStatus.CONFLICT, "해당 경매의 마감 스케쥴이 이미 등록되어 있습니다."),
+    AUCTION_CAN_NOT_DELETE(HttpStatus.CONFLICT, "낙찰된 경매는 삭제할 수 없습니다."),
 
     // 422 - Unprocessable Entity,
     NICKNAME_ALREADY_EXISTS(HttpStatus.UNPROCESSABLE_ENTITY, "이미 존재하는 닉네임입니다."),

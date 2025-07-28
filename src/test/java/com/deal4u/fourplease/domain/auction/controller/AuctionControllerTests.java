@@ -3,11 +3,11 @@ package com.deal4u.fourplease.domain.auction.controller;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionCreateRequest;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionDetailResponse;
 import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuctionListResponsePageResponse;
-import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -64,9 +64,11 @@ class AuctionControllerTests extends BaseTokenTest {
     @MockitoBean
     private SaveAuctionImageService saveAuctionImageService;
 
+    private Member member;
+
     @BeforeEach
     void setUp() {
-        Member member = Member.builder()
+        member = Member.builder()
                 .memberId(1L)
                 .email("test@nave.com")
                 .role(Role.USER)
@@ -134,11 +136,8 @@ class AuctionControllerTests extends BaseTokenTest {
                 new byte[]{1, 2, 3, 4}
         );
 
-        Member member = Mockito.mock(Member.class);
-        when(member.getNickName()).thenReturn("test");
-        when(memberRepository.findAll()).thenReturn(List.of(member));
-        when(saveAuctionImageService.upload(member, file)).thenReturn(
-                new AuctionImageUrlResponse("test.com")
+        when(saveAuctionImageService.upload(member, List.of(file))).thenReturn(
+                new AuctionImageUrlResponse(List.of("test.com"))
         );
 
         mockMvc.perform(multipart("/api/v1/auctions/images").file(file)
@@ -156,10 +155,7 @@ class AuctionControllerTests extends BaseTokenTest {
                 new byte[]{1, 2, 3, 4}
         );
 
-        Member member = Mockito.mock(Member.class);
-        when(member.getNickName()).thenReturn("test");
-        when(memberRepository.findAll()).thenReturn(List.of(member));
-        when(saveAuctionImageService.upload(member, file)).thenThrow(
+        when(saveAuctionImageService.upload(member, List.of(file))).thenThrow(
                 ErrorCode.INVALID_IMAGE_TYPE.toException()
         );
 
@@ -178,10 +174,7 @@ class AuctionControllerTests extends BaseTokenTest {
                 new byte[]{1, 2, 3, 4}
         );
 
-        Member member = Mockito.mock(Member.class);
-        when(member.getNickName()).thenReturn("test");
-        when(memberRepository.findAll()).thenReturn(List.of(member));
-        when(saveAuctionImageService.upload(member, file)).thenThrow(
+        when(saveAuctionImageService.upload(member, List.of(file))).thenThrow(
                 ErrorCode.INVALID_FILE.toException()
         );
 
@@ -204,10 +197,11 @@ class AuctionControllerTests extends BaseTokenTest {
 
         PageResponse<AuctionListResponse> resp = genAuctionListResponsePageResponse();
 
-        when(auctionService.findAll(req)).thenReturn(resp);
+        when(auctionService.findAll(eq(req), any(Member.class))).thenReturn(resp);
 
         mockMvc.perform(
                         get("/api/v1/auctions")
+                                .with(user("user").roles("USER")) // 인증 정보 주입
                                 .param("page", "0")
                                 .param("size", "20")
                                 .param("keyword", req.keyword())
@@ -225,6 +219,5 @@ class AuctionControllerTests extends BaseTokenTest {
                 .andExpect(jsonPath("$.page").value(resp.getPage()))
                 .andExpect(jsonPath("$.size").value(resp.getSize()))
                 .andDo(print());
-
     }
 }

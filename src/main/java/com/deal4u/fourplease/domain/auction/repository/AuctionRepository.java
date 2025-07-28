@@ -42,20 +42,17 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "FROM Auction a "
             + "WHERE a.auctionId = :auctionId "
             + "AND a.deleted = false "
-            + "AND a.status = 'CLOSED'")
+            + "AND a.status = 'CLOSE'")
     Optional<Auction> findByAuctionIdAndDeletedFalseAndStatusClosed(
             @Param("auctionId") Long auctionId);
 
     @Query("SELECT a "
             + "FROM Auction a "
-            + "JOIN FETCH a.product p "
             + "WHERE a.deleted = false "
-            + "AND p.productId in :productIds "
+            + "AND a.product.seller.member.memberId = :sellerId "
             + "ORDER BY a.createdAt DESC")
-    Page<Auction> findAllByProductIdIn(
-            @Param("productIds") List<Long> productIds,
-            Pageable pageable
-    );
+    @EntityGraph(attributePaths = {"product"}) // 필요한 연관 엔티티 지연 로딩 없이 미리 로딩
+    Page<Auction> findAllBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 
     @Query("SELECT a "
             + "FROM Auction a "
