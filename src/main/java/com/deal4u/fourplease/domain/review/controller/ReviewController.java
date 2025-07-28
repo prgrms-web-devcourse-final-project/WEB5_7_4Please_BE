@@ -56,7 +56,7 @@ public class ReviewController {
     @GetMapping("/reviews")
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<ReviewResponse> getReviews(
-            @AuthenticationPrincipal Member member,
+            @PathVariable Long memberId,
             @Valid @ModelAttribute @ParameterObject ReviewListRequest request) {
 
         // 1. Pageable 검증 및 변환
