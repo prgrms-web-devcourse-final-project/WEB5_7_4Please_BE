@@ -101,7 +101,7 @@ class AuctionControllerTests extends BaseTokenTest {
         Long auctionId = 1L;
         AuctionDetailResponse resp = genAuctionDetailResponse();
 
-        when(auctionService.getByAuctionId(auctionId)).thenReturn(resp);
+        when(auctionService.getByAuctionId(auctionId, null)).thenReturn(resp);
 
         mockMvc.perform(
                         get("/api/v1/auctions/{auctionId}/description", auctionId)
