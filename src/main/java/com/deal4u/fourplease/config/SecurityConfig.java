@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,7 +42,30 @@ public class SecurityConfig {
     /**
      * SecurityFilterChain Bean 등록.
      */
+
     @Bean
+    @Order(1)
+    public SecurityFilterChain authFileChain(HttpSecurity http) throws Exception {
+        return http
+                .securityMatcher("/api/v1/auth/**",
+                        "/api/v1/my/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(
+                        auth ->
+                                auth.anyRequest().authenticated()
+                ).exceptionHandling(
+                        exceptions -> exceptions.authenticationEntryPoint(
+                                (request, response, authException) -> response.sendError(
+                                        HttpServletResponse.SC_UNAUTHORIZED))
+                ).addFilterBefore(
+                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
+                ).build();
+
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -59,8 +83,7 @@ public class SecurityConfig {
                                         .userService(customOauth2UserService)
                                 )
                                 .successHandler(oauth2AuthSuccessHandler)
-                )
-                .authorizeHttpRequests(auth -> auth
+                ).authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/oauth2/**",
                                 "/api/v1/login/**",
@@ -69,18 +92,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET).permitAll()
-                        .requestMatchers(
-                                "/api/v1/auth/**"
-                        ).authenticated()
                         .anyRequest().authenticated()
-                )
-                .exceptionHandling(
-                        exceptions -> exceptions.authenticationEntryPoint(
-                                (request, response, authException) -> response.sendError(
-                                        HttpServletResponse.SC_FORBIDDEN))
-                )
-                .addFilterBefore(
-                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
                 );
         return http.build();
     }
