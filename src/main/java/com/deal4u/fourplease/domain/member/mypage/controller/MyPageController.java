@@ -2,6 +2,7 @@ package com.deal4u.fourplease.domain.member.mypage.controller;
 
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.mypage.dto.MyPageAuctionHistory;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyPageBidHistory;
 import com.deal4u.fourplease.domain.member.mypage.service.MyPageAuctionHistoryService;
 import com.deal4u.fourplease.domain.member.mypage.service.MyPageBidHistoryService;
@@ -39,10 +40,10 @@ public class MyPageController {
         return myPageBidHistoryService.getMyBidHistory(member, pageable);
     }
 
-//    @GetMapping("/auctions")
-//    public PageResponse<MyPageAuctionHistory> getMyAuctionHistory(
-//            @AuthenticationPrincipal Member member,
-//            @PageableDefault Pageable pageable) {
-//        return myPageAuctionHistoryService.getMyAuctionHistory(member, pageable);
-//    }
+    @GetMapping("/auctions")
+    public PageResponse<MyPageAuctionHistory> getMyAuctionHistory(
+            @AuthenticationPrincipal Member member,
+            @PageableDefault Pageable pageable) {
+        return myPageAuctionHistoryService.getMyAuctionHistory(member, pageable);
+    }
 }

@@ -28,7 +28,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "AND b.bidder.member = :member "
             + "AND b.isSuccessfulBidder = true")
     Optional<Bid> findSuccessfulBid(@Param("auctionId") Long auctionId,
-                                    @Param("member") Member member);
+            @Param("member") Member member);
 
     Optional<Bid> findTopByAuctionAndBidderOrderByPriceDesc(Auction auction, Bidder bidder);
 
@@ -53,7 +53,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     @SuppressWarnings("checkstyle:MethodName")
     Page<Bid> findByAuctionAndDeletedFalseOrderByPriceDescBidTimeAsc(Auction auction,
-                                                                     Pageable pageable);
+            Pageable pageable);
 
     @Query("""
             SELECT b
@@ -97,42 +97,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             ORDER BY b.bidTime DESC
             """)
     Page<Tuple> findAllBidHistoryByMemberId(@Param("memberId") Long memberId,
-                                            Pageable pageable);
+            Pageable pageable);
 
-    // 한번도 안해본 방법이라 성능은 잘 모르겠어욤
-    //이런 느낌 어떠신가요? 저두욤 ㅎ
-    //아니네요 ㄱㅊ 할것 같아ㅛ 해보시죠 그 실행계획 한번 잡아주실 수 있나요?
-
-    /**
-     * SELECT
-     * MAX(b.bid_time) AS maxTime,
-     * b.auction_id
-     * FROM
-     * bid b
-     * JOIN
-     * member m ON b.bidder_member_id = m.member_id
-     * WHERE
-     * m.member_id = :memberId
-     * GROUP BY
-     * b.auction_id
-     * ORDER BY
-     * maxTime DESC;
-     * limit 10
-     */
-    //맞춰서 조금 수정해주세요
-    //유한님 보실때 어때 보이시나요?
-    //일단 만들어뒀습니다
-
-    // 이제 settlement랑 shipment는 어케 가져오나요?
-    // 저번에 유한님이 만든것 처럼 service에서 핸들링 할가요?
-    // 일단 찾아볼게요 ㅎㅎ 어딨지... ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ 만들고 리펙토링 하죠
-    /*
-    -> Limit: 10 row(s)  (actual time=90.5..90.5 rows=10 loops=1)
-    -> Sort: maxTime DESC, limit input to 10 row(s) per chunk  (actual time=90.5..90.5 rows=10 loops=1)
-        -> Table scan on <temporary>  (actual time=88.8..89.6 rows=10001 loops=1)
-            -> Aggregate using temporary table  (actual time=88.8..88.8 rows=10001 loops=1)
-                -> Index lookup on b using FK5af976l09i5v2jv9kgxp8te8x (bidder_member_id = 2)  (cost=15239 rows=106456) (actual time=7.36..80.4 rows=50001 loops=1)
-     */
     @Query("""
                 SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyBidBase(
                     a.auctionId,

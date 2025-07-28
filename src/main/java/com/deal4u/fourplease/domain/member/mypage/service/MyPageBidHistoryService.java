@@ -85,10 +85,8 @@ public class MyPageBidHistoryService {
                             highestBidMap.getOrDefault(auctionId, BigDecimal.ZERO);
                     SettlementInfo settlementInfo = settlementMap.get(auctionId);
 
-
                     String displayStatus =
                             determineDisplayStatus(auction, settlementInfo);
-
 
                     String paymentDeadline =
                             settlementInfo != null && settlementInfo.paymentDeadline() != null
@@ -108,9 +106,10 @@ public class MyPageBidHistoryService {
                             null,
                             bidTime,
                             paymentDeadline,
-                            auction.getProduct().getSeller() != null &&
-                                    auction.getProduct().getSeller().getMember() != null
-                                    ? auction.getProduct().getSeller().getMember().getNickName()
+                            auction.getProduct().getSeller()
+                                    != null && auction.getProduct().getSeller().getMember()
+                                    != null ? auction.getProduct().getSeller()
+                                    .getMember().getNickName()
                                     : "알 수 없음"
                     );
                 })
@@ -121,6 +120,7 @@ public class MyPageBidHistoryService {
         return PageResponse.fromPage(resultPage);
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     private String determineDisplayStatus(Auction auction, SettlementInfo settlementInfo) {
         AuctionStatus auctionStatus = auction.getStatus();
 
@@ -143,6 +143,7 @@ public class MyPageBidHistoryService {
         }
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     private String determineStatusBySettlement(SettlementInfo settlementInfo) {
         SettlementStatus settlementStatus = settlementInfo.settlementStatus();
 
@@ -161,6 +162,7 @@ public class MyPageBidHistoryService {
         }
     }
 
+    @SuppressWarnings("checkstyle:Indentation")
     private String determineStatusByShipment(ShipmentStatus shipmentStatus) {
         if (shipmentStatus == null) {
             return "SUCCESS";
