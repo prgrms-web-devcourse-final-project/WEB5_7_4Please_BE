@@ -14,8 +14,10 @@ import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
 import com.deal4u.fourplease.domain.wishlist.repository.WishlistRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -76,7 +78,19 @@ public class WishlistService {
                 });
     }
 
-    public boolean isWishlist(Auction auction, Long memberId) {
-        return wishlistRepository.existsByAuctionAndMemberIdAndDeletedFalse(auction, memberId);
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
+    public Set<Long> getWishlistAuctionIds(List<Long> auctionIds, Long memberId) {
+        final int BATCH_SIZE = 1000;
+        Set<Long> wishlistAuctionIds = new HashSet<>();
+
+        for (int i = 0; i < auctionIds.size(); i += BATCH_SIZE) {
+            int min = Math.min(i + BATCH_SIZE, auctionIds.size());
+            List<Long> batch = auctionIds.subList(i, min);
+
+            wishlistAuctionIds.addAll(
+                    wishlistRepository.findAuctionIdsInWishlist(batch, memberId)
+            );
+        }
+        return wishlistAuctionIds;
     }
 }
