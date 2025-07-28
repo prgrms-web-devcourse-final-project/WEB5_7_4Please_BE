@@ -8,7 +8,11 @@ public record BidSummaryDto(
         int bidCount
 ) {
 
-    public static BidSummaryDto toBidSummaryDto(List<BigDecimal> bidList) {
+    public static BidSummaryDto emptySummary() {
+        return new BidSummaryDto(BigDecimal.ZERO, 0);
+    }
+
+    public static BidSummaryDto emptySummary(List<BigDecimal> bidList) {
         if (bidList.isEmpty()) {
             return new BidSummaryDto(BigDecimal.ZERO, 0);
         }

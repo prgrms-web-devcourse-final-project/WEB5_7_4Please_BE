@@ -28,6 +28,13 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
             @Param("memberId") Long memberId
     );
 
+    @Override
+    @Query("SELECT w "
+            + "FROM Wishlist w "
+            + "WHERE w.wishlistId = :wishlistId "
+            + "AND w.deleted = false")
+    Optional<Wishlist> findById(@Param("wishlistId") Long wishlistId);
+  
     @Query("SELECT w "
             + "FROM Wishlist w "
             + "WHERE w.deleted = false "

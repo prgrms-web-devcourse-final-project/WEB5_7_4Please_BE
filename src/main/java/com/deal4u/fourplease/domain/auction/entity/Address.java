@@ -8,5 +8,7 @@ public record Address(
         String addressDetail,
         String zipCode
 ) {
-
+    public static Address empty() {
+        return new Address(null, null, null);
+    }
 }

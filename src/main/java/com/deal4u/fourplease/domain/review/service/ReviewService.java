@@ -10,6 +10,7 @@ import com.deal4u.fourplease.domain.auction.entity.Seller;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.domain.order.entity.Order;
@@ -26,11 +27,13 @@ import com.deal4u.fourplease.domain.review.repository.ReviewRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ReviewService {
 
@@ -41,6 +44,8 @@ public class ReviewService {
     private final PaymentRepository paymentRepository;
 
     public void createReview(ReviewRequest request, Long memberId) {
+
+        log.info("memberId : {} ", memberId);
         // 1. 경매 검증
         Auction auction = getAuction(request.auctionId());
 
@@ -108,7 +113,7 @@ public class ReviewService {
     }
 
     private Order getOrder(Orderer orderer, Auction auction) {
-        return orderRepository.findByOrdererAndAuctionAndStatus(orderer, auction,
+        return orderRepository.findByOrdererAndAuctionAndOrderStatus(orderer, auction,
                         OrderStatus.SUCCESS)
                 .orElseThrow(ORDER_NOT_FOUND::toException);
     }
@@ -123,5 +128,4 @@ public class ReviewService {
                 .orElseThrow(USER_NOT_FOUND::toException);
         return Seller.create(member);
     }
-
 }

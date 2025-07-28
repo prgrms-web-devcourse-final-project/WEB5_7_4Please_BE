@@ -19,13 +19,11 @@ import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.lock.NamedLock;
 import com.deal4u.fourplease.global.lock.NamedLockProvider;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -140,7 +138,7 @@ public class BidService {
         List<BigDecimal> bidList = bidRepository.findPricesByAuctionIdOrderByPriceDesc(
                 auctionId
         );
-        return BidSummaryDto.toBidSummaryDto(bidList);
+        return BidSummaryDto.emptySummary(bidList);
     }
 
     public PageResponse<BidResponse> getBidListForAuction(Long auctionId, Pageable pageable) {
@@ -179,12 +177,16 @@ public class BidService {
             Map<Long, List<BigDecimal>> auctionBidPricesMap =
                     bidRepository.findPricesByAuctionIdsGrouped(batch);
 
-            // BudSummaryDto로 변환
-            for (Map.Entry<Long, List<BigDecimal>> entry : auctionBidPricesMap.entrySet()) {
-                Long auctionId = entry.getKey();
-                List<BigDecimal> bidPrices = entry.getValue();
+            for (Long auctionId : batch) {
+                if (!auctionBidPricesMap.containsKey(auctionId)) {
+                    bidSummaryDtoMap.put(auctionId,
+                            BidSummaryDto.emptySummary());
+                    continue;
+                }
 
-                BidSummaryDto bidSummaryDto = BidSummaryDto.toBidSummaryDto(bidPrices);
+                List<BigDecimal> bidPrices = auctionBidPricesMap.get(auctionId);
+
+                BidSummaryDto bidSummaryDto = BidSummaryDto.emptySummary(bidPrices);
                 bidSummaryDtoMap.put(auctionId, bidSummaryDto);
             }
         }
