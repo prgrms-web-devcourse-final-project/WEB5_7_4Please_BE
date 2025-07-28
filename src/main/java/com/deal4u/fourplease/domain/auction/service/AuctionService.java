@@ -21,11 +21,9 @@ import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.review.repository.ReviewRepository;
-import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
 import com.deal4u.fourplease.domain.wishlist.repository.WishlistRepository;
 import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -128,18 +126,6 @@ public class AuctionService {
                 auctionSupportService.getSellerSaleListResponses(auctionPage);
 
         return PageResponse.fromPage(sellerSaleListResponsePage);
-    }
-
-    // TODO: 추후 AuctionStatusService로 이동
-    @Transactional
-    public void close(Auction auction) {
-        auction.close();
-    }
-
-    // TODO: 추후 AuctionStatusService로 이동
-    @Transactional
-    public void fail(Auction auction) {
-        auction.fail();
     }
 
     @Transactional(readOnly = true)
