@@ -143,7 +143,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "WHERE a.product.seller.member.memberId = :sellerId "
             + "AND a.status = :status")
     Integer countBySellerIdAndStatus(@Param("sellerId") Long sellerId,
-                                     @Param("status") AuctionStatus status);
+            @Param("status") AuctionStatus status);
 
     @Query("""
                 SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyAuctionBase (
@@ -170,7 +170,8 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
                 LEFT JOIN Bid successfulBid ON successfulBid.auction.auctionId = a.auctionId
                     AND successfulBid.isSuccessfulBidder = TRUE
                     AND successfulBid.deleted = FALSE
-                LEFT JOIN successfulBid.bidder successfulBidderBd ON successfulBid.bidder = successfulBidderBd
+                LEFT JOIN successfulBid.bidder successfulBidderBd 
+                ON successfulBid.bidder = successfulBidderBd
                 LEFT JOIN successfulBidderBd.member successfulBidMember
                 LEFT JOIN (
                          SELECT innerBid.auction.auctionId AS auctionId,
@@ -186,7 +187,8 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
                            WHERE innerBidCount.deleted = FALSE
                            GROUP BY innerBidCount.auction.auctionId
                       ) bidCountInfo On bidCountInfo.auctionId = a.auctionId
-                LEFT JOIN Settlement s ON s.auction.auctionId = a.auctionId AND s.bidder = successfulBidderBd
+                LEFT JOIN Settlement s ON s.auction.auctionId = a.auctionId 
+                AND s.bidder = successfulBidderBd
                 WHERE m.memberId = :memberId
                 AND a.deleted = FALSE
                 ORDER BY a.createdAt DESC
