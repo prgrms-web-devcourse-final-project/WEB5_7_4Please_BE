@@ -2,7 +2,6 @@ package com.deal4u.fourplease.domain.auction.service;
 
 import static com.deal4u.fourplease.domain.auction.validator.Validator.validateAuctionStatus;
 import static com.deal4u.fourplease.domain.auction.validator.Validator.validateSeller;
-import static com.deal4u.fourplease.global.exception.ErrorCode.AUCTION_CAN_NOT_DELETE;
 import static com.deal4u.fourplease.global.exception.ErrorCode.AUCTION_NOT_FOUND;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
@@ -22,8 +21,11 @@ import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.review.repository.ReviewRepository;
+import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
+import com.deal4u.fourplease.domain.wishlist.repository.WishlistRepository;
 import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,6 +44,7 @@ public class AuctionService {
     private final ProductImageService productImageService;
     private final AuctionScheduleService auctionScheduleService;
     private final ReviewRepository reviewRepository;
+    private final WishlistRepository wishlistRepository;
 
     private final BidService bidService;
 
@@ -61,7 +64,7 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public AuctionDetailResponse getByAuctionId(Long auctionId) {
+    public AuctionDetailResponse getByAuctionId(Long auctionId, Member member) {
         BidSummaryDto bidSummaryDto = bidService.getBidSummaryDto(auctionId);
 
         Auction auction = auctionRepository.findByIdWithProduct(auctionId)
@@ -69,10 +72,13 @@ public class AuctionService {
 
         List<String> productImageUrls = getProductImageUrls(auction.getProduct());
 
+        boolean isWishList = isIsWishList(member, auction);
+
         return AuctionDetailResponse.toAuctionDetailResponse(
                 auction,
                 productImageUrls,
-                bidSummaryDto
+                bidSummaryDto,
+                isWishList
         );
     }
 
@@ -217,5 +223,14 @@ public class AuctionService {
             return Sort.by(Sort.Direction.ASC, "duration.endTime");
         }
         return Sort.by(Sort.Direction.DESC, "createdAt");
+    }
+
+    private boolean isIsWishList(Member member, Auction auction) {
+        boolean isWishList = false;
+
+        if (member != null) {
+            isWishList = wishlistRepository.findWishlist(auction, member.getMemberId()).isPresent();
+        }
+        return isWishList;
     }
 }

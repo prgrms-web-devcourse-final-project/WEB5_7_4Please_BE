@@ -23,14 +23,17 @@ public record AuctionDetailResponse(
         LocalDateTime endTime,
 
         String thumbnailUrl,
-        List<String> imageUrls
+        List<String> imageUrls,
+
+        boolean isWishList
 
 ) {
 
     public static AuctionDetailResponse toAuctionDetailResponse(
             Auction auction,
             List<String> productImageUrls,
-            BidSummaryDto bidSummaryDto
+            BidSummaryDto bidSummaryDto,
+            boolean isWishList
     ) {
         Product product = auction.getProduct();
         return new AuctionDetailResponse(
@@ -44,7 +47,8 @@ public record AuctionDetailResponse(
                 product.getDescription(),
                 auction.getDuration().getEndTime(),
                 product.getThumbnailUrl(),
-                productImageUrls
+                productImageUrls,
+                isWishList
         );
     }
 

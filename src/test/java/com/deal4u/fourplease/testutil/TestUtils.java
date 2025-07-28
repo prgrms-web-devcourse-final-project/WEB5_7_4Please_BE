@@ -116,7 +116,8 @@ public class TestUtils {
                 "한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.",
                 LocalDateTime.now(),
                 "http://example.com/thumbnail.jpg",
-                List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg")
+                List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg"),
+                false
         );
     }
 
