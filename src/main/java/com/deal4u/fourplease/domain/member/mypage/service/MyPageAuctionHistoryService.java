@@ -38,7 +38,7 @@ public class MyPageAuctionHistoryService {
     private final SettlementRepository settlementRepository;
 
     public PageResponse<MyPageAuctionHistory> getMyAuctionHistory(Member member,
-            Pageable pageable) {
+                                                                  Pageable pageable) {
 
         // 1. 경매 정보 조회
         Page<Tuple> tuples = auctionRepository.findAllAuctionHistoryByMemberId(member.getMemberId(),
@@ -70,7 +70,8 @@ public class MyPageAuctionHistoryService {
         List<SuccessfulBidder> successfulBidders = bidRepository.findSuccessfulBidderForAuctionIds(
                 auctionIds);
         Map<Long, SuccessfulBidder> successfulBidderMap = successfulBidders.stream()
-                .collect(Collectors.toMap(SuccessfulBidder::auctionId, bidder -> bidder));
+                .collect(Collectors.toMap(SuccessfulBidder::auctionId,
+                        successfulBidder -> successfulBidder));
 
         // deadline 조회
         List<SettlementDeadline> settlementDeadlines = settlementRepository
@@ -104,10 +105,15 @@ public class MyPageAuctionHistoryService {
                     BigDecimal bidCount = BigDecimal.valueOf(countBid.countBid());
 
                     SuccessfulBidder successfulBidder = successfulBidderMap.get(auctionId);
-                    Long bidId = successfulBidder.bidId();
-                    String bidderName =
-                            (successfulBidder != null && successfulBidder.nickname() != null)
-                                    ? successfulBidder.nickname() : "알 수 없음";
+
+                    Long bidId = null;
+                    String bidderName = null;
+                    if (successfulBidder != null) {
+                        bidId = successfulBidder.bidId();
+                        bidderName =
+                                (successfulBidder != null && successfulBidder.nickname() != null)
+                                        ? successfulBidder.nickname() : "낙찰자 없음";
+                    }
 
                     LocalDateTime createdAt = (LocalDateTime) tuple.get("startTime");
                     AuctionStatus status = (AuctionStatus) tuple.get("status");

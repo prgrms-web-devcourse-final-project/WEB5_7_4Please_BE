@@ -12,7 +12,6 @@ import com.deal4u.fourplease.domain.member.mypage.dto.SuccessfulBidder;
 import jakarta.persistence.Tuple;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +34,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "AND b.bidder.member = :member "
             + "AND b.isSuccessfulBidder = true")
     Optional<Bid> findSuccessfulBid(@Param("auctionId") Long auctionId,
-            @Param("member") Member member);
+                                    @Param("member") Member member);
 
     Optional<Bid> findTopByAuctionAndBidderOrderByPriceDesc(Auction auction, Bidder bidder);
 
@@ -60,7 +59,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     @SuppressWarnings("checkstyle:MethodName")
     Page<Bid> findByAuctionAndDeletedFalseOrderByPriceDescBidTimeAsc(Auction auction,
-            Pageable pageable);
+                                                                     Pageable pageable);
 
     @Query("""
             SELECT b
@@ -126,7 +125,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                         WHERE b.deleted = false
                         AND b.isSuccessfulBidder = true
                         AND ba.auctionId IN :auctionIds
-                        GROUP BY ba.auctionId
             """
     )
     List<SuccessfulBidder> findSuccessfulBidderForAuctionIds(
@@ -142,7 +140,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             ORDER BY b.bidTime DESC
             """)
     Page<Tuple> findAllBidHistoryByMemberId(@Param("memberId") Long memberId,
-            Pageable pageable);
+                                            Pageable pageable);
 
     @Query("""
                 SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyBidBase(
@@ -203,7 +201,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             @Param("memberId") Long memberId,
             @Param("auctionIds") List<Long> auctionIds
     );
-           
+
     @Query("SELECT b.auction.auctionId, b.price "
             + "FROM Bid b "
             + "WHERE b.auction.auctionId IN :auctionIds")

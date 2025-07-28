@@ -2,7 +2,6 @@ package com.deal4u.fourplease.domain.auction.repository;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
-import com.deal4u.fourplease.domain.member.mypage.dto.MyAuctionBase;
 import jakarta.persistence.Tuple;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +50,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "WHERE a.deleted = false "
             + "AND a.product.seller.member.memberId = :sellerId "
             + "ORDER BY a.createdAt DESC")
-    @EntityGraph(attributePaths = {"product"}) // 필요한 연관 엔티티 지연 로딩 없이 미리 로딩
+    @EntityGraph(attributePaths = {"product"})
     Page<Auction> findAllBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 
     @Query("SELECT a "
@@ -142,70 +141,20 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "WHERE a.product.seller.member.memberId = :sellerId "
             + "AND a.status = :status")
     Integer countBySellerIdAndStatus(@Param("sellerId") Long sellerId,
-            @Param("status") AuctionStatus status);
-
-    @Query("""
-                SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyAuctionBase (
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null ,
-                    null 
-                )
-                FROM Auction a
-                JOIN a.product p
-                JOIN p.seller seller
-                JOIN seller.member m
-                LEFT JOIN Bid successfulBid ON successfulBid.auction.auctionId = a.auctionId
-                    AND successfulBid.isSuccessfulBidder = TRUE
-                    AND successfulBid.deleted = FALSE
-                LEFT JOIN successfulBid.bidder successfulBidderBd
-                ON successfulBid.bidder = successfulBidderBd
-                LEFT JOIN successfulBidderBd.member successfulBidMember
-                LEFT JOIN (
-                         SELECT innerBid.auction.auctionId AS auctionId,
-                            MAX(innerBid.price) AS highestPrice
-                         FROM Bid innerBid
-                         WHERE innerBid.deleted = FALSE
-                         GROUP BY innerBid.auction.auctionId
-                         ) maxBid On maxBid.auctionId = a.auctionId
-                LEFT JOIN (
-                        SELECT innerBidCount.auction.auctionId AS auctionId,
-                               COUNT(innerBidCount.bidId) AS totalBidCount
-                           FROM Bid innerBidCount
-                           WHERE innerBidCount.deleted = FALSE
-                           GROUP BY innerBidCount.auction.auctionId
-                      ) bidCountInfo On bidCountInfo.auctionId = a.auctionId
-                LEFT JOIN Settlement s ON s.auction.auctionId = a.auctionId 
-                AND s.bidder = successfulBidderBd
-                WHERE m.memberId = :memberId
-                AND a.deleted = FALSE
-                ORDER BY a.createdAt DESC
-            """)
-    Page<MyAuctionBase> findMyAuctionHistory(Long memberId, Pageable pageable);
+                                     @Param("status") AuctionStatus status);
 
     @EntityGraph(attributePaths = {"product"})
     List<Auction> findByAuctionIdIn(List<Long> auctionIds);
 
     @Query("""
-            SELECT a.auctionId,
-                   a.duration.startTime,
-                   a.duration.endTime,
-                   a.instantBidPrice,
-                   a.status,
-                   p.name,
-                   p.thumbnailUrl,
-                   p.category
+            SELECT a.auctionId AS auctionId,
+                   a.duration.startTime as startTime,
+                   a.duration.endTime as endTime,
+                   a.instantBidPrice as instantBidPrice,
+                   a.status AS status,
+                   p.name AS name,
+                   p.thumbnailUrl AS thumbnailUrl,
+                   p.category as category
             FROM Auction a
             JOIN a.product p
             WHERE a.product.seller.member.memberId = :memberId
@@ -213,5 +162,5 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             ORDER BY a.createdAt DESC
             """)
     Page<Tuple> findAllAuctionHistoryByMemberId(@Param("memberId") Long memberId,
-            Pageable pageable);
+                                                Pageable pageable);
 }
