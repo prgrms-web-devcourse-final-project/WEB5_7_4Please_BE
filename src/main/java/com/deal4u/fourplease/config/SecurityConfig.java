@@ -47,7 +47,8 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain authFileChain(HttpSecurity http) throws Exception {
         return http
-                .securityMatcher("/api/v1/auth/**",
+                .securityMatcher(
+                        "/api/v1/auth/**",
                         "/api/v1/my/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -93,6 +94,12 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET).permitAll()
                         .anyRequest().authenticated()
+                ).exceptionHandling(
+                        exceptions -> exceptions.authenticationEntryPoint(
+                                        (request, response, authException) -> response.sendError(
+                                                HttpServletResponse.SC_UNAUTHORIZED)))
+                .addFilterBefore(
+                        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class
                 );
         return http.build();
     }
