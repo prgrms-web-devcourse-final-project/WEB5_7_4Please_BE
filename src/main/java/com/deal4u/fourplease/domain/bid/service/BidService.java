@@ -168,7 +168,7 @@ public class BidService {
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public Map<Long, BidSummaryDto> getBidSummaryDtoMap(List<Long> auctionIds) {
         // 개수가 많은 경우를 대비하여 batch 처리
-        final int BATCH_SIZE = 500;
+        final int BATCH_SIZE = 1000;
         Map<Long, BidSummaryDto> bidSummaryDtoMap = new HashMap<>();
 
         for (int i = 0; i < auctionIds.size(); i += BATCH_SIZE) {
