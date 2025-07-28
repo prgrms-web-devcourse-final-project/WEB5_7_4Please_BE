@@ -116,23 +116,10 @@ public class AuctionService {
             Long sellerId,
             Pageable pageable
     ) {
-        List<Product> products = productService.getProductListBySellerId(sellerId);
+        Page<Auction> auctionPage = auctionRepository.findAllBySellerId(sellerId, pageable);
 
-        List<Long> productIds = products.stream()
-                .map(Product::getProductId)
-                .toList();
-
-        Page<Auction> auctionPage = auctionRepository.findAllByProductIdIn(productIds, pageable);
-
-        Page<SellerSaleListResponse> sellerSaleListResponsePage = auctionPage
-                .map(auction -> {
-                    BidSummaryDto bidSummaryDto = bidService
-                            .getBidSummaryDto(auction.getAuctionId());
-                    return SellerSaleListResponse.toSellerSaleListResponse(
-                            auction,
-                            bidSummaryDto
-                    );
-                });
+        Page<SellerSaleListResponse> sellerSaleListResponsePage =
+                auctionSupportService.getSellerSaleListResponses(auctionPage);
 
         return PageResponse.fromPage(sellerSaleListResponsePage);
     }
