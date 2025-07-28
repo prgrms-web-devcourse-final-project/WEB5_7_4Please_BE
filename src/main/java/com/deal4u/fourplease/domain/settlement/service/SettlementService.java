@@ -37,6 +37,7 @@ public class SettlementService {
     private final FailedSettlementScheduleService scheduleService;
     private final SecondBidderNotifier secondBidderNotifier;
     private final AuctionStatusService auctionStatusService;
+    private final HighestBidderNotifier highestBidderNotifier;
 
     @Transactional
     public void save(Long auctionId, int days) {
@@ -65,6 +66,8 @@ public class SettlementService {
         // 2. 정산 스케쥴러 생성
         settlementScheduleService.scheduleSettlementClose(save.getSettlementId(),
                 save.getPaymentDeadline());
+
+        highestBidderNotifier.send(bidder, auction, save.getPaymentDeadline());
     }
 
     private Auction closeAuction(Long auctionId) {
@@ -144,7 +147,7 @@ public class SettlementService {
     }
 
     private Settlement createSettlementForSecondBidder(Bid secondHighestBid, Auction auction,
-                                                       LocalDateTime paymentDeadline) {
+            LocalDateTime paymentDeadline) {
         Settlement settlement = Settlement.builder()
                 .auction(auction)
                 .bidder(secondHighestBid.getBidder())
@@ -206,5 +209,4 @@ public class SettlementService {
                 .orElseThrow(BID_NOT_FOUND::toException);
         bid.update(true);
     }
-
 }

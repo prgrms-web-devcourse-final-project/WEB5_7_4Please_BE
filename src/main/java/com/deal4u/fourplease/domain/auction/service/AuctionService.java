@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.domain.auction.service;
 
 import static com.deal4u.fourplease.domain.auction.validator.Validator.validateSeller;
+import static com.deal4u.fourplease.global.exception.ErrorCode.AUCTION_NOT_FOUND;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.AuctionDetailResponse;
@@ -8,14 +9,17 @@ import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.AuctionSearchRequest;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
+import com.deal4u.fourplease.domain.auction.dto.SellerInfoResponse;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
+import com.deal4u.fourplease.domain.auction.entity.Seller;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
-import com.deal4u.fourplease.global.exception.ErrorCode;
+import com.deal4u.fourplease.domain.review.repository.ReviewRepository;
 import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +39,7 @@ public class AuctionService {
     private final ProductService productService;
     private final ProductImageService productImageService;
     private final AuctionScheduleService auctionScheduleService;
+    private final ReviewRepository reviewRepository;
 
     private final BidService bidService;
 
@@ -58,7 +63,7 @@ public class AuctionService {
         BidSummaryDto bidSummaryDto = bidService.getBidSummaryDto(auctionId);
 
         Auction auction = auctionRepository.findByIdWithProduct(auctionId)
-                .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
+                .orElseThrow(AUCTION_NOT_FOUND::toException);
 
         List<String> productImageUrls = getProductImageUrls(auction.getProduct());
 
@@ -72,7 +77,7 @@ public class AuctionService {
     @Transactional
     public void deleteByAuctionId(Long auctionId, Member member) {
         Auction targetAuction = auctionRepository.findByIdWithProduct(auctionId)
-                .orElseThrow(ErrorCode.AUCTION_NOT_FOUND::toException);
+                .orElseThrow(AUCTION_NOT_FOUND::toException);
 
         // TODO: Auction status 업데이트 후 낙찰된 경매는 취소 불가 기능 추가
 
@@ -128,7 +133,51 @@ public class AuctionService {
 
         return PageResponse.fromPage(sellerSaleListResponsePage);
     }
-    
+
+    // TODO: auction 상태를 CLOSED로 변경하는 메서드로 대체 필요
+    @Transactional
+    public void close(Auction auction) {
+        auction.close();
+    }
+
+    // TODO: auction 상태를 FAIL로 변경하는 메서드로 대체 필요
+    @Transactional
+    public void fail(Auction auction) {
+        auction.fail();
+    }
+
+    @Transactional(readOnly = true)
+    public SellerInfoResponse getSellerInfo(Long auctionId) {
+        Auction auction = getAuctionOrThrow(auctionId);
+
+        Seller seller = auction.getProduct().getSeller();
+
+        Long sellerId = seller.getMember().getMemberId();
+        String sellerNickname = seller.getMember().getNickName();
+        String createdAt = seller.getMember().getCreatedAt().toString();
+
+        Integer totalReviews = reviewRepository.countBySellerMemberId(sellerId);
+        Double averageRating = reviewRepository.getAverageRatingBySellerMemberId(sellerId);
+        averageRating = averageRating != null ? averageRating : 0.0;
+
+        Integer completedDeals =
+                auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE);
+
+        return new SellerInfoResponse(
+                sellerId,
+                sellerNickname,
+                totalReviews,
+                Math.round(averageRating * 100.0) / 100.0,
+                completedDeals,
+                createdAt
+        );
+    }
+
+    private Auction getAuctionOrThrow(Long auctionId) {
+        return auctionRepository.findByIdWithProductAndSellerAndMember(auctionId)
+                .orElseThrow(AUCTION_NOT_FOUND::toException);
+    }
+
     private List<String> getProductImageUrls(Product product) {
         return productImageService.getByProduct(product)
                 .toProductImageUrls();

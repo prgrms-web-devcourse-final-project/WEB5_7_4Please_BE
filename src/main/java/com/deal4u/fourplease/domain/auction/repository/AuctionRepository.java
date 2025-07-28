@@ -1,6 +1,7 @@
 package com.deal4u.fourplease.domain.auction.repository;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyAuctionBase;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,15 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "JOIN FETCH a.product "
             + "WHERE a.auctionId = :auctionId")
     Optional<Auction> findByIdWithProduct(@Param("auctionId") Long auctionId);
+
+    @Query("SELECT a "
+            + "FROM Auction a "
+            + "JOIN FETCH a.product p "
+            + "JOIN FETCH p.seller s "
+            + "JOIN FETCH s.member m "
+            + "WHERE a.auctionId = :auctionId")
+    Optional<Auction> findByIdWithProductAndSellerAndMember(@Param("auctionId") Long auctionId);
+
 
     @Query("SELECT a "
             + "FROM Auction a "
@@ -128,6 +138,12 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             @Param("categoryId") Long categoryId,
             Pageable pageable
     );
+
+    @Query("SELECT COUNT(a) FROM Auction a "
+            + "WHERE a.product.seller.member.memberId = :sellerId "
+            + "AND a.status = :status")
+    Integer countBySellerIdAndStatus(@Param("sellerId") Long sellerId,
+                                     @Param("status") AuctionStatus status);
 
     @Query("""
                 SELECT new com.deal4u.fourplease.domain.member.mypage.dto.MyAuctionBase (

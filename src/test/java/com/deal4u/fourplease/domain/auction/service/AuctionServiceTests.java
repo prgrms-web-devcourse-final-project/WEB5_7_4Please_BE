@@ -21,6 +21,7 @@ import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
 import com.deal4u.fourplease.domain.auction.dto.CategoryDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.dto.ProductImageListResponse;
+import com.deal4u.fourplease.domain.auction.dto.SellerInfoResponse;
 import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
@@ -31,6 +32,7 @@ import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
 import com.deal4u.fourplease.domain.bid.service.BidService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.review.repository.ReviewRepository;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
 import java.math.BigDecimal;
@@ -49,6 +51,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class AuctionServiceTests {
@@ -67,6 +71,9 @@ class AuctionServiceTests {
 
     @Mock
     private AuctionSupportService auctionSupportService;
+
+    @Mock
+    private ReviewRepository reviewRepository;
 
     @Mock
     private BidService bidService;
@@ -395,4 +402,178 @@ class AuctionServiceTests {
 
     }
 
+    @Test
+    @DisplayName("auctionId로 판매자 정보를 조회한다")
+    void getSellerInfoShouldReturnSellerInfoResponse() {
+        // Given
+        Long auctionId = 1L;
+        Long sellerId = 100L;
+        String sellerNickname = "박유한";
+        LocalDateTime createdAt = LocalDateTime.of(2000, 5, 25, 10, 0, 0);
+
+        Member member = Member.builder()
+                .memberId(sellerId)
+                .nickName(sellerNickname)
+                .email("test@example.com")
+                .provider("google")
+                .build();
+
+        ReflectionTestUtils.setField(member, "createdAt", createdAt);
+
+        Seller seller = Seller.create(member);
+
+        Product product = Product.builder()
+                .seller(seller)
+                .build();
+
+        Auction auction = Auction.builder()
+                .auctionId(auctionId)
+                .product(product)
+                .build();
+
+        Integer totalReviews = 25;
+        Double averageRating = 4.7;
+        Integer completedDeals = 18;
+
+        when(auctionRepository.findByIdWithProductAndSellerAndMember(auctionId)).thenReturn(
+                Optional.of(auction));
+        when(reviewRepository.countBySellerMemberId(sellerId)).thenReturn(totalReviews);
+        when(reviewRepository.getAverageRatingBySellerMemberId(sellerId)).thenReturn(
+                averageRating);
+        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE))
+                .thenReturn(completedDeals);
+
+        // When
+        SellerInfoResponse response = auctionService.getSellerInfo(auctionId);
+
+        // Then
+        assertThat(response.sellerId()).isEqualTo(sellerId);
+        assertThat(response.sellerNickname()).isEqualTo(sellerNickname);
+        assertThat(response.totalReviews()).isEqualTo(totalReviews);
+        assertThat(response.averageRating()).isEqualTo(4.7);
+        assertThat(response.completedDeals()).isEqualTo(completedDeals);
+        assertThat(response.createdAt()).isEqualTo(createdAt.toString());
+    }
+
+    @Test
+    @DisplayName("리뷰가 없는 판매자의 평균 평점은 0.0으로 반환된다")
+    void getSellerInfoShouldReturnZeroRatingWhenNoReviews() {
+        // Given
+        Long auctionId = 1L;
+        Long sellerId = 100L;
+        String sellerNickname = "박유한";
+        LocalDateTime createdAt = LocalDateTime.of(2000, 5, 25, 10, 0, 0);
+
+        Member member = Member.builder()
+                .memberId(sellerId)
+                .nickName(sellerNickname)
+                .email("test@example.com")
+                .provider("google")
+                .build();
+
+        ReflectionTestUtils.setField(member, "createdAt", createdAt);
+
+        Seller seller = Seller.create(member);
+
+        Product product = Product.builder()
+                .seller(seller)
+                .build();
+
+        Auction auction = Auction.builder()
+                .auctionId(auctionId)
+                .product(product)
+                .build();
+
+        Integer totalReviews = 0;
+        Double averageRating = null; // 리뷰가 없을 때 null 반환
+        Integer completedDeals = 2;
+
+        when(auctionRepository.findByIdWithProductAndSellerAndMember(auctionId)).thenReturn(
+                Optional.of(auction));
+        when(reviewRepository.countBySellerMemberId(sellerId)).thenReturn(totalReviews);
+        when(reviewRepository.getAverageRatingBySellerMemberId(sellerId)).thenReturn(averageRating);
+        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE))
+                .thenReturn(completedDeals);
+
+        // When
+        SellerInfoResponse response = auctionService.getSellerInfo(auctionId);
+
+        // Then
+        assertThat(response.sellerId()).isEqualTo(sellerId);
+        assertThat(response.sellerNickname()).isEqualTo(sellerNickname);
+        assertThat(response.totalReviews()).isEqualTo(totalReviews);
+        assertThat(response.averageRating()).isEqualTo(0.0);
+        assertThat(response.completedDeals()).isEqualTo(completedDeals);
+        assertThat(response.createdAt()).isEqualTo(createdAt.toString());
+    }
+
+
+    @Test
+    @DisplayName("평균 평점이 소수점 둘째 자리까지 반올림되어 반환된다")
+    void getSellerInfoShouldRoundAverageRatingToTwoDecimalPlaces() {
+        // Given
+        Long auctionId = 1L;
+        Long sellerId = 100L;
+        String sellerNickname = "박유한";
+        LocalDateTime createdAt = LocalDateTime.of(2000, 5, 25, 10, 0, 0);
+
+        Member member = Member.builder()
+                .memberId(sellerId)
+                .nickName(sellerNickname)
+                .email("test@example.com")
+                .provider("google")
+                .build();
+
+        ReflectionTestUtils.setField(member, "createdAt", createdAt);
+
+        Seller seller = Seller.create(member);
+
+        Product product = Product.builder()
+                .seller(seller)
+                .build();
+
+        Auction auction = Auction.builder()
+                .auctionId(auctionId)
+                .product(product)
+                .build();
+
+        Integer totalReviews = 127;
+        Double averageRating = 4.6789; // 소수점 넷째 자리까지 있는 평점
+        Integer completedDeals = 89;
+
+        when(auctionRepository.findByIdWithProductAndSellerAndMember(auctionId)).thenReturn(
+                Optional.of(auction));
+        when(reviewRepository.countBySellerMemberId(sellerId)).thenReturn(totalReviews);
+        when(reviewRepository.getAverageRatingBySellerMemberId(sellerId)).thenReturn(averageRating);
+        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE))
+                .thenReturn(completedDeals);
+
+        // When
+        SellerInfoResponse response = auctionService.getSellerInfo(auctionId);
+
+        // Then
+        assertThat(response.sellerId()).isEqualTo(sellerId);
+        assertThat(response.sellerNickname()).isEqualTo(sellerNickname);
+        assertThat(response.totalReviews()).isEqualTo(totalReviews);
+        assertThat(response.averageRating()).isEqualTo(4.68); // 소수점 둘째 자리까지 반올림
+        assertThat(response.completedDeals()).isEqualTo(completedDeals);
+        assertThat(response.createdAt()).isEqualTo(createdAt.toString());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 auctionId로 판매자 정보 조회를 시도하면 404 예외가 발생한다")
+    void getSellerInfoShouldThrowExceptionWhenAuctionNotFound() {
+        // Given
+        Long auctionId = 999L;
+
+        when(auctionRepository.findByIdWithProductAndSellerAndMember(auctionId)).thenReturn(
+                Optional.empty());
+
+        // When & Then
+        assertThatThrownBy(() -> auctionService.getSellerInfo(auctionId))
+                .isInstanceOf(GlobalException.class)
+                .hasMessage("해당 경매를 찾을 수 없습니다.")
+                .extracting("status")
+                .isEqualTo(HttpStatus.NOT_FOUND);
+    }
 }
