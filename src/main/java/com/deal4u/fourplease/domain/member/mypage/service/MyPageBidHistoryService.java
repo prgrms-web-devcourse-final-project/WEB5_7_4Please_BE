@@ -97,7 +97,7 @@ public class MyPageBidHistoryService {
 
                     return new MyPageBidHistory(
                             auction.getAuctionId(),
-                            bidId,  // 실제 bidId 사용
+                            bidId,
                             auction.getProduct().getThumbnailUrl(),
                             auction.getProduct().getName(),
                             displayStatus,

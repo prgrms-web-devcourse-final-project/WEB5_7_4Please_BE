@@ -6,10 +6,16 @@ import static org.mockito.BDDMockito.given;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
+import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
-import com.deal4u.fourplease.domain.member.mypage.dto.MyAuctionBase;
+import com.deal4u.fourplease.domain.member.mypage.dto.CountBid;
+import com.deal4u.fourplease.domain.member.mypage.dto.HighestBid;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyPageAuctionHistory;
+import com.deal4u.fourplease.domain.member.mypage.dto.SettlementDeadline;
+import com.deal4u.fourplease.domain.member.mypage.dto.SuccessfulBidder;
+import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
+import jakarta.persistence.Tuple;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,17 +38,26 @@ class MyPageAuctionHistoryServiceTest {
     @Mock
     private AuctionRepository auctionRepository;
 
+    @Mock
+    private BidRepository bidRepository;
+
+    @Mock
+    private SettlementRepository settlementRepository;
+
+    @Mock
+    private Tuple tuple;
+
     @InjectMocks
     private MyPageAuctionHistoryService myPageAuctionHistoryService;
 
     private Pageable pageable;
     private Long memberId;
     private LocalDateTime now;
+    private Member member;
 
     private static final DateTimeFormatter PAYMENT_DEADLINE_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    // Category 엔티티 인스턴스 추가
     private Category digitalDevicesCategory;
     private Category clothesCategory;
     private Category furnitureCategory;
@@ -53,8 +68,8 @@ class MyPageAuctionHistoryServiceTest {
         pageable = PageRequest.of(0, 10);
         memberId = 1L;
         now = LocalDateTime.now();
+        member = Member.builder().memberId(memberId).build();
 
-        // 테스트를 위한 Category 엔티티 인스턴스 초기화
         digitalDevicesCategory = new Category(1L, "디지털 기기");
         clothesCategory = new Category(2L, "의류");
         furnitureCategory = new Category(3L, "가구");
@@ -65,12 +80,13 @@ class MyPageAuctionHistoryServiceTest {
     @DisplayName("경매 내역이 없는 경우 빈 페이지를 반환한다")
     void getMyAuctionHistoryWhenNoHistoryReturnsEmptyPage() {
         // given
-        Page<MyAuctionBase> emptyPage = Page.empty();
-        given(auctionRepository.findMyAuctionHistory(memberId, pageable)).willReturn(emptyPage);
+        Page<Tuple> emptyPage = Page.empty();
+        given(auctionRepository.findAllAuctionHistoryByMemberId(memberId, pageable)).willReturn(
+                emptyPage);
 
         // when
         PageResponse<MyPageAuctionHistory> result = myPageAuctionHistoryService.getMyAuctionHistory(
-                Member.builder().memberId(memberId).build(), pageable);
+                member, pageable);
 
         // then
         assertThat(result.getContent()).isEmpty();
@@ -81,41 +97,41 @@ class MyPageAuctionHistoryServiceTest {
     @DisplayName("진행 중인 경매 내역을 조회 (현재 최고 입찰가 존재)")
     void getMyAuctionHistoryWhenOpenAuctionWithHighestPrice() {
         // given
-        MyAuctionBase myAuctionBase = createMyAuctionBase(
-                101L,
-                now.minusDays(1),
-                now.plusDays(1),
-                BigDecimal.valueOf(50000),
-                AuctionStatus.OPEN,
-                "테스트 상품1",
-                "thumb1.jpg",
-                digitalDevicesCategory,
-                null, // successfulBidId
-                null, // bidderName
-                null, // successfulBidPrice
-                5, // bidCount
-                BigDecimal.valueOf(45000), // currentHighestBidPrice
-                null, // paymentDeadline
-                now.minusDays(2) // createdAt
-        );
-        Page<MyAuctionBase> basePage = new PageImpl<>(List.of(myAuctionBase), pageable, 1);
+        Long auctionId = 101L;
+        setupTupleMock(auctionId, "thumb1.jpg", digitalDevicesCategory, "테스트 상품1",
+                BigDecimal.valueOf(50000), now.plusDays(1), now.minusDays(1), AuctionStatus.OPEN);
 
-        given(auctionRepository.findMyAuctionHistory(memberId, pageable)).willReturn(basePage);
+        Page<Tuple> tuplePage = new PageImpl<>(List.of(tuple), pageable, 1);
+
+        HighestBid highestBid = new HighestBid(auctionId, BigDecimal.valueOf(45000));
+        CountBid countBid = new CountBid(auctionId, 5L);
+        SuccessfulBidder successfulBidder = new SuccessfulBidder(auctionId, null, null);
+
+        given(auctionRepository.findAllAuctionHistoryByMemberId(memberId, pageable)).willReturn(
+                tuplePage);
+        given(bidRepository.findHighestBidsForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(highestBid));
+        given(bidRepository.findCountBidsForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(countBid));
+        given(bidRepository.findSuccessfulBidderForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(successfulBidder));
+        given(settlementRepository.findSettlementDeadlinesByAuctionIds(
+                List.of(auctionId))).willReturn(List.of());
 
         // when
         PageResponse<MyPageAuctionHistory> result = myPageAuctionHistoryService.getMyAuctionHistory(
-                Member.builder().memberId(memberId).build(), pageable);
+                member, pageable);
 
         // then
         assertThat(result.getContent()).hasSize(1);
         MyPageAuctionHistory history = result.getContent().getFirst();
         assertThat(history.auctionId()).isEqualTo(101L);
         assertThat(history.name()).isEqualTo("테스트 상품1");
-        assertThat(history.maxPrice()).isEqualTo(BigDecimal.valueOf(45000)); // highestPrice
+        assertThat(history.maxPrice()).isEqualTo(BigDecimal.valueOf(45000));
         assertThat(history.instantPrice()).isEqualTo(BigDecimal.valueOf(50000));
-        assertThat(history.bidCount()).isEqualTo(5);
-        assertThat(history.bidderName()).isNull(); // Open 상태이므로 낙찰자 없음
-        assertThat(history.paymentDeadline()).isEmpty(); // Open 상태이므로 결제 마감 기한 없음
+        assertThat(history.bidCount()).isEqualTo(BigDecimal.valueOf(5));
+        assertThat(history.bidderName()).isEqualTo("알 수 없음");
+        assertThat(history.paymentDeadline()).isEmpty();
         assertThat(history.status()).isEqualTo(AuctionStatus.OPEN);
     }
 
@@ -123,72 +139,76 @@ class MyPageAuctionHistoryServiceTest {
     @DisplayName("진행 중인 경매 내역을 조회한다 (입찰가 없음)")
     void getMyAuctionHistoryWhenOpenAuctionNoBid() {
         // given
-        MyAuctionBase myAuctionBase = createMyAuctionBase(
-                102L,
-                now.minusHours(5),
-                now.plusHours(10),
-                BigDecimal.valueOf(10000),
-                AuctionStatus.OPEN,
-                "입찰 없는 상품",
-                "thumb2.jpg",
-                clothesCategory, // Category 엔티티 인스턴스 사용
-                null,
-                null,
-                null,
-                0, // bidCount
-                null, // currentHighestBidPrice (입찰 없으므로 null)
-                null,
-                now.minusHours(6)
-        );
-        Page<MyAuctionBase> basePage = new PageImpl<>(List.of(myAuctionBase), pageable, 1);
+        Long auctionId = 102L;
+        setupTupleMock(auctionId, "thumb2.jpg", clothesCategory, "입찰 없는 상품",
+                BigDecimal.valueOf(10000), now.plusHours(10), now.minusHours(5),
+                AuctionStatus.OPEN);
 
-        given(auctionRepository.findMyAuctionHistory(memberId, pageable)).willReturn(basePage);
+        Page<Tuple> tuplePage = new PageImpl<>(List.of(tuple), pageable, 1);
+
+        HighestBid highestBid = new HighestBid(auctionId, BigDecimal.ZERO);
+        CountBid countBid = new CountBid(auctionId, 0L);
+        SuccessfulBidder successfulBidder = new SuccessfulBidder(auctionId, null, null);
+
+        given(auctionRepository.findAllAuctionHistoryByMemberId(memberId, pageable)).willReturn(
+                tuplePage);
+        given(bidRepository.findHighestBidsForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(highestBid));
+        given(bidRepository.findCountBidsForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(countBid));
+        given(bidRepository.findSuccessfulBidderForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(successfulBidder));
+        given(settlementRepository.findSettlementDeadlinesByAuctionIds(
+                List.of(auctionId))).willReturn(List.of());
 
         // when
         PageResponse<MyPageAuctionHistory> result = myPageAuctionHistoryService.getMyAuctionHistory(
-                Member.builder().memberId(memberId).build(), pageable);
+                member, pageable);
 
         // then
         assertThat(result.getContent()).hasSize(1);
         MyPageAuctionHistory history = result.getContent().getFirst();
         assertThat(history.auctionId()).isEqualTo(102L);
-        assertThat(history.maxPrice()).isEqualTo(BigDecimal.ZERO); // 입찰가 없으므로 0
-        assertThat(history.bidCount()).isZero();
-        assertThat(history.bidderName()).isNull();
+        assertThat(history.maxPrice()).isEqualTo(BigDecimal.ZERO);
+        assertThat(history.bidCount()).isEqualTo(BigDecimal.ZERO);
+        assertThat(history.bidderName()).isEqualTo("알 수 없음");
         assertThat(history.paymentDeadline()).isEmpty();
         assertThat(history.status()).isEqualTo(AuctionStatus.OPEN);
-        assertThat(history.category().getName()).isEqualTo(clothesCategory.getName()); // Category 이름 검증
+        assertThat(history.category().getName()).isEqualTo(clothesCategory.getName());
     }
 
     @Test
     @DisplayName("종료된 경매 내역을 조회한다 (낙찰 성공)")
     void getMyAuctionHistoryWhenClosedAuctionSuccessfulBid() {
         // given
+        Long auctionId = 103L;
         LocalDateTime paymentDeadline = now.plusDays(2);
-        MyAuctionBase myAuctionBase = createMyAuctionBase(
-                103L,
-                now.minusDays(5),
-                now.minusDays(1), // 경매 종료
-                BigDecimal.valueOf(100000),
-                AuctionStatus.CLOSE, // 경매 상태는 CLOSE
-                "낙찰된 상품",
-                "thumb3.jpg",
-                furnitureCategory, // Category 엔티티 인스턴스 사용
-                201L, // successfulBidId
-                "성공입찰자", // bidderName
-                BigDecimal.valueOf(95000), // successfulBidPrice
-                10,
-                BigDecimal.valueOf(95000), // currentHighestBidPrice (성공 입찰가와 동일)
-                paymentDeadline, // paymentDeadline 존재
-                now.minusDays(6)
-        );
-        Page<MyAuctionBase> basePage = new PageImpl<>(List.of(myAuctionBase), pageable, 1);
 
-        given(auctionRepository.findMyAuctionHistory(memberId, pageable)).willReturn(basePage);
+        setupTupleMock(auctionId, "thumb3.jpg", furnitureCategory, "낙찰된 상품",
+                BigDecimal.valueOf(100000), now.minusDays(1), now.minusDays(5),
+                AuctionStatus.CLOSE);
+
+        Page<Tuple> tuplePage = new PageImpl<>(List.of(tuple), pageable, 1);
+
+        HighestBid highestBid = new HighestBid(auctionId, BigDecimal.valueOf(95000));
+        CountBid countBid = new CountBid(auctionId, 10L);
+        SuccessfulBidder successfulBidder = new SuccessfulBidder(auctionId, 201L, "성공입찰자");
+        SettlementDeadline settlementDeadline = new SettlementDeadline(auctionId, paymentDeadline);
+
+        given(auctionRepository.findAllAuctionHistoryByMemberId(memberId, pageable)).willReturn(
+                tuplePage);
+        given(bidRepository.findHighestBidsForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(highestBid));
+        given(bidRepository.findCountBidsForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(countBid));
+        given(bidRepository.findSuccessfulBidderForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(successfulBidder));
+        given(settlementRepository.findSettlementDeadlinesByAuctionIds(
+                List.of(auctionId))).willReturn(List.of(settlementDeadline));
 
         // when
         PageResponse<MyPageAuctionHistory> result = myPageAuctionHistoryService.getMyAuctionHistory(
-                Member.builder().memberId(memberId).build(), pageable);
+                member, pageable);
 
         // then
         assertThat(result.getContent()).hasSize(1);
@@ -197,40 +217,40 @@ class MyPageAuctionHistoryServiceTest {
         assertThat(history.name()).isEqualTo("낙찰된 상품");
         assertThat(history.maxPrice()).isEqualTo(BigDecimal.valueOf(95000));
         assertThat(history.bidderName()).isEqualTo("성공입찰자");
-        assertThat(history.paymentDeadline()).isEqualTo(paymentDeadline.format(PAYMENT_DEADLINE_FORMAT));
-        assertThat(history.status()).isEqualTo(AuctionStatus.CLOSE); // AuctionStatus 그대로
-        assertThat(history.category().getName()).isEqualTo(furnitureCategory.getName()); // Category 이름 검증
+        assertThat(history.paymentDeadline()).isEqualTo(
+                paymentDeadline.format(PAYMENT_DEADLINE_FORMAT));
+        assertThat(history.status()).isEqualTo(AuctionStatus.CLOSE);
+        assertThat(history.category().getName()).isEqualTo(furnitureCategory.getName());
     }
-
 
     @Test
     @DisplayName("폐찰된 경매 내역을 조회한다")
     void getMyAuctionHistoryWhenFailedAuction() {
         // given
-        MyAuctionBase myAuctionBase = createMyAuctionBase(
-                104L,
-                now.minusDays(3),
-                now.minusHours(1), // 경매 종료
-                BigDecimal.valueOf(20000),
-                AuctionStatus.FAIL, // 유찰 상태
-                "폐찰된 상품",
-                "thumb4.jpg",
-                booksCategory, // Category 엔티티 인스턴스 사용
-                null,
-                null,
-                null,
-                3,
-                BigDecimal.valueOf(18000), // 유찰되었더라도 최고 입찰가는 있을 수 있음
-                null,
-                now.minusDays(4)
-        );
-        Page<MyAuctionBase> basePage = new PageImpl<>(List.of(myAuctionBase), pageable, 1);
+        Long auctionId = 104L;
+        setupTupleMock(auctionId, "thumb4.jpg", booksCategory, "폐찰된 상품",
+                BigDecimal.valueOf(20000), now.minusHours(1), now.minusDays(3), AuctionStatus.FAIL);
 
-        given(auctionRepository.findMyAuctionHistory(memberId, pageable)).willReturn(basePage);
+        Page<Tuple> tuplePage = new PageImpl<>(List.of(tuple), pageable, 1);
+
+        HighestBid highestBid = new HighestBid(auctionId, BigDecimal.valueOf(18000));
+        CountBid countBid = new CountBid(auctionId, 3L);
+        SuccessfulBidder successfulBidder = new SuccessfulBidder(auctionId, null, null);
+
+        given(auctionRepository.findAllAuctionHistoryByMemberId(memberId, pageable)).willReturn(
+                tuplePage);
+        given(bidRepository.findHighestBidsForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(highestBid));
+        given(bidRepository.findCountBidsForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(countBid));
+        given(bidRepository.findSuccessfulBidderForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(successfulBidder));
+        given(settlementRepository.findSettlementDeadlinesByAuctionIds(
+                List.of(auctionId))).willReturn(List.of());
 
         // when
         PageResponse<MyPageAuctionHistory> result = myPageAuctionHistoryService.getMyAuctionHistory(
-                Member.builder().memberId(memberId).build(), pageable);
+                member, pageable);
 
         // then
         assertThat(result.getContent()).hasSize(1);
@@ -238,84 +258,57 @@ class MyPageAuctionHistoryServiceTest {
         assertThat(history.auctionId()).isEqualTo(104L);
         assertThat(history.name()).isEqualTo("폐찰된 상품");
         assertThat(history.maxPrice()).isEqualTo(BigDecimal.valueOf(18000));
-        assertThat(history.bidderName()).isNull();
+        assertThat(history.bidderName()).isEqualTo("알 수 없음");
         assertThat(history.paymentDeadline()).isEmpty();
         assertThat(history.status()).isEqualTo(AuctionStatus.FAIL);
-        assertThat(history.category().getName()).isEqualTo(booksCategory.getName()); // Category 이름 검증
+        assertThat(history.category().getName()).isEqualTo(booksCategory.getName());
     }
 
     @Test
-    @DisplayName("여러 경매 내역이 페이지네이션되어 반환된다")
-    void getMyAuctionHistoryWhenMultipleAuctionsReturnsPaginated() {
+    @DisplayName("낙찰자 정보가 null인 경우 알 수 없음으로 표시된다")
+    void getMyAuctionHistoryWhenSuccessfulBidderIsNull() {
         // given
-        MyAuctionBase auction1 = createMyAuctionBase(
-                105L, now.minusDays(1), now.plusDays(1), BigDecimal.valueOf(10000), AuctionStatus.OPEN,
-                "상품5", "t5.jpg", clothesCategory, null, null, null, 2, BigDecimal.valueOf(9000), null, now.minusDays(1) // Category 인스턴스
-        );
-        MyAuctionBase auction2 = createMyAuctionBase(
-                106L, now.minusDays(5), now.minusDays(1), BigDecimal.valueOf(50000), AuctionStatus.CLOSE,
-                "상품6", "t6.jpg", digitalDevicesCategory, 301L, "낙찰자2", BigDecimal.valueOf(45000), 7, BigDecimal.valueOf(45000), now.plusDays(2), now.minusDays(5) // Category 인스턴스
-        );
-        MyAuctionBase auction3 = createMyAuctionBase(
-                107L, now.minusDays(10), now.minusDays(2), BigDecimal.valueOf(2000), AuctionStatus.FAIL,
-                "상품7", "t7.jpg", booksCategory, null, null, null, 1, BigDecimal.valueOf(1500), null, now.minusDays(10) // Category 인스턴스
-        );
+        Long auctionId = 105L;
+        setupTupleMock(auctionId, "thumb5.jpg", digitalDevicesCategory, "낙찰자 미상 상품",
+                BigDecimal.valueOf(30000), now.minusDays(1), now.minusDays(2), AuctionStatus.CLOSE);
 
-        List<MyAuctionBase> auctionList = List.of(auction1, auction2, auction3);
-        Page<MyAuctionBase> basePage = new PageImpl<>(auctionList, pageable, auctionList.size());
+        Page<Tuple> tuplePage = new PageImpl<>(List.of(tuple), pageable, 1);
 
-        given(auctionRepository.findMyAuctionHistory(memberId, pageable)).willReturn(basePage);
+        HighestBid highestBid = new HighestBid(auctionId, BigDecimal.valueOf(25000));
+        CountBid countBid = new CountBid(auctionId, 5L);
+        SuccessfulBidder successfulBidder = new SuccessfulBidder(auctionId, null, null);
+
+        given(auctionRepository.findAllAuctionHistoryByMemberId(memberId, pageable)).willReturn(
+                tuplePage);
+        given(bidRepository.findHighestBidsForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(highestBid));
+        given(bidRepository.findCountBidsForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(countBid));
+        given(bidRepository.findSuccessfulBidderForAuctionIds(List.of(auctionId))).willReturn(
+                List.of(successfulBidder));
+        given(settlementRepository.findSettlementDeadlinesByAuctionIds(
+                List.of(auctionId))).willReturn(List.of());
 
         // when
         PageResponse<MyPageAuctionHistory> result = myPageAuctionHistoryService.getMyAuctionHistory(
-                Member.builder().memberId(memberId).build(), pageable);
+                member, pageable);
 
         // then
-        assertThat(result.getContent()).hasSize(3);
-        assertThat(result.getTotalElements()).isEqualTo(3);
-        assertThat(result.getContent().get(0).auctionId()).isEqualTo(105L);
-        assertThat(result.getContent().get(1).auctionId()).isEqualTo(106L);
-        assertThat(result.getContent().get(2).auctionId()).isEqualTo(107L);
-        // Category 이름 검증 예시
-        assertThat(result.getContent().get(0).category().getName()).isEqualTo(clothesCategory.getName());
+        assertThat(result.getContent()).hasSize(1);
+        MyPageAuctionHistory history = result.getContent().getFirst();
+        assertThat(history.bidderName()).isEqualTo("알 수 없음");
     }
 
-    /**
-     * MyAuctionBase 객체를 생성하기 위한 헬퍼 메서드
-     */
-    private MyAuctionBase createMyAuctionBase(
-            Long auctionId,
-            LocalDateTime startTime,
-            LocalDateTime endTime,
-            BigDecimal instantPrice,
-            AuctionStatus status,
-            String name,
-            String thumbnailUrl,
-            Category category,
-            Long bidId, // successfulBid.bidId
-            String bidderName, // successfulBidMember.nickName
-            BigDecimal successfulBidPrice, // successfulBid.price
-            Integer bidCount, // bidCountInfo.totalBidCount
-            BigDecimal currentHighestBidPrice, // maxBid.highestPrice
-            LocalDateTime paymentDeadline, // s.paymentDeadline
-            LocalDateTime createdAt // a.createdAt
-    ) {
-        return new MyAuctionBase(
-                auctionId,
-                startTime,
-                endTime,
-                instantPrice,
-                status,
-                name,
-                thumbnailUrl,
-                category,
-                bidId,
-                bidderName,
-                successfulBidPrice,
-                bidCount,
-                currentHighestBidPrice,
-                paymentDeadline,
-                createdAt
-        );
+    private void setupTupleMock(Long auctionId, String thumbnailUrl, Category category, String name,
+            BigDecimal instantBidPrice, LocalDateTime endTime, LocalDateTime startTime,
+            AuctionStatus status) {
+        given(tuple.get("auctionId")).willReturn(auctionId);
+        given(tuple.get("thumbnailUrl")).willReturn(thumbnailUrl);
+        given(tuple.get("category")).willReturn(category);
+        given(tuple.get("name")).willReturn(name);
+        given(tuple.get("instantBidPrice")).willReturn(instantBidPrice);
+        given(tuple.get("endTime")).willReturn(endTime);
+        given(tuple.get("startTime")).willReturn(startTime);
+        given(tuple.get("status")).willReturn(status);
     }
 }
