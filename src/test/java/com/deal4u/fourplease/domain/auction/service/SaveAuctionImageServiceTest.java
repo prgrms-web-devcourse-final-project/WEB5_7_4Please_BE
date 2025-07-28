@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import lombok.Getter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,16 +39,16 @@ class SaveAuctionImageServiceTest {
                 "file",
                 "file.png",
                 "image/png", // valid MIME type and extension
-                new byte[] {1, 2}
+                new byte[]{1, 2}
         );
         Member test = Member.builder().nickName("test").build();
 
-        AuctionImageUrlResponse upload = saveAuctionImageService.upload(test, file);
+        AuctionImageUrlResponse upload = saveAuctionImageService.upload(test, List.of(file));
 
         assertThat(new SavePath(path, fileName + ".png")).isEqualTo(
                 fakeFileSaver.getInputSavePath());
         assertThat(file).isEqualTo(fakeFileSaver.getFile());
-        assertThat(upload.url()).isEqualTo("https://test.com" + path);
+        assertThat(upload.imageUrls().getFirst()).isEqualTo("https://test.com" + path);
     }
 
     @Test
@@ -62,11 +63,11 @@ class SaveAuctionImageServiceTest {
                 "file",
                 "file.txt",
                 "text/plain", // valid MIME type and extension
-                new byte[] {1, 2}
+                new byte[]{1, 2}
         );
         Member test = Member.builder().nickName("test").build();
 
-        assertThatThrownBy(() -> saveAuctionImageService.upload(test, file))
+        assertThatThrownBy(() -> saveAuctionImageService.upload(test, List.of(file)))
                 .isInstanceOf(GlobalException.class);
     }
 

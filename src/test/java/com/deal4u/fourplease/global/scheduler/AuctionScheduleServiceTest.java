@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
 import com.deal4u.fourplease.domain.auction.dto.ProductCreateDto;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
+import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.entity.Seller;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
@@ -93,6 +94,7 @@ class AuctionScheduleServiceTest {
         Product product = genProduct();
         Seller seller = product.getSeller();
         Auction auction = Auction.builder()
+                .status(AuctionStatus.OPEN)
                 .auctionId(auctionId)
                 .product(product)
                 .build();

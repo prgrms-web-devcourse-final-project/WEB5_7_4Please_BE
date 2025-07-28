@@ -1,5 +1,7 @@
 package com.deal4u.fourplease.domain.auction.dto;
 
-public record AuctionImageUrlResponse(String url) {
+import java.util.List;
+
+public record AuctionImageUrlResponse(List<String> imageUrls) {
 
 }

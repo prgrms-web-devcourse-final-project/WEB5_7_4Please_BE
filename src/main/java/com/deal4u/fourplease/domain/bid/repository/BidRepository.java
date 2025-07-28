@@ -5,7 +5,12 @@ import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -79,4 +84,28 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             + "WHERE b2.auction.auctionId = :auctionId AND b2.deleted = false) "
             + "ORDER BY b.price DESC, b.bidTime ASC")
     Optional<Bid> findSecondHighestBidByAuctionIdForSchedule(@Param("auctionId") Long auctionId);
+
+    @Query("SELECT b.auction.auctionId, b.price "
+            + "FROM Bid b "
+            + "WHERE b.auction.auctionId IN :auctionIds")
+    List<Object[]> findPricesByAuctionIds(@Param("auctionIds") List<Long> auctionIds);
+
+    // findPricesByAuctionIdsGrouped를 직접 가공
+    default Map<Long, List<BigDecimal>> findPricesByAuctionIdsGrouped(List<Long> auctionIds) {
+        Map<Long, List<BigDecimal>> result = new HashMap<>();
+        List<Object[]> rows = findPricesByAuctionIds(auctionIds);
+
+        for (Object[] row : rows) {
+            Long auctionId = (Long) row[0];
+            BigDecimal price = (BigDecimal) row[1];
+            // key auctionId가 result에 존재하면 기존 값, 없으면 빈 리스트 생성해서 map에 추가
+            result.computeIfAbsent(auctionId, k -> new ArrayList<>()).add(price);
+        }
+
+        // 각 가격 내림차순 정렬
+        result.values().forEach(list -> list.sort(Comparator.reverseOrder()));
+
+        return result;
+    }
+
 }

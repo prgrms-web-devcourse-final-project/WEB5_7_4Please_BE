@@ -10,13 +10,13 @@ import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.SaveAuctionImageService;
 import com.deal4u.fourplease.domain.common.PageResponse;
 import com.deal4u.fourplease.domain.member.entity.Member;
-import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
@@ -42,7 +42,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class AuctionController {
 
     private final AuctionService auctionService;
-    private final MemberRepository memberRepository;
     private final SaveAuctionImageService saveAuctionImageService;
 
     @Operation(summary = "전체 경매 조회")
@@ -52,9 +51,10 @@ public class AuctionController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PageResponse<AuctionListResponse> readAllAuctions(
-            @Valid @ModelAttribute @ParameterObject AuctionSearchRequest request
+            @Valid @ModelAttribute @ParameterObject AuctionSearchRequest request,
+            @AuthenticationPrincipal Member member
     ) {
-        return auctionService.findAll(request);
+        return auctionService.findAll(request, member);
     }
 
     @Operation(summary = "경매등록")
@@ -98,7 +98,7 @@ public class AuctionController {
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/images")
     public AuctionImageUrlResponse readAuctionImageUrl(
-            @RequestParam(name = "image") MultipartFile image,
+            @RequestParam(name = "image") List<MultipartFile> image,
             @AuthenticationPrincipal Member member) {
         return saveAuctionImageService.upload(member, image);
     }

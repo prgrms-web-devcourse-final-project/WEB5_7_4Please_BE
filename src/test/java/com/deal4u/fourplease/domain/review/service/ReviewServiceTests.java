@@ -107,7 +107,7 @@ class ReviewServiceTests {
                 .product(product)
                 .startingPrice(new BigDecimal("100"))
                 .instantBidPrice(new BigDecimal("20000"))
-                .status(AuctionStatus.CLOSED)
+                .status(AuctionStatus.CLOSE)
                 .deleted(false)
                 .build();
 

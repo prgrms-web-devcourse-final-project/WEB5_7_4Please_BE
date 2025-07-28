@@ -1,6 +1,8 @@
 package com.deal4u.fourplease.domain.auction.service;
 
+import static com.deal4u.fourplease.domain.auction.validator.Validator.validateAuctionStatus;
 import static com.deal4u.fourplease.domain.auction.validator.Validator.validateSeller;
+import static com.deal4u.fourplease.global.exception.ErrorCode.AUCTION_CAN_NOT_DELETE;
 import static com.deal4u.fourplease.global.exception.ErrorCode.AUCTION_NOT_FOUND;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionCreateRequest;
@@ -79,7 +81,9 @@ public class AuctionService {
         Auction targetAuction = auctionRepository.findByIdWithProduct(auctionId)
                 .orElseThrow(AUCTION_NOT_FOUND::toException);
 
-        // TODO: Auction status 업데이트 후 낙찰된 경매는 취소 불가 기능 추가
+        // Auction status 업데이트 후 낙찰된 경매는 취소 불가 기능 추가
+        String status = targetAuction.getStatus().toString();
+        validateAuctionStatus(status);
 
         // Seller가 member와 일치하지 않으면 403 예외 발생
         validateSeller(targetAuction.getProduct().getSeller(), member);
@@ -92,7 +96,7 @@ public class AuctionService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<AuctionListResponse> findAll(AuctionSearchRequest request) {
+    public PageResponse<AuctionListResponse> findAll(AuctionSearchRequest request, Member member) {
         Page<Auction> auctionPage = getAuctionPage(
                 request.page(),
                 request.size(),
@@ -102,7 +106,7 @@ public class AuctionService {
         );
 
         Page<AuctionListResponse> auctionListResponsePage =
-                auctionSupportService.getAuctionListResponses(auctionPage);
+                auctionSupportService.getAuctionListResponses(auctionPage, member);
 
         return PageResponse.fromPage(auctionListResponsePage);
     }
@@ -112,35 +116,21 @@ public class AuctionService {
             Long sellerId,
             Pageable pageable
     ) {
-        List<Product> products = productService.getProductListBySellerId(sellerId);
+        Page<Auction> auctionPage = auctionRepository.findAllBySellerId(sellerId, pageable);
 
-        List<Long> productIds = products.stream()
-                .map(Product::getProductId)
-                .toList();
-
-        Page<Auction> auctionPage = auctionRepository.findAllByProductIdIn(productIds, pageable);
-
-        Page<SellerSaleListResponse> sellerSaleListResponsePage = auctionPage
-                .map(auction -> {
-                    BidSummaryDto bidSummaryDto = bidService
-                            .getBidSummaryDto(auction.getAuctionId());
-                    return SellerSaleListResponse.toSellerSaleListResponse(
-                            auction,
-                            bidSummaryDto,
-                            auctionSupportService.getSaleAuctionStatus(auction)
-                    );
-                });
+        Page<SellerSaleListResponse> sellerSaleListResponsePage =
+                auctionSupportService.getSellerSaleListResponses(auctionPage);
 
         return PageResponse.fromPage(sellerSaleListResponsePage);
     }
 
-    // TODO: auction 상태를 CLOSED로 변경하는 메서드로 대체 필요
+    // TODO: 추후 AuctionStatusService로 이동
     @Transactional
     public void close(Auction auction) {
         auction.close();
     }
 
-    // TODO: auction 상태를 FAIL로 변경하는 메서드로 대체 필요
+    // TODO: 추후 AuctionStatusService로 이동
     @Transactional
     public void fail(Auction auction) {
         auction.fail();
@@ -161,7 +151,7 @@ public class AuctionService {
         averageRating = averageRating != null ? averageRating : 0.0;
 
         Integer completedDeals =
-                auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSED);
+                auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE);
 
         return new SellerInfoResponse(
                 sellerId,
