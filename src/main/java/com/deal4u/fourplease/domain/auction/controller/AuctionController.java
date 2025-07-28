@@ -75,8 +75,9 @@ public class AuctionController {
     @GetMapping("/{auctionId}/description")
     @ResponseStatus(HttpStatus.OK)
     public AuctionDetailResponse readAuction(
-            @PathVariable(name = "auctionId") @Positive Long auctionId) {
-        return auctionService.getByAuctionId(auctionId);
+            @PathVariable(name = "auctionId") @Positive Long auctionId,
+            @AuthenticationPrincipal Member member) {
+        return auctionService.getByAuctionId(auctionId, member);
     }
 
     @Operation(summary = "경매제거")
