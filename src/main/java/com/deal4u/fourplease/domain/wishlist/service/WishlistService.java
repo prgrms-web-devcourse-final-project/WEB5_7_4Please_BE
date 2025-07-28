@@ -36,8 +36,11 @@ public class WishlistService {
     }
 
     @Transactional
-    public void deleteByWishlistId(Long wishlistId, Member member) {
-        Wishlist targetWishlist = wishlistRepository.findById(wishlistId)
+    public void deleteByWishlistId(Long auctionId, Member member) {
+        Auction auction = auctionReaderImpl.getAuctionByAuctionId(auctionId);
+
+        Wishlist targetWishlist = wishlistRepository.findWishlist(
+                        auction, member.getMemberId())
                 .orElseThrow(ErrorCode.WISHLIST_NOT_FOUND::toException);
 
         validateMember(targetWishlist, member);
