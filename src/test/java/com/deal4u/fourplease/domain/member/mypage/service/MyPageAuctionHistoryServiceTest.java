@@ -130,7 +130,7 @@ class MyPageAuctionHistoryServiceTest {
         assertThat(history.maxPrice()).isEqualTo(BigDecimal.valueOf(45000));
         assertThat(history.instantPrice()).isEqualTo(BigDecimal.valueOf(50000));
         assertThat(history.bidCount()).isEqualTo(BigDecimal.valueOf(5));
-        assertThat(history.bidderName()).isEqualTo("알 수 없음");
+        assertThat(history.bidderName()).isEqualTo("낙찰자 없음");
         assertThat(history.paymentDeadline()).isEmpty();
         assertThat(history.status()).isEqualTo(AuctionStatus.OPEN);
     }
@@ -171,7 +171,7 @@ class MyPageAuctionHistoryServiceTest {
         assertThat(history.auctionId()).isEqualTo(102L);
         assertThat(history.maxPrice()).isEqualTo(BigDecimal.ZERO);
         assertThat(history.bidCount()).isEqualTo(BigDecimal.ZERO);
-        assertThat(history.bidderName()).isEqualTo("알 수 없음");
+        assertThat(history.bidderName()).isEqualTo("낙찰자 없음");
         assertThat(history.paymentDeadline()).isEmpty();
         assertThat(history.status()).isEqualTo(AuctionStatus.OPEN);
         assertThat(history.category().getName()).isEqualTo(clothesCategory.getName());
@@ -258,7 +258,7 @@ class MyPageAuctionHistoryServiceTest {
         assertThat(history.auctionId()).isEqualTo(104L);
         assertThat(history.name()).isEqualTo("폐찰된 상품");
         assertThat(history.maxPrice()).isEqualTo(BigDecimal.valueOf(18000));
-        assertThat(history.bidderName()).isEqualTo("알 수 없음");
+        assertThat(history.bidderName()).isEqualTo("낙찰자 없음");
         assertThat(history.paymentDeadline()).isEmpty();
         assertThat(history.status()).isEqualTo(AuctionStatus.FAIL);
         assertThat(history.category().getName()).isEqualTo(booksCategory.getName());
@@ -296,12 +296,13 @@ class MyPageAuctionHistoryServiceTest {
         // then
         assertThat(result.getContent()).hasSize(1);
         MyPageAuctionHistory history = result.getContent().getFirst();
-        assertThat(history.bidderName()).isEqualTo("알 수 없음");
+        assertThat(history.bidderName()).isEqualTo("낙찰자 없음");
     }
 
     private void setupTupleMock(Long auctionId, String thumbnailUrl, Category category, String name,
-            BigDecimal instantBidPrice, LocalDateTime endTime, LocalDateTime startTime,
-            AuctionStatus status) {
+                                BigDecimal instantBidPrice, LocalDateTime endTime,
+                                LocalDateTime startTime,
+                                AuctionStatus status) {
         given(tuple.get("auctionId")).willReturn(auctionId);
         given(tuple.get("thumbnailUrl")).willReturn(thumbnailUrl);
         given(tuple.get("category")).willReturn(category);

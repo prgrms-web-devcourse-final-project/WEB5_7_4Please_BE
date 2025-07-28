@@ -43,5 +43,4 @@ public class SaleController {
         Pageable pageable = PageRequest.of(request.page(), request.size());
         return auctionService.findSalesBySellerId(sellerId, pageable);
     }
-
 }
