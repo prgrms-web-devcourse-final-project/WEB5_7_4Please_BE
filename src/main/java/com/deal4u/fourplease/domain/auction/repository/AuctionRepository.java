@@ -3,6 +3,7 @@ package com.deal4u.fourplease.domain.auction.repository;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyAuctionBase;
+import jakarta.persistence.Tuple;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -171,7 +172,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
                 LEFT JOIN Bid successfulBid ON successfulBid.auction.auctionId = a.auctionId
                     AND successfulBid.isSuccessfulBidder = TRUE
                     AND successfulBid.deleted = FALSE
-                LEFT JOIN successfulBid.bidder successfulBidderBd 
+                LEFT JOIN successfulBid.bidder successfulBidderBd
                 ON successfulBid.bidder = successfulBidderBd
                 LEFT JOIN successfulBidderBd.member successfulBidMember
                 LEFT JOIN (
@@ -198,4 +199,22 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @EntityGraph(attributePaths = {"product"})
     List<Auction> findByAuctionIdIn(List<Long> auctionIds);
+
+    @Query("""
+            SELECT a.auctionId,
+                   a.duration.startTime,
+                   a.duration.endTime,
+                   a.instantBidPrice,
+                   a.status,
+                   p.name,
+                   p.thumbnailUrl,
+                   p.category
+            FROM Auction a
+            JOIN a.product p
+            WHERE a.product.seller.member.memberId = :memberId
+            AND a.deleted = FALSE
+            ORDER BY a.createdAt DESC
+            """)
+    Page<Tuple> findAllAuctionHistoryByMemberId(@Param("memberId") Long memberId,
+            Pageable pageable);
 }

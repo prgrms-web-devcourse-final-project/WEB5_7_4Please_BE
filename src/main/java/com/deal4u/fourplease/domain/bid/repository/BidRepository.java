@@ -4,9 +4,11 @@ import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.member.entity.Member;
+import com.deal4u.fourplease.domain.member.mypage.dto.CountBid;
 import com.deal4u.fourplease.domain.member.mypage.dto.HighestBid;
 import com.deal4u.fourplease.domain.member.mypage.dto.MyBidBase;
 import com.deal4u.fourplease.domain.member.mypage.dto.SettlementInfo;
+import com.deal4u.fourplease.domain.member.mypage.dto.SuccessfulBidder;
 import jakarta.persistence.Tuple;
 import java.math.BigDecimal;
 import java.util.List;
@@ -89,6 +91,41 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             """
     )
     List<HighestBid> findHighestBidsForAuctionIds(@Param("auctionIds") List<Long> auctionIds);
+
+    // 입찰수 가져오기
+    @Query("""
+                        SELECT new com.deal4u.fourplease.domain.member.mypage.dto.CountBid(
+                            ba.auctionId,
+                            COUNT(b.bidId)
+                        )
+                        FROM Bid b
+                        JOIN b.auction ba
+                        WHERE b.deleted = false
+                        AND ba.auctionId IN :auctionIds
+                        GROUP BY ba.auctionId
+            """
+    )
+    List<CountBid> findCountBidsForAuctionIds(@Param("auctionIds") List<Long> auctionIds);
+
+    // 낙찰자 가져오기
+    @Query("""
+                        SELECT new com.deal4u.fourplease.domain.member.mypage.dto.SuccessfulBidder(
+                            ba.auctionId,
+                            b.bidId,
+                            b.bidder.member.nickName
+                        )
+                        FROM Bid b
+                        JOIN b.auction ba
+                        JOIN b.bidder bidder
+                        JOIN bidder.member m
+                        WHERE b.deleted = false
+                        AND b.isSuccessfulBidder = true
+                        AND ba.auctionId IN :auctionIds
+                        GROUP BY ba.auctionId
+            """
+    )
+    List<SuccessfulBidder> findSuccessfulBidderForAuctionIds(
+            @Param("auctionIds") List<Long> auctionIds);
 
     @Query("""
             SELECT b.bidTime as bidTime,
