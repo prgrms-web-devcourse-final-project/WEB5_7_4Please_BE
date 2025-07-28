@@ -1,6 +1,5 @@
 package com.deal4u.fourplease.domain.member.mypage.dto;
 
-import com.deal4u.fourplease.domain.auction.entity.AuctionDuration;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.settlement.entity.SettlementStatus;
