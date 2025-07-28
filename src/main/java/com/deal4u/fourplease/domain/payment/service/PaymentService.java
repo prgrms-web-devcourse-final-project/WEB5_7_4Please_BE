@@ -36,6 +36,7 @@ public class PaymentService {
     private final PaymentTransactionService paymentTransactionService;
     private final BidRepository bidRepository;
     private final OrderService orderService;
+    private final PaymentSuccessNotifier paymentSuccessNotifier;
 
     public void paymentConfirm(TossPaymentConfirmRequest tossPaymentConfirmRequest) {
         OrderId orderId = OrderId.create(tossPaymentConfirmRequest.orderId());
@@ -59,8 +60,8 @@ public class PaymentService {
             validatePaymentSuccessOrToFailed(response, payment, order);
 
             paymentTransactionService.paymentStatusSuccess(payment, order, auction);
-
-
+            
+            paymentSuccessNotifier.send(payment, order, auction);
         } finally {
             lock.unlock();
         }
