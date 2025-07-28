@@ -52,7 +52,7 @@ public class Auction extends BaseDateEntity {
     private boolean deleted;
 
     public void close() {
-        this.status = AuctionStatus.CLOSED;
+        this.status = AuctionStatus.CLOSE;
     }
 
     public void fail() {

@@ -9,6 +9,7 @@ import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionDuration;
+import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.entity.BidPeriod;
 import com.deal4u.fourplease.domain.auction.entity.Category;
 import com.deal4u.fourplease.domain.auction.entity.Product;
@@ -184,6 +185,7 @@ public class TestUtils {
                         .instantBidPrice(BigDecimal.valueOf(250000))
                         .duration(new AuctionDuration(LocalDateTime.now(),
                                 LocalDateTime.now().plusDays(3)))
+                        .status(AuctionStatus.OPEN)
                         .build(),
                 Auction.builder()
                         .auctionId(2L)
@@ -206,6 +208,7 @@ public class TestUtils {
                         .instantBidPrice(null)
                         .duration(new AuctionDuration(LocalDateTime.now(),
                                 LocalDateTime.now().plusDays(7)))
+                        .status(AuctionStatus.OPEN)
                         .build(),
                 Auction.builder()
                         .auctionId(3L)
@@ -228,6 +231,7 @@ public class TestUtils {
                         .instantBidPrice(null)
                         .duration(new AuctionDuration(LocalDateTime.now(),
                                 LocalDateTime.now().plusDays(1)))
+                        .status(AuctionStatus.OPEN)
                         .build()
 
         );

@@ -2,14 +2,14 @@ package com.deal4u.fourplease.domain.auction.service;
 
 import com.deal4u.fourplease.domain.auction.dto.AuctionListResponse;
 import com.deal4u.fourplease.domain.auction.dto.BidSummaryDto;
+import com.deal4u.fourplease.domain.auction.dto.SellerSaleListResponse;
 import com.deal4u.fourplease.domain.auction.entity.Auction;
-import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
-import com.deal4u.fourplease.domain.auction.entity.SaleAuctionStatus;
 import com.deal4u.fourplease.domain.bid.service.BidService;
-import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
-import com.deal4u.fourplease.domain.shipment.repository.ShipmentRepository;
+import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.wishlist.service.WishlistService;
-import com.deal4u.fourplease.global.exception.ErrorCode;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -23,59 +23,42 @@ public class AuctionSupportService {
     private final BidService bidService;
     private final WishlistService wishlistService;
 
-    private final SettlementRepository settlementRepository;
-    private final ShipmentRepository shipmentRepository;
+    public Page<AuctionListResponse> getAuctionListResponses(
+            Page<Auction> auctionPage,
+            Member member
+    ) {
+        List<Long> auctionIds = auctionPage.getContent().stream()
+                .map(Auction::getAuctionId)
+                .toList();
 
-    public Page<AuctionListResponse> getAuctionListResponses(Page<Auction> auctionPage) {
-        return auctionPage
-                .map(auction -> {
-                    BidSummaryDto bidSummaryDto = bidService
-                            .getBidSummaryDto(auction.getAuctionId());
-                    return AuctionListResponse.toAuctionListResponse(
-                            auction,
-                            bidSummaryDto,
-                            wishlistService.isWishlist(auction)
-                    );
-                });
+        // IN 쿼리로 한번에 가져오기
+        Map<Long, BidSummaryDto> bidSummaryDtoMap = bidService.getBidSummaryDtoMap(auctionIds);
+
+        Set<Long> wishlistAuctionIds =
+                wishlistService.getWishlistAuctionIds(auctionIds, member.getMemberId());
+
+        return auctionPage.map(auction -> {
+            BidSummaryDto bidSummaryDto = bidSummaryDtoMap.get(auction.getAuctionId());
+            boolean isWishlist = wishlistAuctionIds.contains(auction.getAuctionId());
+
+            return AuctionListResponse.toAuctionListResponse(
+                    auction,
+                    bidSummaryDto,
+                    isWishlist
+            );
+        });
     }
 
-    // TODO: 추후 개선 필요
-    public SaleAuctionStatus getSaleAuctionStatus(Auction auction) {
-        if (auction.getStatus().equals(AuctionStatus.OPEN)) {
-            return SaleAuctionStatus.OPEN;
-        }
-        if (auction.getStatus().equals(AuctionStatus.FAIL)) {
-            return SaleAuctionStatus.FAIL;
-        }
-        // AuctionStatus.CLOSE
-        return getSettlementStatus(auction.getAuctionId());
-    }
+    public Page<SellerSaleListResponse> getSellerSaleListResponses(Page<Auction> auctionPage) {
+        List<Long> auctionIds = auctionPage.getContent().stream()
+                .map(Auction::getAuctionId)
+                .toList();
 
-    private SaleAuctionStatus getSettlementStatus(Long auctionId) {
-        String settlementStatus = settlementRepository.getSettlementStatusByAuctionId(auctionId)
-                .toString();
-        if (settlementStatus.equals("PENDING")) {
-            return SaleAuctionStatus.PENDING;
-        }
-        if (settlementStatus.equals("SUCCESS")) {
-            return SaleAuctionStatus.SUCCESS;
-        }
-        if (settlementStatus.equals("REJECTED")) {
-            return SaleAuctionStatus.REJECT;
-        }
+        Map<Long, BidSummaryDto> bidSummaryDtoMap = bidService.getBidSummaryDtoMap(auctionIds);
 
-        return getShipmentStatus(auctionId);
-    }
-
-    private SaleAuctionStatus getShipmentStatus(Long auctionId) {
-        String shipmentStatus = shipmentRepository.getShipmentStatusByAuctionId(auctionId)
-                .toString();
-        if (shipmentStatus.equals("INTRANSIT")) {
-            return SaleAuctionStatus.INTRANSIT;
-        }
-        if (shipmentStatus.equals("DELIVERED")) {
-            return SaleAuctionStatus.DELIVERED;
-        }
-        throw ErrorCode.STATUS_NOT_FOUND.toException();
+        return auctionPage.map(auction -> {
+            BidSummaryDto bidSummaryDto = bidSummaryDtoMap.get(auction.getAuctionId());
+            return SellerSaleListResponse.toSellerSaleListResponse(auction, bidSummaryDto);
+        });
     }
 }
