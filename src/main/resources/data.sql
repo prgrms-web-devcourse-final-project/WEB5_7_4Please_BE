@@ -260,7 +260,7 @@ INSERT INTO orders (
              2000.00,
              5,
              CURRENT_TIMESTAMP,
-             3,
+             23,
              CURRENT_TIMESTAMP,
              '경기도 성남시 분당구 판교로 235',
              '우림W시티 706호',
