@@ -116,7 +116,7 @@ class WishlistTest extends MockMvcBaseAcceptTest {
         // 위시리스트 삭제
         authRequest(testMember.getMemberId())
                 .when()
-                .delete("/api/v1/wishlist/{wishlistId}", wishlistId)
+                .delete("/api/v1/wishlist/{wishlistId}", testAuction.getAuctionId())
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
