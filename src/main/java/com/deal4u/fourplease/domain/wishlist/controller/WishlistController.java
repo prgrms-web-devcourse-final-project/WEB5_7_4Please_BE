@@ -84,13 +84,13 @@ public class WishlistController {
     @ApiResponse(responseCode = "204", description = "위시리스트 삭제 성공")
     @ApiResponse(responseCode = "403", description = "권한 없음")
     @ApiResponse(responseCode = "404", description = "해당 위시리스트를 찾을 수 없음")
-    @DeleteMapping("/{wishlistId}")
+    @DeleteMapping("/{auctionId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWishlist(
-            @PathVariable(name = "wishlistId") @Positive Long wishlistId,
+            @PathVariable(name = "auctionId") @Positive Long auctionId,
             @AuthenticationPrincipal Member member
     ) {
-        wishlistService.deleteByWishlistId(wishlistId, member);
+        wishlistService.deleteByWishlistId(auctionId, member);
     }
 
 }

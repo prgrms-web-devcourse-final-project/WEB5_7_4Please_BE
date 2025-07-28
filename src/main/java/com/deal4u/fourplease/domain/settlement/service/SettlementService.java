@@ -8,7 +8,6 @@ import static com.deal4u.fourplease.global.exception.ErrorCode.SETTLEMENT_NOT_FO
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
-import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.bid.entity.Bid;
 import com.deal4u.fourplease.domain.bid.entity.Bidder;
 import com.deal4u.fourplease.domain.bid.repository.BidRepository;
@@ -35,6 +34,7 @@ public class SettlementService {
     private final SettlementScheduleService settlementScheduleService;
     private final FailedSettlementScheduleService scheduleService;
     private final SecondBidderNotifier secondBidderNotifier;
+    private final HighestBidderNotifier highestBidderNotifier;
 
     @Transactional
     public void save(Long auctionId, int days) {
@@ -63,6 +63,8 @@ public class SettlementService {
         // 2. 정산 스케쥴러 생성
         settlementScheduleService.scheduleSettlementClose(save.getSettlementId(),
                 save.getPaymentDeadline());
+
+        highestBidderNotifier.send(bidder, auction, save.getPaymentDeadline());
     }
 
     private Auction closeAuction(Long auctionId) {
@@ -144,7 +146,7 @@ public class SettlementService {
     }
 
     private Settlement createSettlementForSecondBidder(Bid secondHighestBid, Auction auction,
-            LocalDateTime paymentDeadline) {
+                                                       LocalDateTime paymentDeadline) {
         Settlement settlement = Settlement.builder()
                 .auction(auction)
                 .bidder(secondHighestBid.getBidder())
@@ -205,5 +207,4 @@ public class SettlementService {
                 .orElseThrow(BID_NOT_FOUND::toException);
         bid.update(true);
     }
-
 }

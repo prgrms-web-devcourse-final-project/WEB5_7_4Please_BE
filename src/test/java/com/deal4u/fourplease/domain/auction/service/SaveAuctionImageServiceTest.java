@@ -32,13 +32,13 @@ class SaveAuctionImageServiceTest {
         FakeFileSaver fakeFileSaver = new FakeFileSaver();
         SaveAuctionImageService saveAuctionImageService = new SaveAuctionImageService(
                 saveDataFactory,
-                fakeFileSaver,"test.com");
+                fakeFileSaver, "test.com");
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "file.png",
                 "image/png", // valid MIME type and extension
-                new byte[]{1, 2}
+                new byte[] {1, 2}
         );
         Member test = Member.builder().nickName("test").build();
 
@@ -57,12 +57,12 @@ class SaveAuctionImageServiceTest {
                 () -> "test");
 
         SaveAuctionImageService saveAuctionImageService = new SaveAuctionImageService(
-                saveDataFactory, new FakeFileSaver(),"test.com");
+                saveDataFactory, new FakeFileSaver(), "test.com");
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "file.txt",
                 "text/plain", // valid MIME type and extension
-                new byte[]{1, 2}
+                new byte[] {1, 2}
         );
         Member test = Member.builder().nickName("test").build();
 

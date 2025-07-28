@@ -6,6 +6,11 @@ import static com.deal4u.fourplease.testutil.TestUtils.genMemberById;
 import static com.deal4u.fourplease.testutil.TestUtils.genWishlist;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genAuction;
+import static com.deal4u.fourplease.domain.auction.util.TestUtils.genMember;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -77,15 +82,21 @@ class WishlistServiceTests {
     @DisplayName("위시리스트를 삭제할 수 있다")
     void deleteShouldDeleteWishlistByWishlistId() {
 
-        Long wishlistId = 1L;
+        Long auctionId = 1L;
         Member member = Member.builder()
                 .memberId(1L)
                 .build();
-        Wishlist wishlist = genWishlist(member.getMemberId());
+        Auction auction = genAuction();
 
-        when(wishlistRepository.findById(wishlistId)).thenReturn(Optional.of(wishlist));
+        Wishlist wishlist = Wishlist.builder().auction(auction).memberId(member.getMemberId())
+                .deleted(false).build();
 
-        wishlistService.deleteByWishlistId(wishlistId, member);
+        when(auctionReaderImpl.getAuctionByAuctionId(auctionId)).thenReturn(auction);
+
+        when(wishlistRepository.findWishlist(eq(auction), eq(member.getMemberId())))
+                .thenReturn(Optional.of(wishlist));
+
+        wishlistService.deleteByWishlistId(auctionId, member);
 
         assertThat(wishlist.isDeleted()).isTrue();
 
@@ -95,11 +106,18 @@ class WishlistServiceTests {
     @DisplayName("존재하지 않는 위시리스트 삭제를 시도하면 예외가 발생한다")
     void throwsIfWishlistIdNotExist() {
 
-        when(wishlistRepository.findById(1L)).thenReturn(Optional.empty());
+        Long auctionId = 1L;
+        Member member = genMember();
+        Auction auction = genAuction();
+
+        when(auctionReaderImpl.getAuctionByAuctionId(auctionId)).thenReturn(auction);
+
+        when(wishlistRepository.findWishlist(eq(auction), eq(member.getMemberId())))
+                .thenReturn(Optional.empty());
 
         assertThatThrownBy(
                 () -> {
-                    wishlistService.deleteByWishlistId(1L, genMember());
+                    wishlistService.deleteByWishlistId(auctionId, genMember());
                 }
         ).isInstanceOf(GlobalException.class).hasMessage("해당 위시리스트를 찾을 수 없습니다.");
 
@@ -109,14 +127,25 @@ class WishlistServiceTests {
     @DisplayName("일치하지 않는 사용자가 위시리스트 삭제를 시도하면 예외가 발생한다")
     void throwsIfTryToDeleteWishlistByDifferentMember() {
 
-        Long wishlistId = 1L;
-        Wishlist wishlist = genWishlist(99L);
+        Long auctionId = 1L;
+        Member currentMember = Member.builder().memberId(1L).build();
+        Member wishlistOwner = Member.builder().memberId(99L).build();
+        Auction auction = genAuction();
 
-        when(wishlistRepository.findById(wishlistId)).thenReturn(Optional.of(wishlist));
+        Wishlist wishlist = Wishlist.builder()
+                .auction(auction)
+                .memberId(wishlistOwner.getMemberId())
+                .deleted(false)
+                .build();
+
+        when(auctionReaderImpl.getAuctionByAuctionId(auctionId)).thenReturn(auction);
+
+        when(wishlistRepository.findWishlist(eq(auction), eq(currentMember.getMemberId())))
+                .thenReturn(Optional.of(wishlist));
 
         assertThatThrownBy(
                 () -> {
-                    wishlistService.deleteByWishlistId(wishlistId, genMemberById(2L));
+                    wishlistService.deleteByWishlistId(auctionId, currentMember);
                 }
         ).isInstanceOf(GlobalException.class).hasMessage("권한이 없습니다.");
 

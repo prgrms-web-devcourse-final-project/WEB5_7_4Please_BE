@@ -20,6 +20,7 @@ import com.deal4u.fourplease.domain.bid.repository.BidRepository;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.settlement.entity.Settlement;
 import com.deal4u.fourplease.domain.settlement.repository.SettlementRepository;
+import com.deal4u.fourplease.domain.settlement.service.HighestBidderNotifier;
 import com.deal4u.fourplease.domain.settlement.service.SettlementService;
 import com.deal4u.fourplease.global.exception.GlobalException;
 import java.time.LocalDateTime;
@@ -46,6 +47,9 @@ class SettlementScheduleServiceTest {
 
     @Mock
     private SettlementRepository settlementRepository;
+
+    @Mock
+    private HighestBidderNotifier highestBidderNotifier;
 
     @Mock
     private SettlementScheduleService settlementScheduleService;
@@ -142,5 +146,5 @@ class SettlementScheduleServiceTest {
                 .isInstanceOf(GlobalException.class)
                 .hasMessageContaining("해당 경매를 찾을 수 없습니다.");
     }
-    
+
 }

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deal4U - 결제 완료 안내</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .header-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .success-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #155724;
+            margin-bottom: 5px;
+        }
+
+        .success-subtext {
+            color: #155724;
+            opacity: 0.8;
+        }
+
+        .order-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .order-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 18px;
+            color: #667eea;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .amount {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .next-steps {
+            margin: 30px 0;
+        }
+
+        .steps-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            background-color: #667eea;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+            transition: transform 0.2s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .contact-info {
+            color: #999;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                box-shadow: none;
+            }
+
+            .header, .content, .footer {
+                padding: 20px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .detail-value {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">Deal4U</div>
+        <div class="header-subtitle">결제 완료 안내</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="greeting">
+            안녕하세요, <strong>${buyerName}</strong>님!
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-message">
+            <div class="success-icon">✅</div>
+            <div class="success-text">결제가 성공적으로 완료되었습니다!</div>
+            <div class="success-subtext">주문 내역을 확인해 보세요.</div>
+        </div>
+
+        <!-- Order Details -->
+        <div class="order-details">
+            <div class="order-title">📋 주문 상세 정보</div>
+
+            <div class="detail-row">
+                <span class="detail-label">상품명</span>
+                <span class="detail-value">${auctionTitle}</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">결제 금액</span>
+                <span class="detail-value amount">${paymentAmount}원</span>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="next-steps">
+            <div class="steps-title">📍 다음 단계</div>
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">
+                    <strong>운송장 번호 입력 대기</strong><br>
+                    판매자가 운송장 번호를 입력할 때까지 기다려 주세요.
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">
+                    <strong>상품 수령 및 구매 확정</strong><br>
+                    상품을 받으신 후 구매 확정 처리를 해주세요.
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Button -->
+        <div class="button-container">
+            <a href="${orderDetailsUrl}" class="cta-button">
+                📊 내 입찰내역 확인하기
+            </a>
+        </div>
+
+        <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
+            <div style="color: #856404; font-size: 14px;">
+                <strong>💡 안내사항</strong><br>
+                • 문의사항이 있으시면 고객센터로 연락해 주세요.<br>
+                • 이 이메일은 발신 전용입니다.
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-text">
+            Deal4U를 이용해 주셔서 감사합니다! 🎉
+        </div>
+        <div class="contact-info">
+            고객센터: 1588-0000 | 이메일: support@deal4u.com<br>
+            서울특별시 강남구 테헤란로 427 (우) 06158
+        </div>
+    </div>
+</div>
+</body>
+</html>

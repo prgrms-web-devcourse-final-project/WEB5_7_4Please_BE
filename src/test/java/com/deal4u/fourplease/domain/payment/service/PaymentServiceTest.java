@@ -60,6 +60,9 @@ class PaymentServiceTest {
     @Mock
     private Order buyNowOrder;  // Mock the order
 
+    @Mock
+    private PaymentSuccessNotifier paymentSuccessNotifier;
+
     @InjectMocks
     private PaymentService paymentService;
 
