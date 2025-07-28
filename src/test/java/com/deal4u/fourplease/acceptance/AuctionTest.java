@@ -355,7 +355,7 @@ class AuctionTest extends MockMvcBaseAcceptTest {
 
         // 응답에 URL이 포함되어 있는지 확인
         assertThat(response).isNotNull();
-        assertThat(response.url()).isNotEmpty();
+        assertThat(response.imageUrls().getFirst()).isNotEmpty();
     }
 
     @Test

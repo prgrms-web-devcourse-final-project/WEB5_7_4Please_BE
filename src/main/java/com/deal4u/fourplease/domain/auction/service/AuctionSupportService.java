@@ -34,7 +34,7 @@ public class AuctionSupportService {
         // IN 쿼리로 한번에 가져오기
         Map<Long, BidSummaryDto> bidSummaryDtoMap = bidService.getBidSummaryDtoMap(auctionIds);
 
-        Set<Long> wishlistAuctionIds =
+        Set<Long> wishlistAuctionIds = member == null ? Set.of() :
                 wishlistService.getWishlistAuctionIds(auctionIds, member.getMemberId());
 
         return auctionPage.map(auction -> {
