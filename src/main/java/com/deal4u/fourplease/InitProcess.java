@@ -66,7 +66,7 @@
 //                                """,
 //                        new BatchPreparedStatementSetter() {
 //                            @Override
-//                            public void setValues(PreparedStatement ps, int i) throws SQLException {
+//        public void setValues(PreparedStatement ps, int i) throws SQLException {
 //                                AuctionPair auctionPair = null;
 //                                int countValue = -1;
 //                                synchronized (pairs) {
@@ -136,7 +136,7 @@
 //                                """,
 //                        new BatchPreparedStatementSetter() {
 //                            @Override
-//                            public void setValues(PreparedStatement ps, int i) throws SQLException {
+//                public void setValues(PreparedStatement ps, int i) throws SQLException {
 //                                int value = atomicInteger.incrementAndGet();
 //                                ps.setLong(1, value + 2);
 //                                if (value <= 7000) {
