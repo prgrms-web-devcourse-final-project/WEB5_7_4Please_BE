@@ -48,7 +48,12 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(String.format("{\"token\":\"%s\"}", token));
+            response.getWriter().write(
+                    String.format(
+                            "{\"token\":\"%s\"}",
+                            token
+                    )
+            );
             response.getWriter().flush();
             return;
         }
@@ -65,6 +70,17 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
                 .maxAge(Duration.ofDays(7))
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(
+                String.format(
+                        "{\"nickname\":\"%s\"}",
+                        member.getNickName()
+                )
+        );
+        response.getWriter().flush();
+
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }
