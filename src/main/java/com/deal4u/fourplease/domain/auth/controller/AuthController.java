@@ -3,16 +3,15 @@ package com.deal4u.fourplease.domain.auth.controller;
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
 import com.deal4u.fourplease.domain.auth.service.AuthService;
 import com.deal4u.fourplease.domain.auth.service.LogoutService;
+import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -29,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtProvider jwtProvider;
     private final LogoutService logoutService;
 
     @PostMapping("/reissue/token")
@@ -36,21 +36,14 @@ public class AuthController {
             @CookieValue(value = "refreshToken", required = false) String refreshToken,
             HttpServletResponse response
     ) {
+        log.info("재발급: " + refreshToken);
         TokenPair tokenPair = authService.refreshAccessToken(refreshToken);
 
         // access token → 헤더
         response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
 
-        // refresh token → 쿠키
-        ResponseCookie refreshCookie = ResponseCookie
-                .from("refreshToken", tokenPair.refreshToken())
-                .httpOnly(true)
-                .secure(false) // 운영 환경에서는 true
-                .path("/")
-                .sameSite("None") // 운영 환경에서는 Strict
-                .maxAge(Duration.ofDays(7))
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE,
+                jwtProvider.refreshTokenCookie(tokenPair.refreshToken()).toString());
         return ResponseEntity.ok().build(); // 바디 없이 OK 응답
     }
 
