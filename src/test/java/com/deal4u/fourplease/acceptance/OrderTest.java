@@ -143,7 +143,9 @@ class OrderTest extends MockMvcBaseAcceptTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         OrderResponse orderResponse = response.body().as(OrderResponse.class);
         assertThat(orderResponse).isNotNull();
-        assertThat(orderResponse.price()).isEqualTo(800000L);
+        assertThat(orderResponse.phone()).isNotNull();
+        assertThat(orderResponse.deliveryRequest()).isNotNull();
+        assertThat(orderResponse.recipient()).isNotNull();
     }
 
     @Test

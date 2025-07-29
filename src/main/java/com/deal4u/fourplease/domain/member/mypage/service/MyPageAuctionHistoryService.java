@@ -88,6 +88,7 @@ public class MyPageAuctionHistoryService {
                     String name = (String) tuple.get("name");
                     BigDecimal instantPrice = (BigDecimal) tuple.get("instantBidPrice");
                     LocalDateTime endTime = (LocalDateTime) tuple.get("endTime");
+                    String orderId = (String) tuple.get("orderId"); // 추가된 부분
 
                     SettlementDeadline settlementDeadline = deadlineMap.get(auctionId);
 
@@ -131,7 +132,8 @@ public class MyPageAuctionHistoryService {
                             bidderName,
                             paymentDeadline,
                             createdAt,
-                            status
+                            status,
+                            orderId
                     );
                 })
                 .toList();
