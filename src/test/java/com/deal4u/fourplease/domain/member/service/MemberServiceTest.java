@@ -17,6 +17,7 @@ import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
+import java.time.Duration;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -56,6 +58,13 @@ class MemberServiceTest {
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
         when(memberRepository.existsByNickName(nickname)).thenReturn(false);
         when(authService.createTokenPair(member)).thenReturn(new TokenPair("access", "refresh"));
+        when(jwtProvider.refreshTokenCookie(member)).thenReturn(ResponseCookie
+                .from("refreshToken", "refresh")
+                .httpOnly(true)
+                .secure(false) // 운영 환경에서는 true
+                .path("/")
+                .maxAge(Duration.ofMillis(1000))
+                .build());
 
         ResponseEntity<SignupResponse> data = memberService.signup(validToken, request);
 

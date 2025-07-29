@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,6 +90,14 @@ class Oauth2AuthenticationSuccessHandlerTest {
         when(authService.createTokenPair(member)).thenReturn(
                 new TokenPair(accessToken, refreshToken));
         when(member.getEmail()).thenReturn("test@example.com");
+        ResponseCookie cookie = ResponseCookie
+                .from("refreshToken", "refresh")
+                .httpOnly(true)
+                .secure(false) // 운영 환경에서는 true
+                .path("/")
+                .maxAge(Duration.ofMillis(1000))
+                .build();
+        when(jwtProvider.refreshTokenCookie(member)).thenReturn(cookie);
 
         // when
         successHandler.onAuthenticationSuccess(request, response, authentication);
