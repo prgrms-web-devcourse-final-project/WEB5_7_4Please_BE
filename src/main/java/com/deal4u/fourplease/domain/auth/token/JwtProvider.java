@@ -58,6 +58,16 @@ public class JwtProvider {
                 .build();
     }
 
+    public ResponseCookie refreshTokenCookie(String token) {
+        return  ResponseCookie
+                .from("refreshToken", token)
+                .httpOnly(true)
+                .secure(false) // 운영 환경에서는 true
+                .path("/")
+                .maxAge(Duration.ofMillis(refreshTokenExpiration))
+                .build();
+    }
+
     private String generateAccessToken(Member member) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenExpiration);
