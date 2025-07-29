@@ -48,8 +48,8 @@ class ProductServiceTests {
         ProductCreateDto req = genProductCreateDto();
         Member seller = genMember();
 
-        Category category = new Category(4L, "생활용품");
-        when(categoryRepository.findById(4L)).thenReturn(Optional.of(category));
+        Category category = new Category(5L, "생활용품");
+        when(categoryRepository.findById(5L)).thenReturn(Optional.of(category));
 
         Product actualProduct = productService.save(req);
 

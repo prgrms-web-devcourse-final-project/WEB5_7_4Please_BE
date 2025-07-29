@@ -82,7 +82,7 @@ class AuctionEndTest extends MockMvcBaseAcceptTest {
     }
 
     @Test
-    @DisplayName("경매 상태가 CLOSED로 변경되면 입찰 불가")
+    @DisplayName("경매 상태가 CLOSE로 변경되면 입찰 불가")
     void bidOnClosedAuctionFails() {
 
         // when - 종료된 경매에 입찰 시도
