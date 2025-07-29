@@ -6,7 +6,6 @@ import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.auction.repository.CategoryRepository;
 import com.deal4u.fourplease.domain.auction.repository.ProductRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,9 +24,11 @@ public class ProductService {
         Category category = categoryRepository.findById(request.categoryId())
                 .orElseThrow(ErrorCode.CATEGORY_NOT_FOUND::toException);
         Product product = request.toEntity(category);
-        productImageService.save(product, request.imageUrls());
 
         productRepository.save(product);
+
+        productImageService.save(product, request.imageUrls());
+
         return product;
     }
 
@@ -35,9 +36,5 @@ public class ProductService {
     public void deleteProduct(Product targetProduct) {
         productImageService.deleteProductImage(targetProduct);
         targetProduct.delete();
-    }
-
-    public List<Product> getProductListBySellerId(Long sellerId) {
-        return productRepository.findBySellerId(sellerId);
     }
 }
