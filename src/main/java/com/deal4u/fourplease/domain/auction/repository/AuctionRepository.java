@@ -28,7 +28,6 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "WHERE a.auctionId = :auctionId")
     Optional<Auction> findByIdWithProductAndSellerAndMember(@Param("auctionId") Long auctionId);
 
-
     @Query("SELECT a "
             + "FROM Auction a "
             + "WHERE a.auctionId = :auctionId "
@@ -56,6 +55,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     @Query("SELECT a "
             + "FROM Auction a "
             + "WHERE a.deleted = false")
+    @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findAll(Pageable pageable);
 
     @Query("SELECT a "
@@ -65,6 +65,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "WHERE a.deleted = false "
             + "AND p.name LIKE %:keyword% "
             + "AND c.categoryId = :categoryId")
+    @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findByKeywordAndCategoryId(
             @Param("keyword") String keyword,
             @Param("categoryId") Long categoryId,
@@ -76,6 +77,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "JOIN a.product p "
             + "WHERE a.deleted = false "
             + "AND p.name LIKE %:keyword%")
+    @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     @Query("SELECT a "
@@ -83,6 +85,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "JOIN a.product.category c "
             + "WHERE a.deleted = false "
             + "AND c.categoryId = :categoryId")
+    @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
 
     @Query("SELECT a "
@@ -93,6 +96,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "GROUP BY a.auctionId "
             + "ORDER BY COUNT(b) DESC, "
             + "a.createdAt DESC")
+    @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findAllOrderByBidCount(Pageable pageable);
 
     @Query("SELECT a "
@@ -106,6 +110,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "AND c.categoryId = :categoryId "
             + "GROUP BY a.auctionId "
             + "ORDER BY COUNT(b) DESC")
+    @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findByKeywordAndCategoryIdOrderByBidCount(
             @Param("keyword") String keyword,
             @Param("categoryId") Long categoryId,
@@ -121,6 +126,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "AND p.name LIKE %:keyword% "
             + "GROUP BY a.auctionId "
             + "ORDER BY COUNT(b) DESC")
+    @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findByKeywordOrderByBidCount(@Param("keyword") String keyword, Pageable pageable);
 
     @Query("SELECT a "
@@ -132,6 +138,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "AND c.categoryId = :categoryId "
             + "GROUP BY a.auctionId "
             + "ORDER BY COUNT(b) DESC")
+    @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findByCategoryIdOrderByBidCount(
             @Param("categoryId") Long categoryId,
             Pageable pageable
