@@ -226,7 +226,6 @@ class AuctionServiceTests {
 
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
 
-
         assertThatThrownBy(() -> {
             auctionService.deleteByAuctionId(auctionId, genMemberById(2L));
         }).isInstanceOf(GlobalException.class).hasMessage("권한이 없습니다.");
@@ -430,7 +429,7 @@ class AuctionServiceTests {
         when(reviewRepository.countBySellerMemberId(sellerId)).thenReturn(totalReviews);
         when(reviewRepository.getAverageRatingBySellerMemberId(sellerId)).thenReturn(
                 averageRating);
-        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE))
+        when(auctionRepository.countBySellerId(sellerId))
                 .thenReturn(completedDeals);
 
         // When
@@ -482,7 +481,7 @@ class AuctionServiceTests {
                 Optional.of(auction));
         when(reviewRepository.countBySellerMemberId(sellerId)).thenReturn(totalReviews);
         when(reviewRepository.getAverageRatingBySellerMemberId(sellerId)).thenReturn(averageRating);
-        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE))
+        when(auctionRepository.countBySellerId(sellerId))
                 .thenReturn(completedDeals);
 
         // When
@@ -535,7 +534,7 @@ class AuctionServiceTests {
                 Optional.of(auction));
         when(reviewRepository.countBySellerMemberId(sellerId)).thenReturn(totalReviews);
         when(reviewRepository.getAverageRatingBySellerMemberId(sellerId)).thenReturn(averageRating);
-        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE))
+        when(auctionRepository.countBySellerId(sellerId))
                 .thenReturn(completedDeals);
 
         // When
@@ -586,6 +585,7 @@ class AuctionServiceTests {
                 BigDecimal.valueOf(2000000L),
                 3
         );
+      
         List<String> productImageUrls =
                 List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg");
 
@@ -622,8 +622,10 @@ class AuctionServiceTests {
                 BigDecimal.valueOf(2000000L),
                 3
         );
+
         List<String> productImageUrls =
                 List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg");
+
         ProductImageListResponse productImageListResponse = mock(ProductImageListResponse.class);
 
         // Mocking 설정
