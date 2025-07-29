@@ -73,17 +73,17 @@ VALUES ('bidderA@example.com', '입찰자A', 'USER', 'ACTIVE','naver', CURRENT_T
 
 -- 카테고리 정보
 INSERT INTO product_categories (category_id, name)
-VALUES (0, '패션');
+VALUES (1, '패션');
 INSERT INTO product_categories (category_id, name)
-VALUES (1, '전자제품');
+VALUES (2, '전자제품');
 INSERT INTO product_categories (category_id, name)
-VALUES (2, '스포츠');
+VALUES (3, '스포츠');
 INSERT INTO product_categories (category_id, name)
-VALUES (3, '가구');
+VALUES (4, '가구');
 INSERT INTO product_categories (category_id, name)
-VALUES (4, '생활용품');
+VALUES (5, '생활용품');
 INSERT INTO product_categories (category_id, name)
-VALUES (5, '기타');
+VALUES (6, '기타');
 
 -- 상품 정보
 INSERT INTO products (name, description, thumbnail_url, address, detail_address, zip_code,

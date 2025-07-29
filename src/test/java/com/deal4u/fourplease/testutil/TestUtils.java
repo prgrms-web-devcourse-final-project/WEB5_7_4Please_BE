@@ -34,7 +34,7 @@ public class TestUtils {
                 "한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.",
                 "http://example.com/thumbnail.jpg",
                 List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg"),
-                4L,
+                5L,
                 "서울시 강남구",
                 "101동 102호",
                 "000000",
@@ -75,7 +75,7 @@ public class TestUtils {
                         "000000"
                 ))
                 .seller(Seller.create(genMember()))
-                .category(new Category(4L, "생활용품"))
+                .category(new Category(5L, "생활용품"))
                 .phone("010-0000-0000")
                 .build();
     }
@@ -90,7 +90,7 @@ public class TestUtils {
                 "한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.",
                 "http://example.com/thumbnail.jpg",
                 List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg"),
-                4L,
+                5L,
                 "서울시 강남구",
                 "101동 102호",
                 "000000",
@@ -109,7 +109,7 @@ public class TestUtils {
                 20,
                 BigDecimal.valueOf(1000000),
                 "칫솔",
-                4L,
+                5L,
                 "생활용품",
                 "한 번도 사용하지 않은 새 칫솔 입니다. 치약은 없습니다.",
                 LocalDateTime.now(),
@@ -131,7 +131,7 @@ public class TestUtils {
                 new AuctionListResponse(
                         1L,
                         "http://example.com/thumbnail1.jpg",
-                        new CategoryDto(0L, "패션"),
+                        new CategoryDto(1L, "패션"),
                         "목도리",
                         BigDecimal.valueOf(200000),
                         BigDecimal.valueOf(250000),
@@ -142,7 +142,7 @@ public class TestUtils {
                 new AuctionListResponse(
                         2L,
                         "http://example.com/thumbnail2.jpg",
-                        new CategoryDto(2L, "스포츠"),
+                        new CategoryDto(3L, "스포츠"),
                         "축구공",
                         BigDecimal.valueOf(10000000),
                         null,
@@ -153,7 +153,7 @@ public class TestUtils {
                 new AuctionListResponse(
                         3L,
                         "http://example.com/thumbnail3.jpg",
-                        new CategoryDto(4L, "생활용품"),
+                        new CategoryDto(5L, "생활용품"),
                         "칫솔",
                         BigDecimal.valueOf(2000000),
                         null,
@@ -190,7 +190,7 @@ public class TestUtils {
                                                 "999999"
                                         ))
                                         .seller(Seller.create(genMember()))
-                                        .category(new Category(0L, "패션"))
+                                        .category(new Category(1L, "패션"))
                                         .phone("010-9999-9999")
                                         .build()
                         )
@@ -213,7 +213,7 @@ public class TestUtils {
                                                 "333333"
                                         ))
                                         .seller(Seller.create(genMember()))
-                                        .category(new Category(2L, "스포츠"))
+                                        .category(new Category(3L, "스포츠"))
                                         .phone("010-3333-3333")
                                         .build()
                         )
@@ -236,7 +236,7 @@ public class TestUtils {
                                                 "000000"
                                         ))
                                         .seller(Seller.create(genMember()))
-                                        .category(new Category(4L, "생활용품"))
+                                        .category(new Category(5L, "생활용품"))
                                         .phone("010-0000-0000")
                                         .build()
                         )
@@ -306,7 +306,7 @@ public class TestUtils {
                                 "999999"
                         ))
                         .seller(Seller.create(genMember()))
-                        .category(new Category(0L, "패션"))
+                        .category(new Category(1L, "패션"))
                         .phone("010-9999-9999")
                         .build(),
                 Product.builder()
@@ -320,7 +320,7 @@ public class TestUtils {
                                 "333333"
                         ))
                         .seller(Seller.create(genMember()))
-                        .category(new Category(2L, "스포츠"))
+                        .category(new Category(3L, "스포츠"))
                         .phone("010-3333-3333")
                         .build(),
                 Product.builder()
@@ -334,7 +334,7 @@ public class TestUtils {
                                 "000000"
                         ))
                         .seller(Seller.create(genMember()))
-                        .category(new Category(4L, "생활용품"))
+                        .category(new Category(5L, "생활용품"))
                         .phone("010-0000-0000")
                         .build()
         );
@@ -382,12 +382,4 @@ public class TestUtils {
                 .build();
     }
 
-
-    public static Wishlist genWishlist(Long memberId) {
-        return Wishlist.builder()
-                .memberId(1L)
-                .auction(genAuction())
-                .deleted(false)
-                .build();
-    }
 }
