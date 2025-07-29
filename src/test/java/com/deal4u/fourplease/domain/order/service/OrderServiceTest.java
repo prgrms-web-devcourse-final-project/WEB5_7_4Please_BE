@@ -372,18 +372,15 @@ class OrderServiceTest {
                     .build();
 
             Order orderWithProduct = Order.builder()
-                    .id(1L)
-                    .orderId(orderIdObj)
+                    .id(1L) // DB ID는 여전히 Long
+                    .orderId(orderIdObj) // UUID 기반 OrderId 객체
                     .price(new BigDecimal("100.0"))
                     .auction(auctionWithProduct)
                     .address(address)
                     .orderer(orderer)
-                    .phone("010-1234-5678")
-                    .content("주문 내용")
-                    .receiver("수령인")
                     .build();
 
-            when(orderRepository.findByOrderId(orderId))
+            when(orderRepository.findByOrderIdWithAuctionAndProduct(orderId))
                     .thenReturn(Optional.of(orderWithProduct));
 
             // When
@@ -391,15 +388,13 @@ class OrderServiceTest {
 
             // Then
             assertThat(result).isNotNull();
+            assertThat(result.price()).isEqualTo(orderWithProduct.getPrice().longValue());
+            assertThat(result.productName()).isEqualTo(
+                    orderWithProduct.getAuction().getProduct().getName());
+            assertThat(result.imageUrl()).isEqualTo(
+                    orderWithProduct.getAuction().getProduct().getThumbnailUrl());
 
-            assertThat(result.address()).isEqualTo(address.address());
-            assertThat(result.addressDetail()).isEqualTo(address.addressDetail());
-            assertThat(result.zipCode()).isEqualTo(address.zipCode());
-            assertThat(result.phone()).isEqualTo(orderWithProduct.getPhone());
-            assertThat(result.deliveryRequest()).isEqualTo(orderWithProduct.getContent());
-            assertThat(result.recipient()).isEqualTo(orderWithProduct.getReceiver());
-
-            verify(orderRepository, times(1)).findByOrderId(orderId);
+            verify(orderRepository, times(1)).findByOrderIdWithAuctionAndProduct(orderId);
         }
 
         @Test
@@ -408,7 +403,7 @@ class OrderServiceTest {
             // Given
             String orderId = "non-existent-order-uuid";
 
-            when(orderRepository.findByOrderId(orderId))
+            when(orderRepository.findByOrderIdWithAuctionAndProduct(orderId))
                     .thenReturn(Optional.empty());
 
             // When, Then

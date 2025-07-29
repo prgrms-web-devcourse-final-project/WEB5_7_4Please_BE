@@ -141,7 +141,7 @@ public class OrderService {
     }
 
     private Order getOrderOrThrow(String orderId) {
-        return orderRepository.findByOrderId(orderId)
+        return orderRepository.findByOrderIdWithAuctionAndProduct(orderId)
                 .orElseThrow(ORDER_NOT_FOUND::toException);
     }
 
