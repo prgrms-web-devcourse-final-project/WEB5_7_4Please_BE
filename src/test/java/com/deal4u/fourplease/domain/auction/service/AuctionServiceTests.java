@@ -221,7 +221,6 @@ class AuctionServiceTests {
 
         when(auctionRepository.findByIdWithProduct(auctionId)).thenReturn(Optional.of(auction));
 
-
         assertThatThrownBy(() -> {
             auctionService.deleteByAuctionId(auctionId, genMemberById(2L));
         }).isInstanceOf(GlobalException.class).hasMessage("권한이 없습니다.");
@@ -243,9 +242,12 @@ class AuctionServiceTests {
         when(auctionRepository.findAllBySellerId(sellerId, pageable)).thenReturn(auctionPage);
 
         List<SellerSaleListResponse> responseList = List.of(
-                SellerSaleListResponse.toSellerSaleListResponse(auctionList.get(0), new BidSummaryDto(BigDecimal.valueOf(2000000), 5)),
-                SellerSaleListResponse.toSellerSaleListResponse(auctionList.get(1), new BidSummaryDto(BigDecimal.valueOf(10000000), 20)),
-                SellerSaleListResponse.toSellerSaleListResponse(auctionList.get(2), new BidSummaryDto(BigDecimal.valueOf(2000000), 20))
+                SellerSaleListResponse.toSellerSaleListResponse(auctionList.get(0),
+                        new BidSummaryDto(BigDecimal.valueOf(2000000), 5)),
+                SellerSaleListResponse.toSellerSaleListResponse(auctionList.get(1),
+                        new BidSummaryDto(BigDecimal.valueOf(10000000), 20)),
+                SellerSaleListResponse.toSellerSaleListResponse(auctionList.get(2),
+                        new BidSummaryDto(BigDecimal.valueOf(2000000), 20))
         );
         when(auctionSupportService.getSellerSaleListResponses(auctionPage))
                 .thenReturn(new PageImpl<>(responseList, pageable, responseList.size()));
@@ -422,7 +424,7 @@ class AuctionServiceTests {
         when(reviewRepository.countBySellerMemberId(sellerId)).thenReturn(totalReviews);
         when(reviewRepository.getAverageRatingBySellerMemberId(sellerId)).thenReturn(
                 averageRating);
-        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE))
+        when(auctionRepository.countBySellerId(sellerId))
                 .thenReturn(completedDeals);
 
         // When
@@ -474,7 +476,7 @@ class AuctionServiceTests {
                 Optional.of(auction));
         when(reviewRepository.countBySellerMemberId(sellerId)).thenReturn(totalReviews);
         when(reviewRepository.getAverageRatingBySellerMemberId(sellerId)).thenReturn(averageRating);
-        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE))
+        when(auctionRepository.countBySellerId(sellerId))
                 .thenReturn(completedDeals);
 
         // When
@@ -527,7 +529,7 @@ class AuctionServiceTests {
                 Optional.of(auction));
         when(reviewRepository.countBySellerMemberId(sellerId)).thenReturn(totalReviews);
         when(reviewRepository.getAverageRatingBySellerMemberId(sellerId)).thenReturn(averageRating);
-        when(auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE))
+        when(auctionRepository.countBySellerId(sellerId))
                 .thenReturn(completedDeals);
 
         // When
@@ -578,7 +580,8 @@ class AuctionServiceTests {
                 BigDecimal.valueOf(2000000L),
                 3
         );
-        List<String> productImageUrls = List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg");
+        List<String> productImageUrls = List.of("http://example.com/image1.jpg",
+                "http://example.com/image2.jpg");
 
         ProductImageListResponse productImageListResponse = mock(ProductImageListResponse.class);
 
@@ -588,7 +591,8 @@ class AuctionServiceTests {
         when(productImageService.getByProduct(product)).thenReturn(productImageListResponse);
         when(productImageListResponse.toProductImageUrls()).thenReturn(productImageUrls);
 
-        when(wishlistRepository.findWishlist(auction, member.getMemberId())).thenReturn(Optional.of(wishlist));
+        when(wishlistRepository.findWishlist(auction, member.getMemberId())).thenReturn(
+                Optional.of(wishlist));
 
         // When
         AuctionDetailResponse actualResp = auctionService.getByAuctionId(auctionId, member);
@@ -612,7 +616,8 @@ class AuctionServiceTests {
                 BigDecimal.valueOf(2000000L),
                 3
         );
-        List<String> productImageUrls = List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg");
+        List<String> productImageUrls = List.of("http://example.com/image1.jpg",
+                "http://example.com/image2.jpg");
         ProductImageListResponse productImageListResponse = mock(ProductImageListResponse.class);
 
         // Mocking 설정
