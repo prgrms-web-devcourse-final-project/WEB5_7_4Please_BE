@@ -4,12 +4,10 @@ import com.deal4u.fourplease.domain.auction.entity.Address;
 import com.deal4u.fourplease.domain.auction.entity.Product;
 import com.deal4u.fourplease.domain.order.dto.OrderResponse;
 import com.deal4u.fourplease.domain.order.entity.Order;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class OrderMapper {
-
-    private OrderMapper() {
-        // 인스턴스화 방지
-    }
 
     public static OrderResponse toOrderResponse(Order order) {
         Product product = order.getAuction().getProduct();

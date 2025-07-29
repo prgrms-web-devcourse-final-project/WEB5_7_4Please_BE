@@ -167,9 +167,11 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
                    a.status AS status,
                    p.name AS name,
                    p.thumbnailUrl AS thumbnailUrl,
-                   p.category as category
+                   p.category as category,
+                   o.orderId.orderId as orderId
             FROM Auction a
             JOIN a.product p
+            LEFT JOIN Order o ON o.auction.auctionId = a.auctionId
             WHERE a.product.seller.member.memberId = :memberId
             AND a.deleted = FALSE
             ORDER BY a.createdAt DESC

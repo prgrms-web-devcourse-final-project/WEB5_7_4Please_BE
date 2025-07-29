@@ -18,7 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByOrderId(OrderId orderId);
 
     Optional<Order> findByOrdererAndAuctionAndOrderStatus(Orderer orderer, Auction auction,
-            OrderStatus status);
+                                                          OrderStatus status);
 
 
     @Query("SELECT o FROM Order o "
@@ -26,5 +26,4 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             + "JOIN FETCH a.product p "
             + "WHERE o.orderId.orderId = :orderId")
     Optional<Order> findByOrderIdWithAuctionAndProduct(@Param("orderId") String orderId);
-
 }
