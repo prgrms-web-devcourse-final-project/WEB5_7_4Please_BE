@@ -51,7 +51,6 @@ public class WishlistController {
             @Valid @RequestBody WishlistCreateRequest request,
             @AuthenticationPrincipal Member member
     ) {
-        // TODO: 병합 후 멤버 검증 validator로 변경 필요
         if (member == null) {
             throw ErrorCode.FORBIDDEN_RECEIVER.toException();
         }
@@ -70,7 +69,6 @@ public class WishlistController {
             @RequestParam(name = "order", defaultValue = "latest") String order,
             @AuthenticationPrincipal Member member
     ) {
-        // TODO: 병합 후 멤버 검증 validator로 변경 필요
         if (member == null) {
             throw ErrorCode.FORBIDDEN_RECEIVER.toException();
         }

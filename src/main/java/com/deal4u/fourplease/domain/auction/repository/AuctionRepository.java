@@ -54,7 +54,8 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @Query("SELECT a "
             + "FROM Auction a "
-            + "WHERE a.deleted = false")
+            + "WHERE a.deleted = false "
+            + "AND a.status = 'OPEN'")
     @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findAll(Pageable pageable);
 
@@ -63,6 +64,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "JOIN a.product p "
             + "JOIN p.category c "
             + "WHERE a.deleted = false "
+            + "AND a.status = 'OPEN' "
             + "AND p.name LIKE %:keyword% "
             + "AND c.categoryId = :categoryId")
     @EntityGraph(attributePaths = {"product", "product.category"})
@@ -76,6 +78,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "FROM Auction a "
             + "JOIN a.product p "
             + "WHERE a.deleted = false "
+            + "AND a.status = 'OPEN' "
             + "AND p.name LIKE %:keyword%")
     @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
@@ -84,6 +87,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "FROM Auction a "
             + "JOIN a.product.category c "
             + "WHERE a.deleted = false "
+            + "AND a.status = 'OPEN' "
             + "AND c.categoryId = :categoryId")
     @EntityGraph(attributePaths = {"product", "product.category"})
     Page<Auction> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
@@ -93,6 +97,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "LEFT JOIN Bid b "
             + "ON b.auction = a "
             + "WHERE a.deleted = false "
+            + "AND a.status = 'OPEN' "
             + "GROUP BY a.auctionId "
             + "ORDER BY COUNT(b) DESC, "
             + "a.createdAt DESC")
@@ -106,6 +111,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "LEFT JOIN Bid b "
             + "ON b.auction = a "
             + "WHERE a.deleted = false "
+            + "AND a.status = 'OPEN' "
             + "AND p.name LIKE %:keyword% "
             + "AND c.categoryId = :categoryId "
             + "GROUP BY a.auctionId "
@@ -123,6 +129,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "LEFT JOIN Bid b "
             + "ON b.auction = a "
             + "WHERE a.deleted = false "
+            + "AND a.status = 'OPEN' "
             + "AND p.name LIKE %:keyword% "
             + "GROUP BY a.auctionId "
             + "ORDER BY COUNT(b) DESC")
@@ -135,6 +142,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
             + "LEFT JOIN Bid b "
             + "ON b.auction = a "
             + "WHERE a.deleted = false "
+            + "AND a.status = 'OPEN' "
             + "AND c.categoryId = :categoryId "
             + "GROUP BY a.auctionId "
             + "ORDER BY COUNT(b) DESC")

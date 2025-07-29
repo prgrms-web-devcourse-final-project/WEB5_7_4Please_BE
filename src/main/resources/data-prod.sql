@@ -73,38 +73,40 @@ VALUES ('bidderA@example.com', '입찰자A', 'USER', 'ACTIVE','naver', CURRENT_T
 
 -- 카테고리 정보
 INSERT INTO product_categories (category_id, name)
-VALUES (0, '패션');
+VALUES (0, '');
 INSERT INTO product_categories (category_id, name)
-VALUES (1, '전자제품');
+VALUES (1, '패션');
 INSERT INTO product_categories (category_id, name)
-VALUES (2, '스포츠');
+VALUES (2, '전자제품');
 INSERT INTO product_categories (category_id, name)
-VALUES (3, '가구');
+VALUES (3, '스포츠');
 INSERT INTO product_categories (category_id, name)
-VALUES (4, '생활용품');
+VALUES (4, '가구');
 INSERT INTO product_categories (category_id, name)
-VALUES (5, '기타');
+VALUES (5, '생활용품');
+INSERT INTO product_categories (category_id, name)
+VALUES (6, '기타');
 
 -- 상품 정보
 INSERT INTO products (name, description, thumbnail_url, address, detail_address, zip_code,
                       seller_member_id, category_category_id, phone, deleted,
                       created_at, updated_at)
 VALUES ('최신형 노트북', '한 번도 사용하지 않은 최신형 노트북입니다. 성능이 매우 뛰어납니다.',
-        'https://example.com/images/laptop.jpg', '경기도 평택시 안산로 25번길 21', '100동 102호', '12345', 1, 1,
+        'https://example.com/images/laptop.jpg', '경기도 평택시 안산로 25번길 21', '100동 102호', '12345', 1, 2,
         '010-1234-5678', false,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        ('최신형 IPhone 16', '미개봉 IPhone 16입니다. 256gb, 컬러는 화이트입니다. 쿨거래시 네고 가능합니다.',
         'https://example.com/images/iPhone16.jpg', '경기도 오산시 안산로 25번길 21', '100동 1004호', '12333', 2,
-        1,
+        2,
         '010-2222-1111', false,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        ('삼성 갤럭시 Z 플립6', '갤럭시 Z 플립6 새제품입니다. 퍼플 컬러이며, 박스 미개봉입니다. 직거래 및 택배 모두 가능합니다.',
         'https://example.com/images/galaxyZFlip6.jpg', '서울특별시 마포구 월드컵북로 396', '202호', '04567', 3,
-        1,
+        2,
         '010-3333-4444', false,
         DATEADD('DAY', -4, CURRENT_TIMESTAMP), DATEADD('DAY', -4, CURRENT_TIMESTAMP)),
        ('삭제를 위한 품목', '삭제 테스트를 위해서 추가한 데이터',
-        'https://example.com/images/delete.jpg', '경기도 평택시 안산로 25번길 21', '100동 102호', '12345', 1, 1,
+        'https://example.com/images/delete.jpg', '경기도 평택시 안산로 25번길 21', '100동 102호', '12345', 1, 2,
         '010-1234-5678', false,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
        ('애플 아이폰 15 프로 맥스',
@@ -114,7 +116,7 @@ VALUES ('최신형 노트북', '한 번도 사용하지 않은 최신형 노트�
         '1501호',
         '61200',
         1,
-        0,
+        1,
         '010-9999-8888',
         false,
         DATEADD('DAY', -4, CURRENT_TIMESTAMP),
@@ -127,7 +129,7 @@ VALUES ('최신형 노트북', '한 번도 사용하지 않은 최신형 노트�
         '1501호',
         '61200',
         1,
-        0,
+        1,
         '010-9999-8888',
         false,
         DATEADD('DAY', -4, CURRENT_TIMESTAMP),
