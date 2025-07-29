@@ -262,7 +262,7 @@
 //                                ps.setString(3, settlementData.status()); // status
 //                                ps.setTimestamp(4,
 //                                        settlementData.paymentDeadline()); // payment_deadline
-//                                ps.setString(5, settlementData.rejectedReason()); // rejected_reason
+//                                ps.setString(5, settlementData.rejectedReason());
 //                                ps.setTimestamp(6, settlementData.paidAt()); // paid_at
 //                            }
 //
@@ -355,7 +355,8 @@
 //                                """,
 //                        new BatchPreparedStatementSetter() {
 //                            @Override
-//                            public void setValues(PreparedStatement ps, int i) throws SQLException {
+//                            public void setValues(PreparedStatement ps, int i)
+//                            throws SQLException {
 //                                int index = atomicInteger.incrementAndGet();
 //
 //                                // CLOSE 상태 경매 중에서 랜덤하게 선택
@@ -366,7 +367,7 @@
 //                                ps.setInt(2, (index % 20) + 2); // member_id (2~21)
 //                                ps.setLong(3, auctionId); // auction_id
 //                                ps.setBigDecimal(4,
-//                                        new java.math.BigDecimal(10000 + (index % 50000))); // price
+//                                new java.math.BigDecimal(10000 + (index % 50000))); // price
 //                                ps.setString(5, generateAddress(index)); // address
 //                                ps.setString(6, generateAddressDetail(index)); // address_detail
 //                                ps.setString(7, generateZipCode(index)); // zip_code
@@ -483,7 +484,8 @@
 //                                """,
 //                        new BatchPreparedStatementSetter() {
 //                            @Override
-//                            public void setValues(PreparedStatement ps, int i) throws SQLException {
+//                            public void setValues(PreparedStatement ps, int i)
+//                            throws SQLException {
 //                                int index = atomicInteger.incrementAndGet();
 //
 //                                // 주문 ID 중에서 순차적으로 선택 (각 주문마다 하나의 결제)
@@ -551,7 +553,8 @@
 //                                """,
 //                        new BatchPreparedStatementSetter() {
 //                            @Override
-//                            public void setValues(PreparedStatement ps, int i) throws SQLException {
+//                            public void setValues(PreparedStatement ps, int i)
+//                            throws SQLException {
 //                                int index = atomicInteger.incrementAndGet();
 //
 //                                // CLOSE 상태 경매 중에서 랜덤하게 선택
@@ -621,7 +624,8 @@
 //                                """,
 //                        new BatchPreparedStatementSetter() {
 //                            @Override
-//                            public void setValues(PreparedStatement ps, int i) throws SQLException {
+//                            public void setValues(PreparedStatement ps, int i)
+//                            throws SQLException {
 //                                int index = atomicInteger.incrementAndGet();
 //
 //                                // 멤버 ID는 2~21 범위에서 선택 (기존 코드와 동일한 범위)
