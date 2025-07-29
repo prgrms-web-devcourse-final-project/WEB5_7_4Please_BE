@@ -41,7 +41,6 @@ class AuctionEndTest extends MockMvcBaseAcceptTest {
                 "상세 주소",
                 "12345",
                 "010-1234-5678",
-                pastStartTime,
                 THREE, // 3일 기간 (이미 종료됨)
                 BigDecimal.valueOf(10000L),
                 null
@@ -114,7 +113,6 @@ class AuctionEndTest extends MockMvcBaseAcceptTest {
                 "상세 주소",
                 "12345",
                 "010-1234-5678",
-                currentStartTime,
                 THREE,
                 BigDecimal.valueOf(10000L),
                 null

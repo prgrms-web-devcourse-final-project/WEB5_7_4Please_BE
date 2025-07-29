@@ -8,6 +8,7 @@ import static com.deal4u.fourplease.testutil.TestUtils.genProduct;
 import static com.deal4u.fourplease.testutil.TestUtils.genProductList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -38,6 +39,7 @@ import com.deal4u.fourplease.global.exception.GlobalException;
 import com.deal4u.fourplease.global.scheduler.AuctionScheduleService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -105,6 +107,8 @@ class AuctionServiceTests {
                 .duration(auctionWithoutId.getDuration())
                 .build();
 
+        LocalDateTime startDate = LocalDateTime.now();
+
         when(productService.save(productDto)).thenReturn(product);
         when(auctionRepository.save(any(Auction.class))).thenReturn(savedAuctionWithId);
 
@@ -119,9 +123,10 @@ class AuctionServiceTests {
 
         assertThat(auction.getStartingPrice()).isEqualTo(req.startingPrice());
         assertThat(auction.getInstantBidPrice()).isEqualTo(req.buyNowPrice());
-        assertThat(auction.getDuration().getStartTime()).isEqualTo(req.startDate());
-        assertThat(auction.getDuration().getEndTime()).isEqualTo(
-                req.startDate().plusDays(bidPeriod));
+        assertThat(auction.getDuration().getStartTime()).isCloseTo(startDate,
+                within(5, ChronoUnit.SECONDS));
+        assertThat(auction.getDuration().getEndTime()).isCloseTo(
+                startDate.plusDays(bidPeriod), within(5, ChronoUnit.SECONDS));
         assertThat(auction.getStatus()).isEqualTo(AuctionStatus.OPEN);
     }
 
@@ -580,8 +585,9 @@ class AuctionServiceTests {
                 BigDecimal.valueOf(2000000L),
                 3
         );
-        List<String> productImageUrls = List.of("http://example.com/image1.jpg",
-                "http://example.com/image2.jpg");
+      
+        List<String> productImageUrls =
+                List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg");
 
         ProductImageListResponse productImageListResponse = mock(ProductImageListResponse.class);
 
@@ -616,8 +622,10 @@ class AuctionServiceTests {
                 BigDecimal.valueOf(2000000L),
                 3
         );
-        List<String> productImageUrls = List.of("http://example.com/image1.jpg",
-                "http://example.com/image2.jpg");
+
+        List<String> productImageUrls =
+                List.of("http://example.com/image1.jpg", "http://example.com/image2.jpg");
+
         ProductImageListResponse productImageListResponse = mock(ProductImageListResponse.class);
 
         // Mocking 설정

@@ -49,9 +49,6 @@ public record AuctionCreateRequest(
                 message = "휴대폰 번호 형식이 올바르지 않습니다.")
         String phone,
 
-        @NotNull(message = "경매 시작 날짜를 입력해 주세요.")
-        LocalDateTime startDate,
-
         @NotNull(message = "경매 기간을 입력해 주세요.")
         BidPeriod bidPeriod,
 
@@ -67,6 +64,7 @@ public record AuctionCreateRequest(
 ) {
 
     public Auction toEntity(Product product) {
+        LocalDateTime startDate = LocalDateTime.now();
         return Auction.builder()
                 .product(product)
                 .startingPrice(startingPrice)

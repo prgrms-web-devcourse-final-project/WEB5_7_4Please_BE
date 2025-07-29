@@ -4,6 +4,7 @@ import static com.deal4u.fourplease.testutil.TestUtils.genAuctionCreateRequest;
 import static com.deal4u.fourplease.testutil.TestUtils.genMember;
 import static com.deal4u.fourplease.testutil.TestUtils.genProduct;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +21,7 @@ import com.deal4u.fourplease.domain.auction.service.AuctionService;
 import com.deal4u.fourplease.domain.auction.service.ProductService;
 import com.deal4u.fourplease.domain.member.entity.Member;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,14 +69,16 @@ class AuctionScheduleServiceTest {
         // when
         auctionService.save(req, member);
 
+        LocalDateTime startDate = auctionWithoutId.getDuration().getStartTime();
+
         // then - auction
         ArgumentCaptor<Auction> auctionCaptor = ArgumentCaptor.forClass(Auction.class);
         verify(auctionRepository).save(auctionCaptor.capture());
         Auction savedAuction = auctionCaptor.getValue();
 
         assertThat(savedAuction.getProduct()).isEqualTo(product);
-        assertThat(savedAuction.getDuration().getEndTime()).isEqualTo(
-                req.bidPeriod().getEndTime(req.startDate()));
+        assertThat(savedAuction.getDuration().getEndTime()).isCloseTo(
+                req.bidPeriod().getEndTime(startDate), within(5, ChronoUnit.SECONDS));
 
         // then - schedule
         ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
