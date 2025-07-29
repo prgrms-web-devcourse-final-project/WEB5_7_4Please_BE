@@ -10,7 +10,6 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -91,16 +90,9 @@ public class MemberService {
                 .redirectUrl(MAIN_REDIRECT_URL)
                 .build();
 
-        ResponseCookie refreshCookie = ResponseCookie
-                .from("refreshToken", tokenPair.refreshToken())
-                .httpOnly(true)
-                .secure(false) // 운영 환경에서는 true
-                .path("/")
-                .sameSite("None") // 운영 환경에서는 Strict
-                .maxAge(Duration.ofDays(7))
-                .build();
+        ResponseCookie responseCookie = jwtProvider.refreshTokenCookie(member);
         return ResponseEntity.status(HttpStatus.CREATED).header(
-                HttpHeaders.SET_COOKIE, refreshCookie.toString()
+                HttpHeaders.SET_COOKIE, responseCookie.toString()
         ).body(response);
     }
 

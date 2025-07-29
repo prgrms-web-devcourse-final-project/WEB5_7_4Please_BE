@@ -10,7 +10,6 @@ import com.deal4u.fourplease.domain.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+
     private static final String SIGNUP_REDIRECT_URL = "api/v1/signup";
     private final JwtProvider jwtProvider;
     private final AuthService authService;
@@ -31,7 +31,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+            Authentication authentication) throws IOException {
 
         log.info("SuccessHandler 실행됨");
         Customoauth2User oauth2User = (Customoauth2User) authentication.getPrincipal();
@@ -61,14 +61,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         // 새로운 JWT 발급
         TokenPair tokenPair = authService.createTokenPair(member);
         response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
-        ResponseCookie refreshCookie = ResponseCookie
-                .from("refreshToken", tokenPair.refreshToken())
-                .httpOnly(true)
-                .secure(false) // 운영 환경에서는 true
-                .path("/")
-                .sameSite("Lax") // 운영 환경에서는 Strict
-                .maxAge(Duration.ofDays(7))
-                .build();
+        ResponseCookie refreshCookie = jwtProvider.refreshTokenCookie(member);
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         response.setContentType("application/json");
