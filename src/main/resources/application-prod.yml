@@ -1,6 +1,3 @@
-# application.yml의 경우 개발 시에 Local에서 사용하기 때문에,
-# gitIgnore을 통해서 제외하고 Commit해야합니다.
-# gitIgnore은 dev에서 설정해두었으나 git add 시에 한 번 확인해주세요.
 jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: 900000   # 15분 (ms 단위)
@@ -22,8 +19,8 @@ spring:
     defer-datasource-initialization: true
   sql:
     init:
-      #애플리케이션 시작 시 항상 data.sql / schema.sql 실행
       mode: always
+      data-locations: classpath:data-prod.sql
   mail:
     host: ${SMTP_HOST}       # SMTP 서버 호스트
     port: ${SMTP_PORT}               # SMTP 서버 포트
@@ -35,9 +32,6 @@ spring:
           auth: true            # 사용자 인증 시도 여부
           starttls:
             enable: true        # starttls 활성화 여부
-  h2:
-    console:
-      enabled: true
   security:
     oauth2:
       client:
@@ -45,7 +39,7 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: "http://localhost:5173/auth/google"
+            redirect-uri: "http://localhost:8080/api/v1/login/google"
             scope:
               - email
               - profile
@@ -54,7 +48,7 @@ spring:
             client-secret: ${NAVER_CLIENT_SECRET} # 발급 받은 Client Secret
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:5173/auth/naver"
+            redirect-uri: "http://localhost:8080/login/oauth2/code/naver"
             scope:
               - name
               - email
@@ -70,7 +64,6 @@ spring:
 
 toss:
   secret-key: ${TOSS_SECRET_KEY}
-
 deal4u:
   host-url: ${HOST_URL}
   s3:
@@ -78,4 +71,3 @@ deal4u:
     bucket-name: ${S3_BUCKET_NAME}
     secret-key: ${S3_SECRET_KEY}
     access-key: ${S3_ACCESS_KEY}
-
