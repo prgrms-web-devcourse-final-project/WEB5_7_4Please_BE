@@ -11,12 +11,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import java.security.Key;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -44,6 +46,16 @@ public class JwtProvider {
                 generateAccessToken(member),
                 generateRefreshToken(member)
         );
+    }
+
+    public ResponseCookie refreshTokenCookie(Member member) {
+        return  ResponseCookie
+                .from("refreshToken", generateRefreshToken(member))
+                .httpOnly(true)
+                .secure(false) // 운영 환경에서는 true
+                .path("/")
+                .maxAge(Duration.ofMillis(refreshTokenExpiration))
+                .build();
     }
 
     private String generateAccessToken(Member member) {
