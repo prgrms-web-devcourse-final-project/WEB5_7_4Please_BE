@@ -43,7 +43,6 @@ public class TestUtils {
     }
 
     public static Member genMember() {
-        // TODO: Member 추후 확인 필요
         return Member.builder()
                 .memberId(1L)
                 .email("user1@user.com")
@@ -55,7 +54,6 @@ public class TestUtils {
     }
 
     public static Member genMemberById(Long id) {
-        // TODO: Member 추후 확인 필요
         return Member.builder()
                 .memberId(id)
                 .email("user1@user.com")
