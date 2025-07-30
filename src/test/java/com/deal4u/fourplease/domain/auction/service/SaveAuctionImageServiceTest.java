@@ -48,7 +48,7 @@ class SaveAuctionImageServiceTest {
         assertThat(new SavePath(path, fileName + ".png")).isEqualTo(
                 fakeFileSaver.getInputSavePath());
         assertThat(file).isEqualTo(fakeFileSaver.getFile());
-        assertThat(upload.imageUrls().getFirst()).isEqualTo("https://test.com" + path);
+        assertThat(upload.imageUrls().getFirst()).isEqualTo("http://test.com" + path);
     }
 
     @Test
