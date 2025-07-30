@@ -17,6 +17,7 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
             + "FROM Wishlist w "
             + "WHERE w.deleted = false "
             + "AND w.memberId = :memberId")
+    @EntityGraph(attributePaths = {"auction.product"})
     Page<Wishlist> findAll(Pageable pageable, @Param("memberId") Long memberId);
 
     @Query("SELECT w.auction.auctionId "
@@ -35,12 +36,12 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
             + "WHERE w.wishlistId = :wishlistId "
             + "AND w.deleted = false")
     Optional<Wishlist> findById(@Param("wishlistId") Long wishlistId);
-  
+
     @Query("SELECT w "
             + "FROM Wishlist w "
             + "WHERE w.deleted = false "
             + "AND w.auction = :auction "
             + "AND w.memberId = :memberId")
     Optional<Wishlist> findWishlist(@Param("auction") Auction auction,
-            @Param("memberId") Long memberId);
+                                    @Param("memberId") Long memberId);
 }
