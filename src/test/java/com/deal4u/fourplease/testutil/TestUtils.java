@@ -20,7 +20,6 @@ import com.deal4u.fourplease.domain.member.entity.Member;
 import com.deal4u.fourplease.domain.member.entity.Role;
 import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.wishlist.dto.WishlistResponse;
-import com.deal4u.fourplease.domain.wishlist.entity.Wishlist;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -95,7 +94,6 @@ public class TestUtils {
                 "101동 102호",
                 "000000",
                 "010-0000-0000",
-                LocalDateTime.now(),
                 BidPeriod.THREE,
                 BigDecimal.valueOf(100000),
                 null

@@ -53,7 +53,7 @@ public class SaveAuctionImageService {
         try {
             URI originalUri = url.toURI();
             URI modifiedUri = new URI(
-                    originalUri.getScheme(),
+                    "http",
                     hostUrl,
                     originalUri.getPath(),
                     originalUri.getQuery(),

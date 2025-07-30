@@ -1,7 +1,6 @@
 package com.deal4u.fourplease.domain.auction.repository;
 
 import com.deal4u.fourplease.domain.auction.entity.Auction;
-import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import jakarta.persistence.Tuple;
 import java.util.List;
 import java.util.Optional;
@@ -153,10 +152,9 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     );
 
     @Query("SELECT COUNT(a) FROM Auction a "
-            + "WHERE a.product.seller.member.memberId = :sellerId "
-            + "AND a.status = :status")
-    Integer countBySellerIdAndStatus(@Param("sellerId") Long sellerId,
-                                     @Param("status") AuctionStatus status);
+            + "WHERE a.deleted = false "
+            + "AND a.product.seller.member.memberId = :sellerId ")
+    Integer countBySellerId(@Param("sellerId") Long sellerId);
 
     @EntityGraph(attributePaths = {"product"})
     List<Auction> findByAuctionIdIn(List<Long> auctionIds);
@@ -169,13 +167,15 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
                    a.status AS status,
                    p.name AS name,
                    p.thumbnailUrl AS thumbnailUrl,
-                   p.category as category
+                   p.category as category,
+                   o.orderId.orderId as orderId
             FROM Auction a
             JOIN a.product p
+            LEFT JOIN Order o ON o.auction.auctionId = a.auctionId
             WHERE a.product.seller.member.memberId = :memberId
             AND a.deleted = FALSE
             ORDER BY a.createdAt DESC
             """)
     Page<Tuple> findAllAuctionHistoryByMemberId(@Param("memberId") Long memberId,
-                                                Pageable pageable);
+            Pageable pageable);
 }

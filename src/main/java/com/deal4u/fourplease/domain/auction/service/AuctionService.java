@@ -142,8 +142,7 @@ public class AuctionService {
         Double averageRating = reviewRepository.getAverageRatingBySellerMemberId(sellerId);
         averageRating = averageRating != null ? averageRating : 0.0;
 
-        Integer completedDeals =
-                auctionRepository.countBySellerIdAndStatus(sellerId, AuctionStatus.CLOSE);
+        Integer completedDeals = auctionRepository.countBySellerId(sellerId);
 
         return new SellerInfoResponse(
                 sellerId,

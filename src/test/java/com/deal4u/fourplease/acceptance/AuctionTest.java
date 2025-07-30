@@ -19,7 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,7 +56,6 @@ class AuctionTest extends MockMvcBaseAcceptTest {
                 "몰라~~",
                 "624803",
                 "010-1111-1111",
-                LocalDateTime.now(),
                 THREE,
                 BigDecimal.valueOf(10000L),
                 null
@@ -130,7 +128,6 @@ class AuctionTest extends MockMvcBaseAcceptTest {
                 "몰라~~",
                 "624803",
                 "010-1111-1111",
-                LocalDateTime.now(),
                 THREE,
                 BigDecimal.valueOf(10000L),
                 null
@@ -175,7 +172,6 @@ class AuctionTest extends MockMvcBaseAcceptTest {
                 "상세주소1",
                 "123456",
                 "010-1111-1111",
-                LocalDateTime.now(),
                 THREE,
                 BigDecimal.valueOf(50000L),
                 null
@@ -192,7 +188,6 @@ class AuctionTest extends MockMvcBaseAcceptTest {
                 "상세주소2",
                 "234567",
                 "010-2222-2222",
-                LocalDateTime.now(),
                 THREE,
                 BigDecimal.valueOf(40000L),
                 null
@@ -260,7 +255,6 @@ class AuctionTest extends MockMvcBaseAcceptTest {
                 "상세주소1",
                 "123456",
                 "010-1111-1111",
-                LocalDateTime.now(),
                 THREE,
                 BigDecimal.valueOf(10000L),
                 null
@@ -277,7 +271,6 @@ class AuctionTest extends MockMvcBaseAcceptTest {
                 "상세주소2",
                 "234567",
                 "010-2222-2222",
-                LocalDateTime.now(),
                 THREE,
                 BigDecimal.valueOf(20000L),
                 null
@@ -377,7 +370,6 @@ class AuctionTest extends MockMvcBaseAcceptTest {
                 "상세주소",
                 "123456",
                 "010-1111-1111",
-                LocalDateTime.now(),
                 THREE,
                 startingPrice,
                 instantBidPrice  // 즉시 구매가 설정

@@ -98,8 +98,10 @@ class MyPageAuctionHistoryServiceTest {
     void getMyAuctionHistoryWhenOpenAuctionWithHighestPrice() {
         // given
         Long auctionId = 101L;
+        String orderId = "ORDER-2024-001";
         setupTupleMock(auctionId, "thumb1.jpg", digitalDevicesCategory, "테스트 상품1",
-                BigDecimal.valueOf(50000), now.plusDays(1), now.minusDays(1), AuctionStatus.OPEN);
+                BigDecimal.valueOf(50000), now.plusDays(1), now.minusDays(1), AuctionStatus.OPEN,
+                orderId);
 
         Page<Tuple> tuplePage = new PageImpl<>(List.of(tuple), pageable, 1);
 
@@ -133,6 +135,7 @@ class MyPageAuctionHistoryServiceTest {
         assertThat(history.bidderName()).isEqualTo("낙찰자 없음");
         assertThat(history.paymentDeadline()).isEmpty();
         assertThat(history.status()).isEqualTo(AuctionStatus.OPEN);
+        assertThat(history.orderId()).isEqualTo(orderId);
     }
 
     @Test
@@ -140,9 +143,10 @@ class MyPageAuctionHistoryServiceTest {
     void getMyAuctionHistoryWhenOpenAuctionNoBid() {
         // given
         Long auctionId = 102L;
+        String orderId = null;
         setupTupleMock(auctionId, "thumb2.jpg", clothesCategory, "입찰 없는 상품",
                 BigDecimal.valueOf(10000), now.plusHours(10), now.minusHours(5),
-                AuctionStatus.OPEN);
+                AuctionStatus.OPEN, orderId);
 
         Page<Tuple> tuplePage = new PageImpl<>(List.of(tuple), pageable, 1);
 
@@ -175,6 +179,7 @@ class MyPageAuctionHistoryServiceTest {
         assertThat(history.paymentDeadline()).isEmpty();
         assertThat(history.status()).isEqualTo(AuctionStatus.OPEN);
         assertThat(history.category().getName()).isEqualTo(clothesCategory.getName());
+        assertThat(history.orderId()).isNull();
     }
 
     @Test
@@ -182,11 +187,12 @@ class MyPageAuctionHistoryServiceTest {
     void getMyAuctionHistoryWhenClosedAuctionSuccessfulBid() {
         // given
         Long auctionId = 103L;
+        String orderId = "ORDER-2024-002";
         LocalDateTime paymentDeadline = now.plusDays(2);
 
         setupTupleMock(auctionId, "thumb3.jpg", furnitureCategory, "낙찰된 상품",
                 BigDecimal.valueOf(100000), now.minusDays(1), now.minusDays(5),
-                AuctionStatus.CLOSE);
+                AuctionStatus.CLOSE, orderId);
 
         Page<Tuple> tuplePage = new PageImpl<>(List.of(tuple), pageable, 1);
 
@@ -221,6 +227,7 @@ class MyPageAuctionHistoryServiceTest {
                 paymentDeadline.format(PAYMENT_DEADLINE_FORMAT));
         assertThat(history.status()).isEqualTo(AuctionStatus.CLOSE);
         assertThat(history.category().getName()).isEqualTo(furnitureCategory.getName());
+        assertThat(history.orderId()).isEqualTo(orderId);
     }
 
     @Test
@@ -228,8 +235,10 @@ class MyPageAuctionHistoryServiceTest {
     void getMyAuctionHistoryWhenFailedAuction() {
         // given
         Long auctionId = 104L;
+        String orderId = null;
         setupTupleMock(auctionId, "thumb4.jpg", booksCategory, "폐찰된 상품",
-                BigDecimal.valueOf(20000), now.minusHours(1), now.minusDays(3), AuctionStatus.FAIL);
+                BigDecimal.valueOf(20000), now.minusHours(1), now.minusDays(3), AuctionStatus.FAIL,
+                orderId);
 
         Page<Tuple> tuplePage = new PageImpl<>(List.of(tuple), pageable, 1);
 
@@ -262,6 +271,7 @@ class MyPageAuctionHistoryServiceTest {
         assertThat(history.paymentDeadline()).isEmpty();
         assertThat(history.status()).isEqualTo(AuctionStatus.FAIL);
         assertThat(history.category().getName()).isEqualTo(booksCategory.getName());
+        assertThat(history.orderId()).isNull();
     }
 
     @Test
@@ -269,8 +279,10 @@ class MyPageAuctionHistoryServiceTest {
     void getMyAuctionHistoryWhenSuccessfulBidderIsNull() {
         // given
         Long auctionId = 105L;
+        String orderId = "ORDER-2024-003";
         setupTupleMock(auctionId, "thumb5.jpg", digitalDevicesCategory, "낙찰자 미상 상품",
-                BigDecimal.valueOf(30000), now.minusDays(1), now.minusDays(2), AuctionStatus.CLOSE);
+                BigDecimal.valueOf(30000), now.minusDays(1), now.minusDays(2), AuctionStatus.CLOSE,
+                orderId);
 
         Page<Tuple> tuplePage = new PageImpl<>(List.of(tuple), pageable, 1);
 
@@ -297,12 +309,12 @@ class MyPageAuctionHistoryServiceTest {
         assertThat(result.getContent()).hasSize(1);
         MyPageAuctionHistory history = result.getContent().getFirst();
         assertThat(history.bidderName()).isEqualTo("낙찰자 없음");
+        assertThat(history.orderId()).isEqualTo(orderId);
     }
 
     private void setupTupleMock(Long auctionId, String thumbnailUrl, Category category, String name,
                                 BigDecimal instantBidPrice, LocalDateTime endTime,
-                                LocalDateTime startTime,
-                                AuctionStatus status) {
+                                LocalDateTime startTime, AuctionStatus status, String orderId) {
         given(tuple.get("auctionId")).willReturn(auctionId);
         given(tuple.get("thumbnailUrl")).willReturn(thumbnailUrl);
         given(tuple.get("category")).willReturn(category);
@@ -311,5 +323,6 @@ class MyPageAuctionHistoryServiceTest {
         given(tuple.get("endTime")).willReturn(endTime);
         given(tuple.get("startTime")).willReturn(startTime);
         given(tuple.get("status")).willReturn(status);
+        given(tuple.get("orderId")).willReturn(orderId);
     }
 }

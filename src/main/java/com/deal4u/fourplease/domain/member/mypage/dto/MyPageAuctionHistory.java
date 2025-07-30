@@ -18,7 +18,8 @@ public record MyPageAuctionHistory(
         String bidderName,
         String paymentDeadline,
         LocalDateTime createdAt,
-        AuctionStatus status
+        AuctionStatus status,
+        String orderId
 ) {
 
 }
