@@ -48,7 +48,8 @@ public class SecurityConfig {
     public SecurityFilterChain authFileChain(HttpSecurity http) throws Exception {
         return http
                 .securityMatcher(
-                        "/api/v1/auth/**",
+                        "/api/v1/auth/logout",
+                        "/api/v1/auth/members",
                         "/api/v1/my/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -90,7 +91,8 @@ public class SecurityConfig {
                                 "/api/v1/login/**",
                                 "/api/v1/signup/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui/**"
+                                "/swagger-ui/**",
+                                "/api/v1/auth/reissue/token"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET).permitAll()
                         .anyRequest().authenticated()

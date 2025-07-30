@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private static final String SIGNUP_REDIRECT_URL = "api/v1/signup";
     private final JwtProvider jwtProvider;
     private final AuthService authService;
     private final MemberService memberService;
@@ -31,7 +30,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException {
+                                        Authentication authentication) throws IOException {
 
         log.info("SuccessHandler 실행됨");
         Customoauth2User oauth2User = (Customoauth2User) authentication.getPrincipal();
