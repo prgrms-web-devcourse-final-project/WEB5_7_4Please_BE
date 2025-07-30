@@ -99,11 +99,28 @@ public class MyPageAuctionHistoryService {
                                     : "";
 
                     HighestBid highestBid = highestBidMap.get(auctionId);
-                    BigDecimal maxPrice = (BigDecimal) highestBid.highestBid();
+
+
+                    BigDecimal maxPrice = null;
+
+
+                    if (highestBid == null) {
+                        maxPrice = BigDecimal.ZERO;
+                    } else {
+                        maxPrice = (BigDecimal) highestBid.highestBid();
+                    }
 
                     CountBid countBid = bidCountMap.get(auctionId);
 
-                    BigDecimal bidCount = BigDecimal.valueOf(countBid.countBid());
+
+                    BigDecimal bidCount = null;
+
+                    if (countBid == null) {
+                        bidCount = BigDecimal.ZERO;
+                    } else {
+                        bidCount = BigDecimal.valueOf(countBid.countBid());
+                    }
+
 
                     SuccessfulBidder successfulBidder = successfulBidderMap.get(auctionId);
 
