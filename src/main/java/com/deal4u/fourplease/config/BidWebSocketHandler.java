@@ -45,8 +45,7 @@ public class BidWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status)
-            throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         // Client Connection Lost
         Long auctionId = getAuctionId(session);
         Set<WebSocketSession> roomSessions = rooms.get(auctionId);

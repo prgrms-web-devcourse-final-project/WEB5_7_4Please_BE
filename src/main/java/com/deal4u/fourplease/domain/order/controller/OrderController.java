@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -35,14 +36,14 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "경매나 사용자가 없음")
     })
     @ResponseStatus(HttpStatus.CREATED)
-    public String createOrder(
+    public Map<String, String> createOrder(
             @PathVariable @Positive Long auctionId,
             @PathVariable String type,
             @RequestBody @Valid OrderCreateRequest orderCreateRequest,
             @AuthenticationPrincipal Member member
     ) {
-        return orderService.saveOrder(auctionId, type, member.getMemberId(),
-                orderCreateRequest);
+        return Map.of("orderId", orderService.saveOrder(auctionId, type, member.getMemberId(),
+                orderCreateRequest));
     }
 
     @GetMapping("/orders/{orderId}")
