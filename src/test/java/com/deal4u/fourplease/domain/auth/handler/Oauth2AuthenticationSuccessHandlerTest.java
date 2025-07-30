@@ -52,7 +52,7 @@ class Oauth2AuthenticationSuccessHandlerTest {
     private ByteArrayOutputStream outputStream;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         outputStream = new ByteArrayOutputStream();
 
         when(authentication.getPrincipal()).thenReturn(customOauth2User);
@@ -86,6 +86,7 @@ class Oauth2AuthenticationSuccessHandlerTest {
         // given
         String accessToken = "access.jwt.token";
         String refreshToken = "refresh.jwt.token";
+        String nickname = "홍길동";
         when(member.getStatus()).thenReturn(Status.ACTIVE);
         when(authService.createTokenPair(member)).thenReturn(
                 new TokenPair(accessToken, refreshToken));
@@ -98,6 +99,9 @@ class Oauth2AuthenticationSuccessHandlerTest {
                 .maxAge(Duration.ofMillis(1000))
                 .build();
         when(jwtProvider.refreshTokenCookie(member)).thenReturn(cookie);
+        when(member.getNickName()).thenReturn(nickname);
+        when(response.getWriter()).thenReturn(new PrintWriter(outputStream, true));
+
 
         // when
         successHandler.onAuthenticationSuccess(request, response, authentication);
@@ -106,6 +110,7 @@ class Oauth2AuthenticationSuccessHandlerTest {
         verify(response).setHeader("Authorization", "Bearer " + accessToken);
         verify(response).addHeader(eq("Set-Cookie"), contains("refreshToken=")); // 쿠키 확인
         verify(response).setStatus(HttpServletResponse.SC_OK);
-        assertThat(outputStream.toString()).isBlank();
+        String expectedJson = String.format("{\"nickname\":\"%s\"}", nickname);
+        assertThat(outputStream.toString()).contains(expectedJson);
     }
 }

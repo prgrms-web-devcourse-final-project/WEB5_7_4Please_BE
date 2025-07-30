@@ -36,6 +36,17 @@ public class AuthEndpoinConfig {
                                     )
                             )
             ));
+
+            Content successContent = new Content();
+            successContent.putAll(Map.of(
+                    "application/json", new MediaType()
+                            .schema(new ObjectSchema()
+                                    .addProperties("nickname", new StringSchema()
+                                            .example("홍길동")
+                                    )
+                            )
+            ));
+
             PathItem loginCallbackPath = new PathItem().get(
                     new Operation()
                             .tags(List.of("Member"))

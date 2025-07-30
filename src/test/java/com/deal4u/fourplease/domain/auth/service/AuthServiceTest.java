@@ -2,11 +2,13 @@ package com.deal4u.fourplease.domain.auth.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.hamcrest.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.deal4u.fourplease.domain.auth.dto.TokenPair;
+import com.deal4u.fourplease.domain.auth.entity.BlacklistedToken;
 import com.deal4u.fourplease.domain.auth.repository.BlacklistedTokenRepository;
 import com.deal4u.fourplease.domain.auth.token.JwtProvider;
 import com.deal4u.fourplease.domain.member.entity.Member;
@@ -14,11 +16,13 @@ import com.deal4u.fourplease.domain.member.entity.Status;
 import com.deal4u.fourplease.domain.member.repository.MemberRepository;
 import com.deal4u.fourplease.global.exception.ErrorCode;
 import com.deal4u.fourplease.global.exception.GlobalException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -54,18 +58,24 @@ class AuthServiceTest {
     @DisplayName("기존 리프레시 토큰이 유효하면 새 토큰들을 반환")
     void refreshAccessToken_validToken_returnsNewTokenPair() {
         // given
+        LocalDateTime expirationTime = LocalDateTime.now().plusDays(7);
         doNothing().when(jwtProvider).validateOrThrow(refreshToken);
         when(jwtProvider.getTokenType(refreshToken)).thenReturn("refresh");
         when(blacklistedTokenRepository.existsByToken(refreshToken)).thenReturn(false);
         when(jwtProvider.getEmailFromToken(refreshToken)).thenReturn(email);
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
         when(jwtProvider.generateTokenPair(member)).thenReturn(tokenPair);
+        when(jwtProvider.getExpirationFromToken(refreshToken)).thenReturn(expirationTime);
+
 
         // when
         TokenPair result = authService.refreshAccessToken(refreshToken);
 
         // then
         assertThat(result).isEqualTo(tokenPair);
+        ArgumentCaptor<BlacklistedToken> captor = ArgumentCaptor.forClass(BlacklistedToken.class);
+        verify(blacklistedTokenRepository).save(captor.capture());
+        assertThat(captor.getValue().getExpiryDate()).isEqualTo(expirationTime);
     }
 
     @Test

@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private static final String SIGNUP_REDIRECT_URL = "api/v1/signup";
     private final JwtProvider jwtProvider;
     private final AuthService authService;
     private final MemberService memberService;
@@ -31,7 +30,7 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException {
+                                        Authentication authentication) throws IOException {
 
         log.info("SuccessHandler 실행됨");
         Customoauth2User oauth2User = (Customoauth2User) authentication.getPrincipal();
@@ -48,7 +47,12 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(String.format("{\"token\":\"%s\"}", token));
+            response.getWriter().write(
+                    String.format(
+                            "{\"token\":\"%s\"}",
+                            token
+                    )
+            );
             response.getWriter().flush();
             return;
         }
@@ -58,6 +62,17 @@ public class Oauth2AuthenticationSuccessHandler implements AuthenticationSuccess
         response.setHeader("Authorization", "Bearer " + tokenPair.accessToken());
         ResponseCookie refreshCookie = jwtProvider.refreshTokenCookie(member);
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(
+                String.format(
+                        "{\"nickname\":\"%s\"}",
+                        member.getNickName()
+                )
+        );
+        response.getWriter().flush();
+
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }
