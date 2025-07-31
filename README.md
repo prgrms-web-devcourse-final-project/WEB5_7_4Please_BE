@@ -233,29 +233,77 @@
 
 ### 메인페이지
 
+<img width="2926" height="1322" alt="image" src="https://github.com/user-attachments/assets/f1987683-65a1-4207-8962-58d8b75207e8" />
+
+
+<img width="2938" height="1674" alt="image" src="https://github.com/user-attachments/assets/50040b3d-4167-4db7-afef-214d36ddac3b" />
+
+
 ### 로그인 및 회원가입
+
+<img width="2054" height="1056" alt="image" src="https://github.com/user-attachments/assets/65d10620-973b-42fe-9b47-590834037667" />
+
 
 ### 마이페이지 내 입찰 내역
 
+<img width="2934" height="1202" alt="image" src="https://github.com/user-attachments/assets/4ffbbed8-3577-4844-a1d5-e9295b76649e" />
+
+
+
 ### 마이페이지 내 판매 내역
+
+<img width="2842" height="1286" alt="image" src="https://github.com/user-attachments/assets/15992f51-be6f-42c8-a936-112ca2530d4e" />
+
 
 ### 마이페이지 관심 목록
 
+
+<img width="2906" height="1552" alt="image" src="https://github.com/user-attachments/assets/780b5467-8f15-4cf9-a824-ebcadb0e747c" />
+
 ### 판매하기
+
+<img width="2910" height="1588" alt="image" src="https://github.com/user-attachments/assets/039ef350-5589-4cc9-a93d-1b7b6f524a04" />
+
+
 
 ### 경매 결제
 
+
+
+<img width="1952" height="1342" alt="image" src="https://github.com/user-attachments/assets/82201d49-b967-49c3-8819-65c660c10ddf" />
+
+
 ### 결제하기
+
+<img width="2742" height="1594" alt="image" src="https://github.com/user-attachments/assets/6c692fa5-3852-4183-bc5a-1ffdede1c64d" />
+
+### 상품 설명
+
+<img width="2894" height="1500" alt="image" src="https://github.com/user-attachments/assets/0fcd677f-3823-44df-be22-95f8f4fd1fb1" />
+
+### 실시간 입찰 내역
+
+<img width="2876" height="1440" alt="image" src="https://github.com/user-attachments/assets/0b11114e-da1c-4730-9f25-d8492776a869" />
+
 
 ### 입찰하기
 
+<img width="2788" height="1604" alt="image" src="https://github.com/user-attachments/assets/3a4436dc-78a7-487c-90ce-f481b9b26369" />
+
+### 판매자 정보 조회
+
+<img width="2824" height="1520" alt="image" src="https://github.com/user-attachments/assets/4b4b425b-b870-4892-8a37-52c724d6e154" />
+
+
 ### 전체 상품 조회
 
-### 인기 상품 조회
-
-### 새로 등록된 상품 조회
+<img width="2890" height="1628" alt="image" src="https://github.com/user-attachments/assets/64c1e069-6db2-4ff4-8e11-0ea879d3177f" />
 
 ### 상품 검색
+
+<img width="2940" height="1622" alt="image" src="https://github.com/user-attachments/assets/980b61e1-a2f4-47b0-bb5d-e05ea030ec11" />
+
+
 
 ## 협업 방식
 
