@@ -248,6 +248,15 @@ http://www.deal4u.shop/
 
 <img width="2054" height="1056" alt="image" src="https://github.com/user-attachments/assets/65d10620-973b-42fe-9b47-590834037667" />
 
+### 회원탈퇴 
+
+<img width="1616" height="1266" alt="image" src="https://github.com/user-attachments/assets/9f7d0274-2f6c-4e5d-a39f-14ef844c7040" />
+
+### 회원 정보 수정
+
+<img width="1372" height="930" alt="image" src="https://github.com/user-attachments/assets/d5b5b8cc-012c-4f65-99d3-ee21f972057d" />
+
+
 
 ### 마이페이지 내 입찰 내역
 
