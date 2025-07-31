@@ -221,9 +221,9 @@ http://www.deal4u.shop/
 ## 🛠️ 프로젝트 아키텍쳐
 
 ### 시스템 아키텍처
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/d5e5b76a-1919-40f5-905e-e4992c18a769" />
 
 ### ERD
-
 ![image](https://github.com/user-attachments/assets/2730b0b1-c9fe-4d3f-8a86-aad772285211)
 
 ### Event Storming
