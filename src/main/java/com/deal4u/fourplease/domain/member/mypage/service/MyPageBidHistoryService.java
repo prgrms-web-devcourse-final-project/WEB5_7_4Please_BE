@@ -130,8 +130,8 @@ public class MyPageBidHistoryService {
 
         return switch (auctionStatus) {
             case OPEN -> "OPEN";
-            case CLOSE ->
-                    settlementInfo == null ? "FAIL" : determineStatusBySettlement(settlementInfo);
+            case CLOSE -> !isSuccessfulBidder ? "CLOSE" :
+                    determineStatusBySettlement(settlementInfo);
             case FAIL -> "FAIL";
             default -> "UNKNOWN";
         };

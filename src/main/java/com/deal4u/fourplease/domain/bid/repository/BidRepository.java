@@ -136,7 +136,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             SELECT b.bidTime as bidTime,
                    b.auction.auctionId as auctionId,
                    b.bidId as bidId,
-                   b.price as myBidPrice
+                   b.price as myBidPrice,
+                   b.isSuccessfulBidder as isSuccessfulBidder
             FROM Bid b
             WHERE b.bidder.member.memberId = :memberId
             ORDER BY b.bidTime DESC
