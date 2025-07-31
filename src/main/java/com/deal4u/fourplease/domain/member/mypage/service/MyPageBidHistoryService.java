@@ -1,5 +1,7 @@
 package com.deal4u.fourplease.domain.member.mypage.service;
 
+import static com.deal4u.fourplease.global.exception.ErrorCode.AUCTION_NOT_FOUND;
+
 import com.deal4u.fourplease.domain.auction.entity.Auction;
 import com.deal4u.fourplease.domain.auction.entity.AuctionStatus;
 import com.deal4u.fourplease.domain.auction.repository.AuctionRepository;
@@ -75,11 +77,11 @@ public class MyPageBidHistoryService {
                     LocalDateTime bidTime = (LocalDateTime) tuple.get("bidTime");
                     Long bidId = (Long) tuple.get("bidId");
                     BigDecimal myBidPrice = (BigDecimal) tuple.get("myBidPrice");
+                    boolean isSuccessfulBidder = (boolean) tuple.get("isSuccessfulBidder");
 
                     Auction auction = auctionMap.get(auctionId);
                     if (auction == null) {
-                        throw new IllegalArgumentException(
-                                "Auction not found for ID: " + auctionId);
+                        throw AUCTION_NOT_FOUND.toException();
                     }
 
                     BigDecimal highestPrice =
@@ -87,7 +89,7 @@ public class MyPageBidHistoryService {
                     SettlementInfo settlementInfo = settlementMap.get(auctionId);
 
                     String displayStatus =
-                            determineDisplayStatus(auction, settlementInfo);
+                            determineDisplayStatus(auction, settlementInfo, isSuccessfulBidder);
 
                     String paymentDeadline =
                             settlementInfo != null && settlementInfo.paymentDeadline() != null
@@ -122,7 +124,8 @@ public class MyPageBidHistoryService {
     }
 
     @SuppressWarnings("checkstyle:Indentation")
-    private String determineDisplayStatus(Auction auction, SettlementInfo settlementInfo) {
+    private String determineDisplayStatus(Auction auction, SettlementInfo settlementInfo,
+                                          boolean isSuccessfulBidder) {
         AuctionStatus auctionStatus = auction.getStatus();
 
         return switch (auctionStatus) {
@@ -130,7 +133,7 @@ public class MyPageBidHistoryService {
             case CLOSE ->
                     settlementInfo == null ? "FAIL" : determineStatusBySettlement(settlementInfo);
             case FAIL -> "FAIL";
-            default -> "문제";
+            default -> "UNKNOWN";
         };
     }
 
