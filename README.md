@@ -221,7 +221,8 @@ http://www.deal4u.shop/
 ## 🛠️ 프로젝트 아키텍쳐
 
 ### 시스템 아키텍처
-<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/d5e5b76a-1919-40f5-905e-e4992c18a769" />
+![Image](https://github-production-user-asset-6210df.s3.amazonaws.com/83149998/472885248-d5e5b76a-1919-40f5-905e-e4992c18a769.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250731%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250731T082330Z&X-Amz-Expires=300&X-Amz-Signature=05f0efc8f971f676f78c18620c3bdd8c3cf55e905ab1ea15ce68d37c51200235&X-Amz-SignedHeaders=host)
+
 
 ### ERD
 ![image](https://github.com/user-attachments/assets/2730b0b1-c9fe-4d3f-8a86-aad772285211)
