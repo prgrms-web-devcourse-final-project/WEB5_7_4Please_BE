@@ -2,6 +2,11 @@
 
 # 💰팀 4줘 프로젝트 - Deal4U
 
+## 🔗 배포 링크
+http://www.deal4u.shop/
+
+---
+
 ## 💸프로젝트 소개
 
 실시간 입찰 시스템을 도입한 중고 경매 플랫폼입니다.
@@ -132,15 +137,15 @@
 <table>
   <tr>
     <td align="center">
-      <img src="" width="80" alt="AWS EC2"/><br/>
+      <img width="80" height="80" alt="Arch_Amazon-EC2_64" src="https://github.com/user-attachments/assets/01382739-5936-4a3a-86cd-4895d378083d" /><br/>
       <sub><b>AWS EC2</b></sub>
     </td>
     <td align="center">
-      <img src="" width="80" alt="AWS RDS"/><br/>
+      <img width="80" height="80" alt="Arch_Amazon-RDS_64" src="https://github.com/user-attachments/assets/91e61cef-cb1c-4467-ab94-06bf9e38ad9f" /><br/>
       <sub><b>AWS RDS</b></sub>
     </td>
     <td align="center">
-      <img src="" width="80" alt="AWS S3"/><br/>
+      <img width="80" height="80" alt="Arch_Amazon-S3-on-Outposts_64" src="https://github.com/user-attachments/assets/30dff4d1-c46d-4ddf-b78a-8191562dabff" /><br/>
       <sub><b>AWS S3</b></sub>
     </td>
     <td align="center">
@@ -149,6 +154,7 @@
     </td>
   </tr>
 </table>
+
 
 ----
 
