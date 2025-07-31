@@ -1,5 +1,3 @@
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/prgrms-be-devcourse/NBE5-7-2-Team07)
-
 # 💰팀 4줘 프로젝트 - Deal4U
 
 ## 🔗 배포 링크
@@ -229,8 +227,9 @@ http://www.deal4u.shop/
 ![image](https://github.com/user-attachments/assets/2730b0b1-c9fe-4d3f-8a86-aad772285211)
 
 ### Event Storming
+🔗 https://www.figma.com/board/HZuZEZW5UYBZts5dtOUH8j/4%EC%A4%98---Domain?node-id=0-1&p=f&t=8vs7HYxMhQDLTEYJ-0
 
-![image](https://www.figma.com/board/HZuZEZW5UYBZts5dtOUH8j/4%EC%A4%98---Domain?node-id=0-1&p=f&t=fsYVza5X469p3dK0-0)
+<img width="1026" height="1064" alt="image" src="https://github.com/user-attachments/assets/e2e1ca89-8489-41bf-b483-8b160ebddfd1" />
 
 
 ----
@@ -459,4 +458,4 @@ deal4u/
 ```
 ### 🤔 전체적인 과정 및 개선 과정
 
-[표시할 내용] (https://file.notion.so/f/f/4d91257b-018b-46a4-a866-7598ef6e44aa/63121092-e098-41a6-b4fb-227181f6cec3/%EA%B2%B0%EA%B3%BC_%EB%B3%B4%EA%B3%A0%EC%84%9C_4%ED%8C%80(%EC%A4%91%EA%B3%A0_%EA%B2%BD%EB%A7%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC).pdf?table=block&id=24115a01-2054-8039-a59f-ebda8b3e54c6&spaceId=4d91257b-018b-46a4-a866-7598ef6e44aa&expirationTimestamp=1754006400000&signature=yJ9o0tQoQIncyICufKGqls35C79-6iJLxTqWj3YuPxw&downloadName=%EA%B2%B0%EA%B3%BC+%EB%B3%B4%EA%B3%A0%EC%84%9C+4%ED%8C%80%28%EC%A4%91%EA%B3%A0+%EA%B2%BD%EB%A7%A4+%ED%94%8C%EB%9E%AB%ED%8F%BC%29.pdf)
+🔗 https://file.notion.so/f/f/4d91257b-018b-46a4-a866-7598ef6e44aa/63121092-e098-41a6-b4fb-227181f6cec3/%EA%B2%B0%EA%B3%BC_%EB%B3%B4%EA%B3%A0%EC%84%9C_4%ED%8C%80(%EC%A4%91%EA%B3%A0_%EA%B2%BD%EB%A7%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC).pdf?table=block&id=24115a01-2054-8039-a59f-ebda8b3e54c6&spaceId=4d91257b-018b-46a4-a866-7598ef6e44aa&expirationTimestamp=1754006400000&signature=yJ9o0tQoQIncyICufKGqls35C79-6iJLxTqWj3YuPxw&downloadName=%EA%B2%B0%EA%B3%BC+%EB%B3%B4%EA%B3%A0%EC%84%9C+4%ED%8C%80%28%EC%A4%91%EA%B3%A0+%EA%B2%BD%EB%A7%A4+%ED%94%8C%EB%9E%AB%ED%8F%BC%29.pdf
