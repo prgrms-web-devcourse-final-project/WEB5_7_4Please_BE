@@ -468,4 +468,4 @@ deal4u/
 ```
 ### 🤔 전체적인 과정 및 개선 과정
 
-🔗 https://file.notion.so/f/f/4d91257b-018b-46a4-a866-7598ef6e44aa/63121092-e098-41a6-b4fb-227181f6cec3/%EA%B2%B0%EA%B3%BC_%EB%B3%B4%EA%B3%A0%EC%84%9C_4%ED%8C%80(%EC%A4%91%EA%B3%A0_%EA%B2%BD%EB%A7%A4_%ED%94%8C%EB%9E%AB%ED%8F%BC).pdf?table=block&id=24115a01-2054-8039-a59f-ebda8b3e54c6&spaceId=4d91257b-018b-46a4-a866-7598ef6e44aa&expirationTimestamp=1754006400000&signature=yJ9o0tQoQIncyICufKGqls35C79-6iJLxTqWj3YuPxw&downloadName=%EA%B2%B0%EA%B3%BC+%EB%B3%B4%EA%B3%A0%EC%84%9C+4%ED%8C%80%28%EC%A4%91%EA%B3%A0+%EA%B2%BD%EB%A7%A4+%ED%94%8C%EB%9E%AB%ED%8F%BC%29.pdf
+https://drive.google.com/file/d/1IE1btKPtBWgmXyU6UdWVOH_c1h7N-uWT/view?usp=sharing
